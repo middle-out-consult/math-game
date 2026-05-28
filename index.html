@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SparkMath Quest</title>
+    <title>SparkMath Arcade</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script>
       tailwind.config = {
         theme: {
@@ -12,597 +13,293 @@
             fontFamily: {
               display: ["Trebuchet MS", "Verdana", "sans-serif"],
             },
-            boxShadow: {
-              cozy: "0 12px 28px -8px rgba(30, 41, 59, 0.25)",
-            },
             keyframes: {
               wobble: {
                 "0%": { transform: "translateX(0)" },
-                "15%": { transform: "translateX(-7px) rotate(-1.5deg)" },
-                "30%": { transform: "translateX(6px) rotate(1.5deg)" },
-                "45%": { transform: "translateX(-5px) rotate(-1deg)" },
-                "60%": { transform: "translateX(4px) rotate(0.8deg)" },
-                "75%": { transform: "translateX(-2px) rotate(-0.5deg)" },
+                "20%": { transform: "translateX(-8px) rotate(-2deg)" },
+                "40%": { transform: "translateX(6px) rotate(1deg)" },
+                "60%": { transform: "translateX(-4px) rotate(-1deg)" },
+                "80%": { transform: "translateX(2px) rotate(0.5deg)" },
                 "100%": { transform: "translateX(0)" },
               },
-              pulseGlow: {
-                "0%, 100%": { transform: "scale(1)" },
-                "50%": { transform: "scale(1.01)" },
+              popIn: {
+                "0%": { transform: "scale(0.94)", opacity: "0.75" },
+                "100%": { transform: "scale(1)", opacity: "1" },
               },
             },
             animation: {
               wobble: "wobble 380ms ease-in-out",
-              pulseGlow: "pulseGlow 750ms ease-in-out",
+              popIn: "popIn 220ms ease-out",
             },
           },
         },
       };
     </script>
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-      :root {
-        color-scheme: light;
-      }
-
       body {
         touch-action: manipulation;
       }
 
-      .glass-panel {
-        backdrop-filter: blur(6px);
-        background: rgba(255, 255, 255, 0.72);
-      }
-
       .numpad-btn {
-        user-select: none;
         -webkit-tap-highlight-color: transparent;
+        user-select: none;
       }
     </style>
   </head>
-  <body
-    class="min-h-screen bg-gradient-to-br from-stone-100 via-amber-50 to-violet-100 text-slate-800 font-display"
-  >
-    <canvas id="rewardCanvas" class="fixed inset-0 pointer-events-none z-30"></canvas>
+  <body class="h-screen overflow-hidden bg-gradient-to-br from-amber-100 via-rose-100 to-violet-100 font-display text-slate-800">
+    <canvas id="rewardCanvas" class="pointer-events-none fixed inset-0 z-30"></canvas>
 
-    <main class="relative z-10 mx-auto max-w-5xl px-4 py-5 sm:px-6 sm:py-8">
-      <button
-        id="toggleAssessorBtn"
-        class="fixed right-4 top-4 z-40 rounded-full bg-violet-600 p-3 text-white shadow-lg transition hover:bg-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-300"
-        aria-label="Toggle teacher and assessor panel"
-      >
-        <i data-lucide="line-chart"></i>
-      </button>
-
-      <section
-        id="welcomeScreen"
-        class="mx-auto mt-8 max-w-xl rounded-3xl border border-amber-200/80 bg-white/90 p-6 shadow-cozy sm:mt-16 sm:p-8"
-      >
-        <div class="mb-6 text-center">
-          <div class="mx-auto mb-4 inline-flex rounded-full bg-amber-100 p-3 text-amber-600">
-            <i data-lucide="sparkles"></i>
-          </div>
-          <h1 class="text-3xl font-bold text-indigo-700 sm:text-4xl">SparkMath Quest</h1>
-          <p class="mt-3 text-base text-slate-600">
-            A joyful mental math adventure with rewards, streaks, and coaching support.
-          </p>
-        </div>
-        <label for="playerNameInput" class="mb-2 block text-sm font-semibold text-slate-700"
-          >Your Name</label
-        >
-        <input
-          id="playerNameInput"
-          type="text"
-          maxlength="28"
-          class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-lg outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100"
-          placeholder="Type your name to begin"
-        />
-        <button
-          id="startBtn"
-          class="mt-4 w-full rounded-2xl bg-emerald-500 px-4 py-3 text-lg font-bold text-white shadow-md transition hover:bg-emerald-400 focus:outline-none focus:ring-4 focus:ring-emerald-200"
-        >
-          Start Adventure
-        </button>
-      </section>
-
-      <section id="gameScreen" class="hidden">
-        <header class="mb-5 grid gap-3 md:grid-cols-3">
-          <div class="glass-panel rounded-2xl border border-slate-200 p-4 shadow-cozy">
-            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Player</p>
-            <p id="playerGreeting" class="mt-1 text-xl font-bold text-indigo-700"></p>
-            <p class="mt-2 text-sm text-slate-600">
-              Keep building confidence, one problem at a time.
+    <main class="relative z-10 mx-auto h-screen max-w-6xl p-2 sm:p-3">
+      <section id="landingView" class="h-full rounded-3xl border border-white/70 bg-white/75 p-4 shadow-2xl backdrop-blur-sm sm:p-6">
+        <div class="flex h-full flex-col gap-4">
+          <header class="text-center">
+            <p class="text-xs font-bold uppercase tracking-[0.2em] text-violet-600">Mental Math Arcade</p>
+            <h1 class="mt-1 text-3xl font-black text-indigo-700 sm:text-4xl">Pick Your Math Quest</h1>
+            <p class="mx-auto mt-1 max-w-2xl text-sm font-semibold text-slate-600 sm:text-base">
+              Choose a game mode and jump straight into fast, playful, confidence-building brain training.
             </p>
-          </div>
-          <div class="glass-panel rounded-2xl border border-slate-200 p-4 shadow-cozy">
-            <div class="flex items-center justify-between">
-              <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Level</p>
-              <span
-                id="rankPill"
-                class="rounded-full bg-violet-100 px-2 py-1 text-xs font-semibold text-violet-700"
-              ></span>
-            </div>
-            <p id="levelValue" class="mt-1 text-3xl font-black text-violet-700">1</p>
-            <div class="mt-2 h-2 w-full rounded-full bg-slate-200">
-              <div id="xpBar" class="h-2 rounded-full bg-violet-500 transition-all"></div>
-            </div>
-            <p id="xpText" class="mt-2 text-sm font-semibold text-slate-600"></p>
-          </div>
-          <div class="glass-panel rounded-2xl border border-slate-200 p-4 shadow-cozy">
-            <div class="flex items-center justify-between">
-              <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Streak</p>
-              <span class="inline-flex items-center gap-1 text-amber-600">
-                <i data-lucide="flame" class="h-4 w-4"></i>
-              </span>
-            </div>
-            <p id="streakValue" class="mt-1 text-3xl font-black text-amber-600">0</p>
-            <p id="streakMilestone" class="mt-2 text-sm font-semibold text-slate-600">
-              Start your streak.
-            </p>
-          </div>
-        </header>
+          </header>
 
-        <section class="mb-5 grid gap-4 lg:grid-cols-[1fr_320px]">
-          <article
-            id="problemCard"
-            class="rounded-3xl border border-indigo-100 bg-white/90 p-5 shadow-cozy transition-all duration-300 sm:p-6"
-          >
-            <div class="mb-4 flex flex-wrap items-center gap-2">
-              <span
-                class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-indigo-700"
-                >Problem</span
-              >
-              <span
-                id="badgeToast"
-                class="hidden rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700"
-              ></span>
-            </div>
-            <h2
-              id="equationText"
-              class="text-center text-3xl font-black tracking-tight text-slate-800 sm:text-5xl"
-            ></h2>
-            <div class="mx-auto mt-4 max-w-sm rounded-2xl bg-slate-50 p-4 text-center">
-              <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Your Answer</p>
-              <p id="answerDisplay" class="mt-2 min-h-[2rem] text-3xl font-black text-indigo-700">—</p>
-            </div>
-            <p
-              id="feedbackText"
-              class="mt-4 rounded-2xl bg-indigo-50 px-4 py-3 text-center text-sm font-semibold text-indigo-700 sm:text-base"
-            >
-              Enter your answer with the custom number pad or keyboard.
-            </p>
-            <div id="supportHint" class="mt-3 hidden rounded-2xl bg-emerald-50 p-3 text-sm text-emerald-700"></div>
-          </article>
-
-          <aside class="glass-panel rounded-3xl border border-slate-200 p-4 shadow-cozy">
-            <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-slate-500">Challenge Setup</h3>
-            <div class="space-y-3 text-sm">
-              <div>
-                <p class="mb-2 font-semibold text-slate-700">Operations</p>
-                <div class="grid grid-cols-2 gap-2">
-                  <label class="inline-flex items-center gap-2">
-                    <input id="opAdd" type="checkbox" class="h-4 w-4 accent-indigo-600" checked />
-                    <span>Add (+)</span>
-                  </label>
-                  <label class="inline-flex items-center gap-2">
-                    <input id="opSub" type="checkbox" class="h-4 w-4 accent-indigo-600" checked />
-                    <span>Subtract (-)</span>
-                  </label>
-                  <label class="inline-flex items-center gap-2">
-                    <input id="opMul" type="checkbox" class="h-4 w-4 accent-indigo-600" checked />
-                    <span>Multiply (×)</span>
-                  </label>
-                  <label class="inline-flex items-center gap-2">
-                    <input id="opDiv" type="checkbox" class="h-4 w-4 accent-indigo-600" checked />
-                    <span>Divide (÷)</span>
-                  </label>
-                </div>
-              </div>
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <p class="mb-1 font-semibold text-slate-700">Operand A</p>
-                  <div class="grid grid-cols-2 gap-1">
-                    <input
-                      id="rangeAMin"
-                      type="number"
-                      class="rounded-lg border border-slate-300 px-2 py-1"
-                      value="1"
-                      min="-999"
-                      max="999"
-                    />
-                    <input
-                      id="rangeAMax"
-                      type="number"
-                      class="rounded-lg border border-slate-300 px-2 py-1"
-                      value="12"
-                      min="-999"
-                      max="999"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <p class="mb-1 font-semibold text-slate-700">Operand B</p>
-                  <div class="grid grid-cols-2 gap-1">
-                    <input
-                      id="rangeBMin"
-                      type="number"
-                      class="rounded-lg border border-slate-300 px-2 py-1"
-                      value="1"
-                      min="-999"
-                      max="999"
-                    />
-                    <input
-                      id="rangeBMax"
-                      type="number"
-                      class="rounded-lg border border-slate-300 px-2 py-1"
-                      value="12"
-                      min="-999"
-                      max="999"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div>
-                <label for="complexitySelect" class="mb-1 block font-semibold text-slate-700">Equation Complexity</label>
-                <select id="complexitySelect" class="w-full rounded-lg border border-slate-300 px-2 py-2">
-                  <option value="2">Standard (2 terms)</option>
-                  <option value="3">Three terms</option>
-                  <option value="4">Four terms</option>
-                </select>
-              </div>
-              <label class="inline-flex items-center gap-2">
-                <input id="allowNegatives" type="checkbox" class="h-4 w-4 accent-indigo-600" />
-                <span>Allow negative subtraction results</span>
-              </label>
-              <button
-                id="applyConfigBtn"
-                class="w-full rounded-xl bg-indigo-600 px-3 py-2 font-bold text-white transition hover:bg-indigo-500"
-              >
-                Apply Challenge Rules
-              </button>
-              <div class="rounded-2xl border border-amber-200 bg-amber-50/80 p-3">
-                <div class="mb-2 flex items-center gap-2">
-                  <i data-lucide="group" class="h-4 w-4 text-amber-700"></i>
-                  <p class="text-xs font-bold uppercase tracking-wide text-amber-800">Grouping Coach</p>
-                </div>
-                <p id="groupingPrompt" class="text-xs font-semibold text-slate-700"></p>
-                <div class="mt-2 grid gap-2">
-                  <div id="groupingOptionX" class="rounded-xl bg-white/80 px-2 py-2 text-xs text-slate-700"></div>
-                  <div id="groupingOptionY" class="rounded-xl bg-white/80 px-2 py-2 text-xs text-slate-700"></div>
-                </div>
-                <p id="groupingRecommendation" class="mt-2 rounded-xl bg-emerald-100 px-2 py-2 text-xs font-semibold text-emerald-800"></p>
-              </div>
-            </div>
-          </aside>
-        </section>
-
-        <section class="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-white/90 p-4 shadow-cozy sm:p-5">
-          <h3 class="mb-3 text-center text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Number Pad
-          </h3>
-          <div id="numPad" class="grid grid-cols-3 gap-3">
-            <button class="numpad-btn rounded-2xl bg-slate-100 p-4 text-2xl font-black text-slate-700 transition hover:bg-slate-200 active:scale-95" data-key="1">1</button>
-            <button class="numpad-btn rounded-2xl bg-slate-100 p-4 text-2xl font-black text-slate-700 transition hover:bg-slate-200 active:scale-95" data-key="2">2</button>
-            <button class="numpad-btn rounded-2xl bg-slate-100 p-4 text-2xl font-black text-slate-700 transition hover:bg-slate-200 active:scale-95" data-key="3">3</button>
-            <button class="numpad-btn rounded-2xl bg-slate-100 p-4 text-2xl font-black text-slate-700 transition hover:bg-slate-200 active:scale-95" data-key="4">4</button>
-            <button class="numpad-btn rounded-2xl bg-slate-100 p-4 text-2xl font-black text-slate-700 transition hover:bg-slate-200 active:scale-95" data-key="5">5</button>
-            <button class="numpad-btn rounded-2xl bg-slate-100 p-4 text-2xl font-black text-slate-700 transition hover:bg-slate-200 active:scale-95" data-key="6">6</button>
-            <button class="numpad-btn rounded-2xl bg-slate-100 p-4 text-2xl font-black text-slate-700 transition hover:bg-slate-200 active:scale-95" data-key="7">7</button>
-            <button class="numpad-btn rounded-2xl bg-slate-100 p-4 text-2xl font-black text-slate-700 transition hover:bg-slate-200 active:scale-95" data-key="8">8</button>
-            <button class="numpad-btn rounded-2xl bg-slate-100 p-4 text-2xl font-black text-slate-700 transition hover:bg-slate-200 active:scale-95" data-key="9">9</button>
-            <button class="numpad-btn rounded-2xl bg-rose-100 p-4 text-xl font-black text-rose-700 transition hover:bg-rose-200 active:scale-95" data-key="backspace">⌫</button>
-            <button class="numpad-btn rounded-2xl bg-slate-100 p-4 text-2xl font-black text-slate-700 transition hover:bg-slate-200 active:scale-95" data-key="0">0</button>
-            <button class="numpad-btn rounded-2xl bg-emerald-500 p-4 text-xl font-black text-white transition hover:bg-emerald-400 active:scale-95" data-key="submit">Submit</button>
-          </div>
-        </section>
-        <section class="mx-auto mt-4 max-w-2xl rounded-3xl border border-violet-200 bg-violet-50/70 p-4 shadow-cozy sm:p-5">
-          <div class="mb-3 flex items-center justify-between gap-2">
-            <h3 class="inline-flex items-center gap-2 text-sm font-black uppercase tracking-wide text-violet-800">
-              <i data-lucide="brain-circuit" class="h-4 w-4"></i>
-              Number Pattern Recognition
-            </h3>
-            <button
-              id="newPatternBtn"
-              class="rounded-xl bg-violet-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-violet-500"
-            >
-              New Pattern
-            </button>
-          </div>
-          <p class="text-xs font-semibold text-slate-600">Find the next number in the pattern:</p>
-          <p id="patternSequence" class="mt-2 rounded-2xl bg-white/90 px-3 py-3 text-center text-xl font-black text-violet-700"></p>
-          <div class="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
+          <div class="mx-auto w-full max-w-md rounded-2xl bg-white/90 p-3 shadow-lg sm:p-4">
+            <label for="playerNameInput" class="mb-1 block text-sm font-bold text-slate-700">Player Name</label>
             <input
-              id="patternInput"
-              type="number"
-              class="rounded-xl border border-violet-200 bg-white px-3 py-2 text-base outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
-              placeholder="Next number"
+              id="playerNameInput"
+              maxlength="28"
+              placeholder="Type your name"
+              class="w-full rounded-xl border border-violet-200 bg-white px-3 py-2 text-base font-semibold outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
             />
-            <button
-              id="submitPatternBtn"
-              class="rounded-xl bg-emerald-500 px-4 py-2 font-bold text-white transition hover:bg-emerald-400"
-            >
-              Check Pattern
-            </button>
+            <p id="nameHint" class="mt-1 text-xs font-semibold text-slate-500">Your progress is saved automatically.</p>
           </div>
-          <p id="patternFeedback" class="mt-2 rounded-xl bg-violet-100 px-3 py-2 text-sm font-semibold text-violet-700">
-            Spot the rhythm, then enter the next number.
-          </p>
-        </section>
+
+          <div class="grid flex-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <button class="mode-btn rounded-2xl border border-indigo-200 bg-gradient-to-br from-indigo-100 to-indigo-200 p-4 text-left shadow-md transition hover:scale-[1.01]" data-mode="addition">
+              <div class="mb-1 inline-flex rounded-lg bg-indigo-600 p-2 text-white"><i data-lucide="plus"></i></div>
+              <p class="text-lg font-black text-indigo-800">Addition</p>
+              <p class="text-xs font-semibold text-indigo-700">Build speed with happy sums.</p>
+            </button>
+            <button class="mode-btn rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-100 to-orange-200 p-4 text-left shadow-md transition hover:scale-[1.01]" data-mode="subtraction">
+              <div class="mb-1 inline-flex rounded-lg bg-amber-600 p-2 text-white"><i data-lucide="minus"></i></div>
+              <p class="text-lg font-black text-amber-800">Subtraction</p>
+              <p class="text-xs font-semibold text-amber-700">Stay calm and subtract cleanly.</p>
+            </button>
+            <button class="mode-btn rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-100 to-emerald-200 p-4 text-left shadow-md transition hover:scale-[1.01]" data-mode="multiplication">
+              <div class="mb-1 inline-flex rounded-lg bg-emerald-600 p-2 text-white"><i data-lucide="x"></i></div>
+              <p class="text-lg font-black text-emerald-800">Multiplication</p>
+              <p class="text-xs font-semibold text-emerald-700">Find friendly factors fast.</p>
+            </button>
+            <button class="mode-btn rounded-2xl border border-rose-200 bg-gradient-to-br from-rose-100 to-pink-200 p-4 text-left shadow-md transition hover:scale-[1.01]" data-mode="division">
+              <div class="mb-1 inline-flex rounded-lg bg-rose-600 p-2 text-white"><i data-lucide="divide"></i></div>
+              <p class="text-lg font-black text-rose-800">Division</p>
+              <p class="text-xs font-semibold text-rose-700">Practice whole-number quotients.</p>
+            </button>
+            <button class="mode-btn rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-100 to-fuchsia-200 p-4 text-left shadow-md transition hover:scale-[1.01]" data-mode="pattern">
+              <div class="mb-1 inline-flex rounded-lg bg-violet-600 p-2 text-white"><i data-lucide="brain-circuit"></i></div>
+              <p class="text-lg font-black text-violet-800">Pattern Recognition</p>
+              <p class="text-xs font-semibold text-violet-700">Spot number rhythms and predict next.</p>
+            </button>
+            <div class="rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-100 to-cyan-200 p-4 shadow-md">
+              <div class="mb-1 inline-flex rounded-lg bg-sky-600 p-2 text-white"><i data-lucide="sparkles"></i></div>
+              <p class="text-lg font-black text-sky-800">Bonus Tip</p>
+              <p class="text-xs font-semibold text-sky-700">If 6 and 7 show up together, keep an eye out for a joke drop.</p>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <section
-        id="assessorPanel"
-        class="fixed inset-x-2 bottom-2 z-40 hidden max-h-[58vh] overflow-auto rounded-3xl border border-slate-200 bg-white/95 p-4 shadow-2xl sm:inset-x-6 sm:bottom-5 sm:p-5"
-      >
-        <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <h3 class="text-lg font-black text-slate-800">Teacher & Assessor Panel</h3>
-          <div class="flex flex-wrap gap-2">
-            <button
-              id="copyJsonBtn"
-              class="rounded-xl bg-indigo-600 px-3 py-2 text-sm font-bold text-white hover:bg-indigo-500"
-            >
-              Copy JSON
+      <section id="gameView" class="hidden h-full rounded-3xl border border-white/70 bg-white/75 p-2 shadow-2xl backdrop-blur-sm sm:p-3">
+        <div id="gameShell" class="flex h-full flex-col gap-2 rounded-3xl p-2 sm:gap-3 sm:p-3">
+          <header class="grid gap-2 sm:grid-cols-[auto_1fr_auto] sm:items-center">
+            <button id="homeBtn" class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-sm font-bold text-white transition hover:bg-slate-700">
+              <i data-lucide="house" class="h-4 w-4"></i>
+              Menu
             </button>
-            <button
-              id="copyCsvBtn"
-              class="rounded-xl bg-emerald-600 px-3 py-2 text-sm font-bold text-white hover:bg-emerald-500"
-            >
-              Copy CSV
-            </button>
-          </div>
-        </div>
-        <div class="mb-3 grid gap-2 rounded-2xl bg-slate-50 p-3 text-sm sm:grid-cols-3">
-          <p><span class="font-bold">Problems Solved:</span> <span id="metricSolved">0</span></p>
-          <p><span class="font-bold">Avg Time:</span> <span id="metricAvgTime">0.00s</span></p>
-          <p><span class="font-bold">Fast/Impulsive Flags:</span> <span id="metricImpulsive">0</span></p>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="min-w-full text-left text-sm">
-            <thead class="border-b border-slate-200">
-              <tr class="text-slate-600">
-                <th class="px-2 py-2 font-bold">Equation</th>
-                <th class="px-2 py-2 font-bold">Attempts Before Correct</th>
-                <th class="px-2 py-2 font-bold">Response Time (s)</th>
-                <th class="px-2 py-2 font-bold">Working Style Analytics Badge</th>
-              </tr>
-            </thead>
-            <tbody id="historyTableBody"></tbody>
-          </table>
+            <div class="rounded-xl bg-white/80 px-3 py-2 text-center shadow">
+              <p id="modeTitle" class="text-lg font-black"></p>
+              <p id="jokeLine" class="min-h-[1rem] text-xs font-bold text-slate-600"></p>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-center">
+              <div class="rounded-xl bg-white/85 px-2 py-2 text-xs shadow"><p class="font-bold text-slate-500">XP</p><p id="xpText" class="text-sm font-black text-violet-700">0</p></div>
+              <div class="rounded-xl bg-white/85 px-2 py-2 text-xs shadow"><p class="font-bold text-slate-500">Level</p><p id="levelText" class="text-sm font-black text-indigo-700">1</p></div>
+              <div class="rounded-xl bg-white/85 px-2 py-2 text-xs shadow"><p class="font-bold text-slate-500">Streak</p><p id="streakText" class="text-sm font-black text-amber-600">0</p></div>
+            </div>
+          </header>
+
+          <section id="challengeCard" class="flex-1 rounded-2xl border border-white/70 bg-white/90 p-3 shadow-lg">
+            <div class="grid h-full gap-2 md:grid-cols-[1fr_330px] md:gap-3">
+              <div class="flex flex-col rounded-2xl bg-slate-50 p-3">
+                <p class="text-center text-xs font-bold uppercase tracking-wide text-slate-500">Current Challenge</p>
+                <p id="challengePrompt" class="mt-1 text-center text-3xl font-black text-slate-800 sm:text-4xl"></p>
+                <div class="mx-auto mt-2 w-full max-w-xs rounded-2xl bg-white p-3 text-center shadow-sm">
+                  <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Your Answer</p>
+                  <p id="answerDisplay" class="mt-1 min-h-[2.2rem] text-3xl font-black text-indigo-700">—</p>
+                </div>
+                <p id="feedbackText" class="mt-2 rounded-xl bg-indigo-100 px-3 py-2 text-center text-sm font-bold text-indigo-700">
+                  Tap numbers or use your keyboard.
+                </p>
+                <p id="coachText" class="mt-2 min-h-[2.5rem] rounded-xl bg-emerald-100 px-3 py-2 text-xs font-semibold text-emerald-800"></p>
+                <div class="mt-2 rounded-xl bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800">
+                  <span class="font-black">Grouping Coach:</span>
+                  <span id="groupingText">Grouping insights appear for 3-term expressions.</span>
+                </div>
+              </div>
+
+              <div class="flex h-full flex-col rounded-2xl bg-slate-50 p-2">
+                <p class="mb-1 text-center text-xs font-bold uppercase tracking-wide text-slate-500">Number Pad</p>
+                <div id="numPad" class="grid flex-1 grid-cols-3 gap-2">
+                  <button class="numpad-btn rounded-xl bg-slate-200 text-xl font-black text-slate-700" data-key="1">1</button>
+                  <button class="numpad-btn rounded-xl bg-slate-200 text-xl font-black text-slate-700" data-key="2">2</button>
+                  <button class="numpad-btn rounded-xl bg-slate-200 text-xl font-black text-slate-700" data-key="3">3</button>
+                  <button class="numpad-btn rounded-xl bg-slate-200 text-xl font-black text-slate-700" data-key="4">4</button>
+                  <button class="numpad-btn rounded-xl bg-slate-200 text-xl font-black text-slate-700" data-key="5">5</button>
+                  <button class="numpad-btn rounded-xl bg-slate-200 text-xl font-black text-slate-700" data-key="6">6</button>
+                  <button class="numpad-btn rounded-xl bg-slate-200 text-xl font-black text-slate-700" data-key="7">7</button>
+                  <button class="numpad-btn rounded-xl bg-slate-200 text-xl font-black text-slate-700" data-key="8">8</button>
+                  <button class="numpad-btn rounded-xl bg-slate-200 text-xl font-black text-slate-700" data-key="9">9</button>
+                  <button class="numpad-btn rounded-xl bg-rose-300 text-xl font-black text-rose-800" data-key="backspace">⌫</button>
+                  <button class="numpad-btn rounded-xl bg-slate-200 text-xl font-black text-slate-700" data-key="0">0</button>
+                  <button class="numpad-btn rounded-xl bg-emerald-500 text-lg font-black text-white" data-key="submit">Submit</button>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
       </section>
     </main>
 
-    <div
-      id="levelUpModal"
-      class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/45 p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="levelUpTitle"
-    >
-      <div class="max-w-md rounded-3xl bg-white p-6 text-center shadow-2xl">
-        <div class="mx-auto mb-3 inline-flex rounded-full bg-amber-100 p-3 text-amber-600">
-          <i data-lucide="crown"></i>
-        </div>
-        <h3 id="levelUpTitle" class="text-3xl font-black text-violet-700">Level Up!</h3>
-        <p id="levelUpText" class="mt-3 text-base font-semibold text-slate-700"></p>
-        <button
-          id="closeLevelModalBtn"
-          class="mt-5 rounded-2xl bg-violet-600 px-4 py-2 font-bold text-white hover:bg-violet-500"
-        >
-          Keep Going
-        </button>
-      </div>
-    </div>
-
-    <div
-      id="scaffoldModal"
-      class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/45 p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="scaffoldTitle"
-    >
-      <div class="max-w-lg rounded-3xl bg-white p-6 shadow-2xl">
-        <div class="mb-3 flex items-center gap-2 text-indigo-700">
-          <i data-lucide="lightbulb"></i>
-          <h3 id="scaffoldTitle" class="text-2xl font-black">Let's Solve It Together</h3>
-        </div>
-        <div id="scaffoldBody" class="space-y-2 text-sm text-slate-700"></div>
-        <button
-          id="closeScaffoldModalBtn"
-          class="mt-4 rounded-2xl bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-500"
-        >
-          Got It
-        </button>
-      </div>
-    </div>
-
     <script>
       (() => {
-        const STORAGE_KEY = "sparkMathProfileV1";
-        const RANKS = [
-          "Curious Spark",
-          "Quick Thinker",
-          "Number Ranger",
-          "Pattern Navigator",
-          "Logic Champion",
-          "Mental Math Master",
-          "Grand Strategist",
+        const STORAGE_KEY = "sparkMathArcadeV2";
+
+        const THEMES = {
+          addition: {
+            title: "Addition Arena",
+            shell: "from-indigo-100 via-sky-100 to-cyan-100",
+            titleColor: "text-indigo-700",
+            op: "+",
+          },
+          subtraction: {
+            title: "Subtraction Street",
+            shell: "from-amber-100 via-orange-100 to-yellow-100",
+            titleColor: "text-amber-700",
+            op: "-",
+          },
+          multiplication: {
+            title: "Multiplication Mountain",
+            shell: "from-emerald-100 via-lime-100 to-teal-100",
+            titleColor: "text-emerald-700",
+            op: "×",
+          },
+          division: {
+            title: "Division Dock",
+            shell: "from-rose-100 via-pink-100 to-fuchsia-100",
+            titleColor: "text-rose-700",
+            op: "÷",
+          },
+          pattern: {
+            title: "Pattern Playground",
+            shell: "from-violet-100 via-purple-100 to-fuchsia-100",
+            titleColor: "text-violet-700",
+            op: null,
+          },
+        };
+
+        const jokes67 = [
+          "Why is 6 nervous around 7? Because 7 8 9.",
+          "6 and 7 walked into the problem; 6 checked if 9 was safe.",
+          "If you see 6 next to 7, lock up your 9s.",
         ];
 
         const ui = {
-          welcomeScreen: document.getElementById("welcomeScreen"),
-          gameScreen: document.getElementById("gameScreen"),
+          landingView: document.getElementById("landingView"),
+          gameView: document.getElementById("gameView"),
+          gameShell: document.getElementById("gameShell"),
           playerNameInput: document.getElementById("playerNameInput"),
-          startBtn: document.getElementById("startBtn"),
-          playerGreeting: document.getElementById("playerGreeting"),
-          levelValue: document.getElementById("levelValue"),
-          rankPill: document.getElementById("rankPill"),
-          xpBar: document.getElementById("xpBar"),
-          xpText: document.getElementById("xpText"),
-          streakValue: document.getElementById("streakValue"),
-          streakMilestone: document.getElementById("streakMilestone"),
-          equationText: document.getElementById("equationText"),
+          nameHint: document.getElementById("nameHint"),
+          modeButtons: Array.from(document.querySelectorAll(".mode-btn")),
+          homeBtn: document.getElementById("homeBtn"),
+          modeTitle: document.getElementById("modeTitle"),
+          jokeLine: document.getElementById("jokeLine"),
+          challengePrompt: document.getElementById("challengePrompt"),
           answerDisplay: document.getElementById("answerDisplay"),
           feedbackText: document.getElementById("feedbackText"),
-          supportHint: document.getElementById("supportHint"),
-          badgeToast: document.getElementById("badgeToast"),
-          groupingPrompt: document.getElementById("groupingPrompt"),
-          groupingOptionX: document.getElementById("groupingOptionX"),
-          groupingOptionY: document.getElementById("groupingOptionY"),
-          groupingRecommendation: document.getElementById("groupingRecommendation"),
-          patternSequence: document.getElementById("patternSequence"),
-          patternInput: document.getElementById("patternInput"),
-          submitPatternBtn: document.getElementById("submitPatternBtn"),
-          newPatternBtn: document.getElementById("newPatternBtn"),
-          patternFeedback: document.getElementById("patternFeedback"),
-          problemCard: document.getElementById("problemCard"),
-          applyConfigBtn: document.getElementById("applyConfigBtn"),
+          coachText: document.getElementById("coachText"),
+          groupingText: document.getElementById("groupingText"),
           numPad: document.getElementById("numPad"),
-          assessorPanel: document.getElementById("assessorPanel"),
-          toggleAssessorBtn: document.getElementById("toggleAssessorBtn"),
-          historyTableBody: document.getElementById("historyTableBody"),
-          metricSolved: document.getElementById("metricSolved"),
-          metricAvgTime: document.getElementById("metricAvgTime"),
-          metricImpulsive: document.getElementById("metricImpulsive"),
-          copyJsonBtn: document.getElementById("copyJsonBtn"),
-          copyCsvBtn: document.getElementById("copyCsvBtn"),
-          levelUpModal: document.getElementById("levelUpModal"),
-          levelUpText: document.getElementById("levelUpText"),
-          closeLevelModalBtn: document.getElementById("closeLevelModalBtn"),
-          scaffoldModal: document.getElementById("scaffoldModal"),
-          scaffoldBody: document.getElementById("scaffoldBody"),
-          closeScaffoldModalBtn: document.getElementById("closeScaffoldModalBtn"),
-          opAdd: document.getElementById("opAdd"),
-          opSub: document.getElementById("opSub"),
-          opMul: document.getElementById("opMul"),
-          opDiv: document.getElementById("opDiv"),
-          rangeAMin: document.getElementById("rangeAMin"),
-          rangeAMax: document.getElementById("rangeAMax"),
-          rangeBMin: document.getElementById("rangeBMin"),
-          rangeBMax: document.getElementById("rangeBMax"),
-          complexitySelect: document.getElementById("complexitySelect"),
-          allowNegatives: document.getElementById("allowNegatives"),
+          xpText: document.getElementById("xpText"),
+          levelText: document.getElementById("levelText"),
+          streakText: document.getElementById("streakText"),
           rewardCanvas: document.getElementById("rewardCanvas"),
-        };
-
-        const defaults = {
-          settings: {
-            operations: { "+": true, "-": true, "*": true, "/": true },
-            rangeA: { min: 1, max: 12 },
-            rangeB: { min: 1, max: 12 },
-            complexity: 2,
-            allowNegatives: false,
-          },
         };
 
         const state = {
           profile: null,
-          settings: structuredClone(defaults.settings),
+          mode: null,
           currentInput: "",
-          currentProblem: null,
-          streak: 0,
-          bestStreak: 0,
+          currentChallenge: null,
           lockInput: false,
-          assessorOpen: false,
-          patternChallenge: null,
-          toastTimeout: null,
         };
 
         class AudioEngine {
           constructor() {
             this.ctx = null;
           }
-
-          ensureContext() {
-            if (!this.ctx) {
-              this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (this.ctx.state === "suspended") {
-              this.ctx.resume();
-            }
+          ensure() {
+            if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+            if (this.ctx.state === "suspended") this.ctx.resume();
           }
-
-          tone({ freq, type = "sine", start = 0, duration = 0.1, gain = 0.05 }) {
-            this.ensureContext();
-            const now = this.ctx.currentTime + start;
+          play(freq, duration = 0.1, type = "triangle", gainVal = 0.05, start = 0) {
+            this.ensure();
+            const t = this.ctx.currentTime + start;
             const osc = this.ctx.createOscillator();
-            const g = this.ctx.createGain();
+            const gain = this.ctx.createGain();
             osc.type = type;
-            osc.frequency.setValueAtTime(freq, now);
-            g.gain.setValueAtTime(0.0001, now);
-            g.gain.exponentialRampToValueAtTime(gain, now + 0.012);
-            g.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-            osc.connect(g);
-            g.connect(this.ctx.destination);
-            osc.start(now);
-            osc.stop(now + duration + 0.03);
+            osc.frequency.setValueAtTime(freq, t);
+            gain.gain.setValueAtTime(0.0001, t);
+            gain.gain.exponentialRampToValueAtTime(gainVal, t + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(t);
+            osc.stop(t + duration + 0.03);
           }
-
-          playTap() {
-            this.tone({ freq: 460, type: "square", duration: 0.05, gain: 0.018 });
+          tap() {
+            this.play(460, 0.05, "square", 0.02);
           }
-
-          playSuccess() {
-            [261.63, 329.63, 392.0, 523.25].forEach((f, i) => {
-              this.tone({ freq: f, type: "triangle", duration: 0.16, start: i * 0.07, gain: 0.05 });
-            });
+          success() {
+            [261.63, 329.63, 392, 523.25].forEach((f, i) => this.play(f, 0.15, "sine", 0.045, i * 0.07));
           }
-
-          playScaffold() {
-            this.tone({ freq: 392.0, duration: 0.14, gain: 0.04 });
-            this.tone({ freq: 466.16, duration: 0.16, start: 0.08, gain: 0.04 });
-          }
-
-          playLevelUp() {
-            const sequence = [
-              [261.63, 329.63, 392.0],
-              [293.66, 369.99, 440.0],
-              [329.63, 415.3, 493.88],
-              [392.0, 523.25, 659.25],
-            ];
-            sequence.forEach((chord, step) => {
-              chord.forEach((freq) => {
-                this.tone({
-                  freq,
-                  type: "sine",
-                  start: step * 0.19,
-                  duration: 0.24,
-                  gain: 0.04,
-                });
-              });
+          levelUp() {
+            [[261.63, 329.63, 392], [329.63, 415.3, 523.25]].forEach((chord, step) => {
+              chord.forEach((f) => this.play(f, 0.24, "triangle", 0.035, step * 0.22));
             });
           }
         }
 
-        class RewardParticles {
+        class Particles {
           constructor(canvas) {
             this.canvas = canvas;
             this.ctx = canvas.getContext("2d");
-            this.particles = [];
+            this.items = [];
             this.running = false;
             this.resize();
             window.addEventListener("resize", () => this.resize());
           }
-
           resize() {
             this.canvas.width = window.innerWidth;
             this.canvas.height = window.innerHeight;
           }
-
-          burst(x, y, count = 36) {
-            const colors = ["#10b981", "#22c55e", "#6366f1", "#f43f5e", "#f59e0b", "#8b5cf6"];
+          burst(x, y, count = 30) {
+            const colors = ["#22c55e", "#6366f1", "#ec4899", "#f59e0b", "#06b6d4"];
             for (let i = 0; i < count; i += 1) {
-              const speed = 1 + Math.random() * 3;
-              const angle = (Math.PI * 2 * i) / count + Math.random() * 0.4;
-              this.particles.push({
+              const angle = (Math.PI * 2 * i) / count;
+              this.items.push({
                 x,
                 y,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed - 1.5,
-                size: 5 + Math.random() * 8,
-                life: 55 + Math.floor(Math.random() * 30),
-                shape: ["circle", "square", "triangle"][Math.floor(Math.random() * 3)],
+                vx: Math.cos(angle) * (1 + Math.random() * 3),
+                vy: Math.sin(angle) * (1 + Math.random() * 3) - 1.2,
+                life: 45 + Math.floor(Math.random() * 25),
+                size: 4 + Math.random() * 6,
                 color: colors[Math.floor(Math.random() * colors.length)],
-                rotation: Math.random() * Math.PI,
               });
             }
             if (!this.running) {
@@ -610,830 +307,389 @@
               this.loop();
             }
           }
-
-          drawShape(p) {
-            this.ctx.save();
-            this.ctx.translate(p.x, p.y);
-            this.ctx.rotate(p.rotation);
-            this.ctx.fillStyle = p.color;
-            if (p.shape === "circle") {
-              this.ctx.beginPath();
-              this.ctx.arc(0, 0, p.size * 0.5, 0, Math.PI * 2);
-              this.ctx.fill();
-            } else if (p.shape === "square") {
-              this.ctx.fillRect(-p.size * 0.45, -p.size * 0.45, p.size * 0.9, p.size * 0.9);
-            } else {
-              this.ctx.beginPath();
-              this.ctx.moveTo(0, -p.size * 0.6);
-              this.ctx.lineTo(p.size * 0.55, p.size * 0.45);
-              this.ctx.lineTo(-p.size * 0.55, p.size * 0.45);
-              this.ctx.closePath();
-              this.ctx.fill();
-            }
-            this.ctx.restore();
-          }
-
           loop() {
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.particles = this.particles.filter((p) => p.life > 0);
-            this.particles.forEach((p) => {
+            const ctx = this.ctx;
+            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.items = this.items.filter((p) => p.life > 0);
+            this.items.forEach((p) => {
               p.life -= 1;
-              p.vy += 0.04;
               p.x += p.vx;
               p.y += p.vy;
-              p.rotation += 0.08;
-              this.ctx.globalAlpha = Math.max(0, p.life / 80);
-              this.drawShape(p);
-              this.ctx.globalAlpha = 1;
+              p.vy += 0.04;
+              ctx.globalAlpha = Math.max(0, p.life / 60);
+              ctx.fillStyle = p.color;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.size * 0.5, 0, Math.PI * 2);
+              ctx.fill();
             });
-            if (this.particles.length > 0) {
+            ctx.globalAlpha = 1;
+            if (this.items.length) {
               requestAnimationFrame(() => this.loop());
             } else {
-              this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
               this.running = false;
             }
           }
         }
 
         const audio = new AudioEngine();
-        const particles = new RewardParticles(ui.rewardCanvas);
+        const particles = new Particles(ui.rewardCanvas);
 
-        function clampRange(min, max) {
-          const a = Number.isFinite(min) ? min : 1;
-          const b = Number.isFinite(max) ? max : 12;
-          return { min: Math.min(a, b), max: Math.max(a, b) };
-        }
-
-        function randInt(min, max) {
-          return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-
-        function pickRandom(arr) {
-          return arr[Math.floor(Math.random() * arr.length)];
-        }
-
-        function getEnabledOperations() {
-          const ops = Object.entries(state.settings.operations)
-            .filter(([, enabled]) => enabled)
-            .map(([op]) => op);
-          return ops.length ? ops : ["+"];
-        }
-
-        function pickFromRange(range) {
-          return randInt(range.min, range.max);
-        }
-
-        function computeAnswer(op, terms) {
-          if (op === "+") return terms.reduce((sum, n) => sum + n, 0);
-          if (op === "-") return terms.slice(1).reduce((acc, n) => acc - n, terms[0]);
-          if (op === "*") return terms.reduce((acc, n) => acc * n, 1);
-          return terms.slice(1).reduce((acc, n) => acc / n, terms[0]);
-        }
-
-        function formatEquation(terms, op) {
-          const prettyOp = op === "*" ? "×" : op === "/" ? "÷" : op;
-          return `${terms.join(` ${prettyOp} `)} = ?`;
-        }
-
-        function generateDivisionTerms(termCount, rangeA, rangeB) {
-          const safeB = {
-            min: Math.max(rangeB.min, 1),
-            max: Math.max(rangeB.max, 1),
-          };
-          for (let outer = 0; outer < 250; outer += 1) {
-            const divisors = [];
-            for (let i = 1; i < termCount; i += 1) {
-              divisors.push(randInt(safeB.min, safeB.max));
-            }
-            const product = divisors.reduce((acc, n) => acc * n, 1);
-            const minQ = Math.ceil(rangeA.min / product);
-            const maxQ = Math.floor(rangeA.max / product);
-            if (minQ <= maxQ) {
-              const q = randInt(minQ, maxQ);
-              return [q * product, ...divisors];
-            }
-          }
-          return [rangeA.max, ...Array.from({ length: termCount - 1 }, () => 1)];
-        }
-
-        function generateSubtractionTerms(termCount, rangeA, rangeB, allowNegatives) {
-          if (allowNegatives) {
-            return [pickFromRange(rangeA), ...Array.from({ length: termCount - 1 }, () => pickFromRange(rangeB))];
-          }
-          const terms = [Math.max(0, pickFromRange(rangeA))];
-          let running = terms[0];
-          for (let i = 1; i < termCount; i += 1) {
-            const maxAllowed = Math.min(running, rangeB.max);
-            const minAllowed = Math.min(Math.max(0, rangeB.min), maxAllowed);
-            const sub = maxAllowed >= minAllowed ? randInt(minAllowed, maxAllowed) : 0;
-            terms.push(sub);
-            running -= sub;
-          }
-          return terms;
-        }
-
-        function generateTerms(operation, termCount, rangeA, rangeB) {
-          if (operation === "+") {
-            return [pickFromRange(rangeA), ...Array.from({ length: termCount - 1 }, () => pickFromRange(rangeB))];
-          }
-          if (operation === "-") {
-            return generateSubtractionTerms(termCount, rangeA, rangeB, state.settings.allowNegatives);
-          }
-          if (operation === "*") {
-            const safeA = clampRange(Math.max(1, rangeA.min), Math.max(2, rangeA.max));
-            const safeB = clampRange(Math.max(1, rangeB.min), Math.max(2, rangeB.max));
-            return [pickFromRange(safeA), ...Array.from({ length: termCount - 1 }, () => pickFromRange(safeB))];
-          }
-          return generateDivisionTerms(termCount, rangeA, rangeB);
-        }
-
-        function rankForLevel(level) {
-          return RANKS[Math.min(RANKS.length - 1, Math.floor((level - 1) / 2))];
-        }
-
-        function xpNeeded(level) {
-          return 80 + (level - 1) * 40;
+        function xpForLevel(level) {
+          return 80 + (level - 1) * 35;
         }
 
         function loadProfile() {
           try {
             const raw = localStorage.getItem(STORAGE_KEY);
             if (!raw) return null;
-            const parsed = JSON.parse(raw);
-            if (!parsed.name) return null;
+            const p = JSON.parse(raw);
+            if (!p.name) return null;
             return {
-              name: parsed.name,
-              level: Number(parsed.level) || 1,
-              xp: Number(parsed.xp) || 0,
-              totalXp: Number(parsed.totalXp) || 0,
-              badges: Array.isArray(parsed.badges) ? parsed.badges : [],
-              bestStreak: Number(parsed.bestStreak) || 0,
-              history: Array.isArray(parsed.history) ? parsed.history : [],
-              patternCorrect: Number(parsed.patternCorrect) || 0,
-              settings: parsed.settings && typeof parsed.settings === "object" ? parsed.settings : structuredClone(defaults.settings),
+              name: p.name,
+              xp: Number(p.xp) || 0,
+              totalXp: Number(p.totalXp) || 0,
+              level: Number(p.level) || 1,
+              streak: Number(p.streak) || 0,
             };
-          } catch (error) {
+          } catch {
             return null;
           }
         }
 
         function saveProfile() {
+          if (!state.profile) return;
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state.profile));
         }
 
-        function setupFromProfile(profile) {
-          state.profile = profile;
-          state.settings = {
-            operations: { ...defaults.settings.operations, ...profile.settings.operations },
-            rangeA: clampRange(profile.settings.rangeA.min, profile.settings.rangeA.max),
-            rangeB: clampRange(profile.settings.rangeB.min, profile.settings.rangeB.max),
-            complexity: [2, 3, 4].includes(Number(profile.settings.complexity)) ? Number(profile.settings.complexity) : 2,
-            allowNegatives: Boolean(profile.settings.allowNegatives),
-          };
-          state.streak = 0;
-          state.bestStreak = profile.bestStreak || 0;
-        }
-
-        function syncConfigInputs() {
-          ui.opAdd.checked = state.settings.operations["+"] === true;
-          ui.opSub.checked = state.settings.operations["-"] === true;
-          ui.opMul.checked = state.settings.operations["*"] === true;
-          ui.opDiv.checked = state.settings.operations["/"] === true;
-          ui.rangeAMin.value = String(state.settings.rangeA.min);
-          ui.rangeAMax.value = String(state.settings.rangeA.max);
-          ui.rangeBMin.value = String(state.settings.rangeB.min);
-          ui.rangeBMax.value = String(state.settings.rangeB.max);
-          ui.complexitySelect.value = String(state.settings.complexity);
-          ui.allowNegatives.checked = state.settings.allowNegatives;
-        }
-
-        function createDefaultProfile(name) {
+        function makeProfile(name) {
           return {
             name,
-            level: 1,
             xp: 0,
             totalXp: 0,
-            badges: [],
-            bestStreak: 0,
-            history: [],
-            patternCorrect: 0,
-            settings: structuredClone(defaults.settings),
+            level: 1,
+            streak: 0,
           };
         }
 
-        function getStreakMessage(streak) {
-          if (streak >= 20) return `${streak} In A Row! Cosmic Focus!`;
-          if (streak >= 10) return `${streak} In A Row! Unstoppable!`;
-          if (streak >= 5) return `${streak} In A Row! On Fire!`;
-          if (streak >= 3) return `${streak} In A Row! Nice Rhythm!`;
-          if (streak > 0) return `${streak} In A Row! Keep rising.`;
-          return "Start your streak.";
+        function randInt(min, max) {
+          return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        function showToast(text, tone = "emerald") {
-          clearTimeout(state.toastTimeout);
-          ui.badgeToast.textContent = text;
-          ui.badgeToast.className =
-            tone === "violet"
-              ? "rounded-full bg-violet-100 px-3 py-1 text-xs font-bold text-violet-700"
-              : "rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700";
-          ui.badgeToast.classList.remove("hidden");
-          state.toastTimeout = setTimeout(() => ui.badgeToast.classList.add("hidden"), 2200);
+        function pick(arr) {
+          return arr[Math.floor(Math.random() * arr.length)];
         }
 
-        function unlockBadge(id, label) {
-          if (!state.profile.badges.includes(id)) {
-            state.profile.badges.push(id);
-            showToast(`Badge Unlocked: ${label}`, "violet");
-            saveProfile();
-          }
-        }
-
-        function makeSupportHint(problem) {
-          const name = state.profile.name;
-          const opName = problem.operation === "*" ? "multiplication" : problem.operation === "/" ? "division" : problem.operation === "-" ? "subtraction" : "addition";
-          const first = problem.terms[0];
-          const second = problem.terms[1];
-          return `Let's look at this together, ${name}! For ${opName}, start with ${first} and work one step at a time with ${second}. Rounding to nearby 10s can help your brain estimate before final calculation.`;
-        }
-
-        function buildStepByStep(problem) {
-          const pretty = problem.operation === "*" ? "×" : problem.operation === "/" ? "÷" : problem.operation;
-          const lines = [];
-          lines.push(`<p class="font-semibold">Equation: ${problem.terms.join(` ${pretty} `)}</p>`);
-          let running = problem.terms[0];
-          lines.push(`<p>Start with <strong>${running}</strong>.</p>`);
-          for (let i = 1; i < problem.terms.length; i += 1) {
-            const n = problem.terms[i];
-            if (problem.operation === "+") {
-              running += n;
-              lines.push(`<p>Step ${i}: Add ${n} → <strong>${running}</strong></p>`);
-            } else if (problem.operation === "-") {
-              running -= n;
-              lines.push(`<p>Step ${i}: Subtract ${n} → <strong>${running}</strong></p>`);
-            } else if (problem.operation === "*") {
-              running *= n;
-              lines.push(`<p>Step ${i}: Multiply by ${n} → <strong>${running}</strong></p>`);
-            } else {
-              running /= n;
-              lines.push(`<p>Step ${i}: Divide by ${n} → <strong>${running}</strong></p>`);
+        function sixSevenJoke(values) {
+          for (let i = 0; i < values.length - 1; i += 1) {
+            if ((values[i] === 6 && values[i + 1] === 7) || (values[i] === 7 && values[i + 1] === 6)) {
+              return pick(jokes67);
             }
           }
-          lines.push(`<p class="rounded-xl bg-emerald-50 p-2 font-bold text-emerald-700">Final Answer: ${running}</p>`);
-          return lines.join("");
+          return "";
         }
 
-        function groupingScore(operation, left, right) {
-          if (operation === "+") {
-            const sum = left + right;
-            const to10 = Math.abs(sum - 10);
-            const to100 = Math.abs(sum - 100);
-            return 60 - Math.min(to10, to100);
-          }
-          if (operation === "*") {
-            const prod = left * right;
-            const friendly = [10, 12, 20, 25, 50, 100];
-            const closeness = Math.min(...friendly.map((n) => Math.abs(prod - n)));
-            return 70 - closeness;
-          }
-          if (operation === "-") {
-            return left - right >= 0 ? 40 - Math.abs(left - right) : -40;
-          }
-          return left % right === 0 ? 45 - Math.abs(left / right - 5) : -45;
-        }
+        function mathChallenge(mode) {
+          const termCount = Math.random() < 0.48 ? 3 : 2;
+          let terms = [];
+          let answer = 0;
+          let op = "+";
 
-        function renderGroupingCoach(problem) {
-          if (!problem || problem.terms.length < 3) {
-            ui.groupingPrompt.textContent = "Grouping shines most with 3+ terms. Switch complexity to three or four terms to compare options.";
-            ui.groupingOptionX.textContent = "X Group: (a op b) first";
-            ui.groupingOptionY.textContent = "Y Group: (b op c) first";
-            ui.groupingRecommendation.textContent = "Recommendation: Increase complexity to unlock grouping decisions.";
-            return;
-          }
-
-          const op = problem.operation;
-          const pretty = op === "*" ? "×" : op === "/" ? "÷" : op;
-          const [a, b, c] = problem.terms;
-          const xScore = groupingScore(op, a, b);
-          const yScore = groupingScore(op, b, c);
-
-          ui.groupingPrompt.textContent = `Is X or Y more suitable for grouping in ${a} ${pretty} ${b} ${pretty} ${c}?`;
-          ui.groupingOptionX.textContent = `X: (${a} ${pretty} ${b}) ${pretty} ${c}`;
-          ui.groupingOptionY.textContent = `Y: ${a} ${pretty} (${b} ${pretty} ${c})`;
-
-          if (op === "-" || op === "/") {
-            ui.groupingRecommendation.textContent =
-              "Recommendation: For subtraction and division, keep the normal left-to-right order. Use grouping only for estimation checks.";
-            return;
-          }
-
-          const choice = xScore >= yScore ? "X" : "Y";
-          const reason =
-            op === "+"
-              ? "it forms a friendlier benchmark sum for fast mental arithmetic."
-              : "it creates a friendlier product for quicker mental multiplication.";
-          ui.groupingRecommendation.textContent = `Recommendation: ${choice} is more suitable because ${reason}`;
-        }
-
-        function generatePatternChallenge() {
-          const patternType = pickRandom(["arithmetic", "geometric", "fibonacci", "alternating"]);
-          if (patternType === "arithmetic") {
-            const start = randInt(3, 28);
-            const step = randInt(2, 9);
-            const sequence = Array.from({ length: 5 }, (_, i) => start + i * step);
-            return { sequence, answer: start + 5 * step, patternType };
-          }
-          if (patternType === "geometric") {
-            const start = randInt(2, 6);
-            const ratio = randInt(2, 4);
-            const sequence = Array.from({ length: 5 }, (_, i) => start * ratio ** i);
-            return { sequence, answer: start * ratio ** 5, patternType };
-          }
-          if (patternType === "fibonacci") {
-            const first = randInt(1, 7);
-            const second = randInt(2, 9);
-            const sequence = [first, second];
-            while (sequence.length < 5) {
-              sequence.push(sequence[sequence.length - 1] + sequence[sequence.length - 2]);
+          if (mode === "addition") {
+            op = "+";
+            terms = Array.from({ length: termCount }, () => randInt(2, 45));
+            answer = terms.reduce((s, n) => s + n, 0);
+          } else if (mode === "subtraction") {
+            op = "-";
+            const first = randInt(20, 120);
+            terms = [first];
+            let running = first;
+            for (let i = 1; i < termCount; i += 1) {
+              const next = randInt(1, Math.max(1, Math.min(40, running)));
+              terms.push(next);
+              running -= next;
             }
-            return { sequence, answer: sequence[3] + sequence[4], patternType };
-          }
-          const start = randInt(8, 25);
-          const jumpA = randInt(2, 8);
-          const jumpB = randInt(3, 9);
-          const sequence = [start];
-          for (let i = 1; i < 5; i += 1) {
-            const jump = i % 2 === 1 ? jumpA : jumpB;
-            sequence.push(sequence[i - 1] + jump);
-          }
-          const answer = sequence[4] + jumpA;
-          return { sequence, answer, patternType };
-        }
-
-        function renderPatternChallenge() {
-          if (!state.patternChallenge) state.patternChallenge = generatePatternChallenge();
-          ui.patternSequence.textContent = `${state.patternChallenge.sequence.join(", ")}, ...`;
-          ui.patternInput.value = "";
-          ui.patternFeedback.textContent = "Spot the rhythm, then enter the next number.";
-          ui.patternFeedback.className = "mt-2 rounded-xl bg-violet-100 px-3 py-2 text-sm font-semibold text-violet-700";
-        }
-
-        function submitPatternAnswer() {
-          if (!state.patternChallenge || !state.profile) return;
-          const value = Number(ui.patternInput.value);
-          if (!Number.isFinite(value)) {
-            ui.patternFeedback.textContent = "Please type a number for the pattern.";
-            ui.patternFeedback.className = "mt-2 rounded-xl bg-amber-100 px-3 py-2 text-sm font-semibold text-amber-700";
-            return;
-          }
-          if (value === state.patternChallenge.answer) {
-            const earned = 6;
-            state.profile.patternCorrect += 1;
-            state.profile.totalXp += earned;
-            state.profile.xp += earned;
-            let leveledUp = false;
-            while (state.profile.xp >= xpNeeded(state.profile.level)) {
-              state.profile.xp -= xpNeeded(state.profile.level);
-              state.profile.level += 1;
-              leveledUp = true;
-            }
-            audio.playSuccess();
-            ui.patternFeedback.textContent = `Pattern solved! +${earned} XP.`;
-            ui.patternFeedback.className = "mt-2 rounded-xl bg-emerald-100 px-3 py-2 text-sm font-semibold text-emerald-700";
-            if (state.profile.patternCorrect >= 5) {
-              unlockBadge("pattern-sleuth", "Pattern Sleuth");
-            }
-            if (leveledUp) {
-              audio.playLevelUp();
-              renderLevelUpModal();
-            }
-            updateHud();
-            saveProfile();
-            state.patternChallenge = generatePatternChallenge();
-            setTimeout(renderPatternChallenge, 550);
+            answer = running;
+          } else if (mode === "multiplication") {
+            op = "×";
+            terms = Array.from({ length: termCount }, () => randInt(2, 12));
+            answer = terms.reduce((p, n) => p * n, 1);
           } else {
-            audio.playTap();
-            ui.patternFeedback.textContent = "Not yet. Look at how each step changes from one number to the next.";
-            ui.patternFeedback.className = "mt-2 rounded-xl bg-rose-100 px-3 py-2 text-sm font-semibold text-rose-700";
+            op = "÷";
+            const divisor2 = randInt(2, 10);
+            if (termCount === 2) {
+              answer = randInt(2, 16);
+              terms = [answer * divisor2, divisor2];
+            } else {
+              const divisor3 = randInt(2, 8);
+              answer = randInt(2, 12);
+              terms = [answer * divisor2 * divisor3, divisor2, divisor3];
+            }
           }
-        }
 
-        function createProblem() {
-          const ops = getEnabledOperations();
-          const operation = pickRandom(ops);
-          const termCount = state.settings.complexity;
-          const terms = generateTerms(operation, termCount, state.settings.rangeA, state.settings.rangeB);
-          const answer = computeAnswer(operation, terms);
+          const prompt = `${terms.join(` ${op} `)} = ?`;
           return {
+            kind: "math",
             terms,
-            operation,
-            answer: Math.round(answer),
-            equationText: formatEquation(terms, operation),
-            attempts: [],
-            wrongCount: 0,
-            scaffoldLevel: 0,
+            op,
+            prompt,
+            answer,
+            joke: sixSevenJoke(terms),
             startedAt: performance.now(),
           };
         }
 
-        function resetVisualState() {
-          ui.problemCard.classList.remove("bg-emerald-50", "border-emerald-200", "animate-pulseGlow", "animate-wobble", "bg-rose-50", "border-rose-200");
-          ui.problemCard.classList.add("bg-white/90", "border-indigo-100");
+        function patternChallenge() {
+          const type = pick(["step", "doubleStep", "fib", "geo"]);
+          let seq = [];
+          let answer = 0;
+
+          if (type === "step") {
+            const start = randInt(1, 20);
+            const step = randInt(2, 9);
+            seq = Array.from({ length: 5 }, (_, i) => start + i * step);
+            answer = start + 5 * step;
+          } else if (type === "doubleStep") {
+            const start = randInt(2, 18);
+            const a = randInt(2, 7);
+            const b = randInt(3, 8);
+            seq = [start];
+            for (let i = 1; i < 5; i += 1) {
+              seq.push(seq[i - 1] + (i % 2 ? a : b));
+            }
+            answer = seq[4] + a;
+          } else if (type === "fib") {
+            seq = [randInt(1, 6), randInt(2, 7)];
+            while (seq.length < 5) seq.push(seq.at(-1) + seq.at(-2));
+            answer = seq[4] + seq[3];
+          } else {
+            const base = randInt(2, 4);
+            seq = [randInt(1, 3) * base];
+            while (seq.length < 5) seq.push(seq.at(-1) * base);
+            answer = seq[4] * base;
+          }
+
+          return {
+            kind: "pattern",
+            sequence: seq,
+            prompt: `${seq.join(", ")}, ...`,
+            answer,
+            joke: sixSevenJoke(seq),
+            startedAt: performance.now(),
+          };
         }
 
-        function presentProblem() {
-          state.currentProblem = createProblem();
-          state.currentInput = "";
-          ui.answerDisplay.textContent = "—";
-          ui.supportHint.classList.add("hidden");
-          ui.feedbackText.textContent = "Enter your answer with the custom number pad or keyboard.";
-          ui.feedbackText.className = "mt-4 rounded-2xl bg-indigo-50 px-4 py-3 text-center text-sm font-semibold text-indigo-700 sm:text-base";
-          resetVisualState();
-          ui.equationText.textContent = state.currentProblem.equationText;
-          renderGroupingCoach(state.currentProblem);
+        function groupingHint(challenge) {
+          if (challenge.kind !== "math" || challenge.terms.length < 3) {
+            return "Grouping insights appear when you get a 3-term challenge.";
+          }
+          if (challenge.op === "+") {
+            return `Try (${challenge.terms[0]} + ${challenge.terms[1]}) first, then add ${challenge.terms[2]}.`;
+          }
+          if (challenge.op === "×") {
+            return `Look for easy pairs: (${challenge.terms[0]} × ${challenge.terms[1]}) then × ${challenge.terms[2]}.`;
+          }
+          if (challenge.op === "-") {
+            return "For subtraction, keep left-to-right to avoid accidental sign mistakes.";
+          }
+          return "For division, left-to-right order keeps the result trustworthy.";
         }
 
-        function setAnswerDisplay() {
-          ui.answerDisplay.textContent = state.currentInput || "—";
+        function applyTheme(mode) {
+          const theme = THEMES[mode];
+          ui.gameShell.className = `flex h-full flex-col gap-2 rounded-3xl bg-gradient-to-br ${theme.shell} p-2 sm:gap-3 sm:p-3`;
+          ui.modeTitle.textContent = `${theme.title} • ${state.profile.name}`;
+          ui.modeTitle.className = `text-lg font-black ${theme.titleColor}`;
         }
 
         function updateHud() {
-          const needed = xpNeeded(state.profile.level);
-          ui.playerGreeting.textContent = state.profile.name;
-          ui.levelValue.textContent = String(state.profile.level);
-          ui.rankPill.textContent = rankForLevel(state.profile.level);
-          ui.xpText.textContent = `${state.profile.xp} / ${needed} XP`;
-          ui.xpBar.style.width = `${Math.max(4, Math.min(100, (state.profile.xp / needed) * 100))}%`;
-          ui.streakValue.textContent = String(state.streak);
-          ui.streakMilestone.textContent = getStreakMessage(state.streak);
+          ui.xpText.textContent = `${state.profile.xp}/${xpForLevel(state.profile.level)}`;
+          ui.levelText.textContent = `${state.profile.level}`;
+          ui.streakText.textContent = `${state.profile.streak}`;
         }
 
-        function updateAssessorPanel() {
-          const history = state.profile.history;
-          ui.metricSolved.textContent = String(history.length);
-          const avg = history.length
-            ? history.reduce((sum, h) => sum + h.responseTimeSec, 0) / history.length
-            : 0;
-          ui.metricAvgTime.textContent = `${avg.toFixed(2)}s`;
-          const impulsiveCount = history.filter((h) => h.tags.includes("Fast/Impulsive")).length;
-          ui.metricImpulsive.textContent = String(impulsiveCount);
-
-          ui.historyTableBody.innerHTML = "";
-          history.slice().reverse().forEach((h) => {
-            const tr = document.createElement("tr");
-            tr.className = "border-b border-slate-100";
-            const tags = h.tags.length ? h.tags.join(", ") : "Developing";
-            tr.innerHTML = `
-              <td class="px-2 py-2 font-semibold text-slate-700">${h.equation}</td>
-              <td class="px-2 py-2 text-slate-600">${JSON.stringify(h.attempts)}</td>
-              <td class="px-2 py-2 text-slate-600">${h.responseTimeSec.toFixed(2)}</td>
-              <td class="px-2 py-2"><span class="rounded-full bg-violet-100 px-2 py-1 text-xs font-bold text-violet-700">${tags}</span></td>
-            `;
-            ui.historyTableBody.appendChild(tr);
-          });
-        }
-
-        function analyticsTags(problem, elapsed) {
-          const tags = [];
-          const fastWrong = problem.attempts.some((a) => !a.correct && a.elapsedSec < 3);
-          if (fastWrong) tags.push("Fast/Impulsive");
-          if (elapsed > 15) tags.push("Methodical");
-          if (problem.scaffoldLevel >= 1) tags.push("Persistent");
-          if (problem.attempts.length === 0 && elapsed < 4) tags.push("Fluent");
-          return tags;
-        }
-
-        function addXpForCorrect(problem, elapsed) {
-          const operationMultiplier = problem.operation === "*" || problem.operation === "/" ? 1.4 : 1;
-          const complexityMultiplier = 1 + (state.settings.complexity - 2) * 0.35;
-          const base = Math.round(10 * operationMultiplier * complexityMultiplier);
-          const earned = base * Math.max(1, state.streak);
-          state.profile.totalXp += earned;
-          state.profile.xp += earned;
-          let leveledUp = false;
-          while (state.profile.xp >= xpNeeded(state.profile.level)) {
-            state.profile.xp -= xpNeeded(state.profile.level);
-            state.profile.level += 1;
-            leveledUp = true;
-          }
-          return { earned, leveledUp };
-        }
-
-        function renderLevelUpModal() {
-          ui.levelUpText.textContent = `${state.profile.name}, you reached Level ${state.profile.level} as a ${rankForLevel(state.profile.level)}!`;
-          ui.levelUpModal.classList.remove("hidden");
-          ui.levelUpModal.classList.add("flex");
-        }
-
-        function hideLevelUpModal() {
-          ui.levelUpModal.classList.add("hidden");
-          ui.levelUpModal.classList.remove("flex");
-        }
-
-        function showScaffoldModal(problem) {
-          ui.scaffoldBody.innerHTML = buildStepByStep(problem);
-          ui.scaffoldModal.classList.remove("hidden");
-          ui.scaffoldModal.classList.add("flex");
-        }
-
-        function hideScaffoldModal() {
-          ui.scaffoldModal.classList.add("hidden");
-          ui.scaffoldModal.classList.remove("flex");
-        }
-
-        function handleWrongAnswer(value) {
-          const elapsed = (performance.now() - state.currentProblem.startedAt) / 1000;
-          state.currentProblem.attempts.push({ value, correct: false, elapsedSec: elapsed });
-          state.currentProblem.wrongCount += 1;
-          state.streak = 0;
-          audio.playTap();
-          ui.feedbackText.textContent = "Not quite yet. You are building stronger number sense with every try.";
-          ui.feedbackText.className = "mt-4 rounded-2xl bg-rose-50 px-4 py-3 text-center text-sm font-semibold text-rose-700 sm:text-base";
-          ui.problemCard.classList.remove("bg-white/90", "border-indigo-100", "bg-emerald-50", "border-emerald-200");
-          ui.problemCard.classList.add("bg-rose-50", "border-rose-200", "animate-wobble");
-          setTimeout(() => ui.problemCard.classList.remove("animate-wobble"), 450);
-          if (state.currentProblem.wrongCount === 3) {
-            state.currentProblem.scaffoldLevel = 1;
-            ui.supportHint.classList.remove("hidden");
-            ui.supportHint.textContent = makeSupportHint(state.currentProblem);
-            audio.playScaffold();
-            showToast("Support Activated: Friendly Hint");
-            unlockBadge("resilient-learner", "Resilient Learner");
-          }
-          if (state.currentProblem.wrongCount === 6) {
-            state.currentProblem.scaffoldLevel = 2;
-            showScaffoldModal(state.currentProblem);
-            audio.playScaffold();
-            showToast("Support Activated: Step-by-step Coach");
-          }
+        function setChallenge() {
           state.currentInput = "";
-          setAnswerDisplay();
+          ui.answerDisplay.textContent = "—";
+          if (state.mode === "pattern") {
+            state.currentChallenge = patternChallenge();
+            ui.feedbackText.textContent = "Find the next number in the sequence.";
+          } else {
+            state.currentChallenge = mathChallenge(state.mode);
+            ui.feedbackText.textContent = "Solve it quickly and keep the streak alive.";
+          }
+          ui.feedbackText.className = "mt-2 rounded-xl bg-indigo-100 px-3 py-2 text-center text-sm font-bold text-indigo-700";
+          ui.challengePrompt.textContent = state.currentChallenge.prompt;
+          ui.jokeLine.textContent = state.currentChallenge.joke || "";
+          ui.coachText.textContent = `Coach: ${state.currentChallenge.kind === "pattern" ? "Check how each number changes from one step to the next." : "Estimate first, then compute exactly."}`;
+          ui.groupingText.textContent = groupingHint(state.currentChallenge);
+          ui.challengePrompt.classList.add("animate-popIn");
+          setTimeout(() => ui.challengePrompt.classList.remove("animate-popIn"), 250);
+        }
+
+        function addXp(amount) {
+          state.profile.xp += amount;
+          state.profile.totalXp += amount;
+          let leveled = false;
+          while (state.profile.xp >= xpForLevel(state.profile.level)) {
+            state.profile.xp -= xpForLevel(state.profile.level);
+            state.profile.level += 1;
+            leveled = true;
+          }
+          return leveled;
+        }
+
+        function onCorrect() {
+          const elapsed = (performance.now() - state.currentChallenge.startedAt) / 1000;
+          state.profile.streak += 1;
+          const reward = Math.max(8, Math.round(10 + state.profile.streak * 1.8 + Math.max(0, 8 - elapsed)));
+          const leveled = addXp(reward);
+          audio.success();
+          if (leveled) {
+            audio.levelUp();
+            ui.feedbackText.textContent = `Perfect! +${reward} XP. Level up to ${state.profile.level}!`;
+          } else {
+            ui.feedbackText.textContent = `Perfect! +${reward} XP.`;
+          }
+          ui.feedbackText.className = "mt-2 rounded-xl bg-emerald-100 px-3 py-2 text-center text-sm font-bold text-emerald-700";
+          const rect = document.getElementById("challengeCard").getBoundingClientRect();
+          particles.burst(rect.left + rect.width * 0.5, rect.top + rect.height * 0.4, 34);
+          saveProfile();
+          updateHud();
+          state.lockInput = true;
+          setTimeout(() => {
+            state.lockInput = false;
+            setChallenge();
+          }, 650);
+        }
+
+        function onWrong() {
+          state.profile.streak = 0;
+          ui.feedbackText.textContent = "Close! Reset and try again. Your brain is still lifting reps.";
+          ui.feedbackText.className = "mt-2 rounded-xl bg-rose-100 px-3 py-2 text-center text-sm font-bold text-rose-700";
+          document.getElementById("challengeCard").classList.add("animate-wobble");
+          setTimeout(() => document.getElementById("challengeCard").classList.remove("animate-wobble"), 420);
+          state.currentInput = "";
+          ui.answerDisplay.textContent = "—";
+          saveProfile();
           updateHud();
         }
 
-        function submitAnswer() {
-          if (state.lockInput || !state.currentProblem) return;
+        function submitInput() {
+          if (state.lockInput || !state.currentChallenge) return;
           if (state.currentInput === "" || state.currentInput === "-") {
-            ui.feedbackText.textContent = "Type a full answer before submitting.";
-            ui.feedbackText.className = "mt-4 rounded-2xl bg-amber-50 px-4 py-3 text-center text-sm font-semibold text-amber-700 sm:text-base";
+            ui.feedbackText.textContent = "Enter a complete answer first.";
+            ui.feedbackText.className = "mt-2 rounded-xl bg-amber-100 px-3 py-2 text-center text-sm font-bold text-amber-700";
             return;
           }
           const value = Number(state.currentInput);
           if (!Number.isFinite(value)) return;
-
-          if (value === state.currentProblem.answer) {
-            const elapsed = (performance.now() - state.currentProblem.startedAt) / 1000;
-            const tags = analyticsTags(state.currentProblem, elapsed);
-            const wrongAttempts = state.currentProblem.attempts.map((a) => a.value);
-            state.profile.history.push({
-              equation: state.currentProblem.equationText.replace(" = ?", ""),
-              attempts: wrongAttempts,
-              responseTimeSec: elapsed,
-              tags,
-              timestamp: new Date().toISOString(),
-            });
-
-            state.streak += 1;
-            state.bestStreak = Math.max(state.bestStreak, state.streak);
-            state.profile.bestStreak = Math.max(state.profile.bestStreak, state.bestStreak);
-            const { earned, leveledUp } = addXpForCorrect(state.currentProblem, elapsed);
-
-            if (elapsed < 3.2 && state.currentProblem.attempts.length === 0) {
-              unlockBadge("speed-demon", "Speed Demon");
-            }
-            if (state.streak >= 3) unlockBadge("streak-3", "Rhythm Starter");
-            if (state.streak >= 5) unlockBadge("streak-5", "Firestarter");
-            if (state.streak >= 10) unlockBadge("unstoppable", "Unstoppable");
-            if (state.streak >= 20) unlockBadge("mythic-focus", "Mythic Focus");
-            if (state.currentProblem.scaffoldLevel >= 1) unlockBadge("deep-thinker", "Deep Thinker");
-
-            audio.playSuccess();
-            const rect = ui.problemCard.getBoundingClientRect();
-            particles.burst(rect.left + rect.width * 0.5, rect.top + rect.height * 0.35, 42);
-            ui.feedbackText.textContent = `Excellent! +${earned} XP earned.`;
-            ui.feedbackText.className = "mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-center text-sm font-semibold text-emerald-700 sm:text-base";
-            ui.problemCard.classList.remove("bg-white/90", "border-indigo-100", "bg-rose-50", "border-rose-200");
-            ui.problemCard.classList.add("bg-emerald-50", "border-emerald-200", "animate-pulseGlow");
-            setTimeout(() => ui.problemCard.classList.remove("animate-pulseGlow"), 800);
-            if ([3, 5, 10, 20].includes(state.streak)) {
-              showToast(`Milestone: ${state.streak} In A Row!`);
-            }
-            if (leveledUp) {
-              audio.playLevelUp();
-              renderLevelUpModal();
-            }
-            saveProfile();
-            updateHud();
-            updateAssessorPanel();
-            state.lockInput = true;
-            setTimeout(() => {
-              state.lockInput = false;
-              presentProblem();
-            }, 820);
-          } else {
-            handleWrongAnswer(value);
-          }
+          if (value === state.currentChallenge.answer) onCorrect();
+          else onWrong();
         }
 
-        function handleInputKey(key) {
-          if (state.lockInput || !state.currentProblem) return;
+        function setInputDisplay() {
+          ui.answerDisplay.textContent = state.currentInput || "—";
+        }
+
+        function handleKey(key) {
+          if (state.lockInput || ui.gameView.classList.contains("hidden")) return;
           if (/^\d$/.test(key)) {
-            if (state.currentInput.length >= 8) return;
-            state.currentInput += key;
-            audio.playTap();
+            if (state.currentInput.length < 8) {
+              state.currentInput += key;
+              audio.tap();
+            }
           } else if (key === "backspace") {
             state.currentInput = state.currentInput.slice(0, -1);
-            audio.playTap();
+            audio.tap();
           } else if (key === "submit") {
-            submitAnswer();
+            submitInput();
             return;
-          } else if (key === "-" && state.settings.allowNegatives) {
-            if (state.currentInput === "") {
-              state.currentInput = "-";
-              audio.playTap();
-            }
           } else {
             return;
           }
-          setAnswerDisplay();
+          setInputDisplay();
         }
 
-        function applySettingsFromInputs() {
-          const newSettings = {
-            operations: {
-              "+": ui.opAdd.checked,
-              "-": ui.opSub.checked,
-              "*": ui.opMul.checked,
-              "/": ui.opDiv.checked,
-            },
-            rangeA: clampRange(Number(ui.rangeAMin.value), Number(ui.rangeAMax.value)),
-            rangeB: clampRange(Number(ui.rangeBMin.value), Number(ui.rangeBMax.value)),
-            complexity: Number(ui.complexitySelect.value),
-            allowNegatives: ui.allowNegatives.checked,
-          };
-          if (!Object.values(newSettings.operations).some(Boolean)) {
-            newSettings.operations["+"] = true;
-            ui.opAdd.checked = true;
-          }
-          state.settings = newSettings;
-          state.profile.settings = structuredClone(newSettings);
-          saveProfile();
-          showToast("Challenge rules updated");
-          presentProblem();
-        }
-
-        async function copyText(text) {
-          try {
-            await navigator.clipboard.writeText(text);
-            showToast("Copied to clipboard");
-          } catch (error) {
-            const area = document.createElement("textarea");
-            area.value = text;
-            document.body.appendChild(area);
-            area.select();
-            document.execCommand("copy");
-            area.remove();
-            showToast("Copied to clipboard");
-          }
-        }
-
-        function toCSV(history) {
-          const header = ["equation", "attempts", "responseTimeSec", "tags", "timestamp"];
-          const lines = history.map((h) => [
-            h.equation,
-            JSON.stringify(h.attempts),
-            h.responseTimeSec.toFixed(2),
-            h.tags.join("|"),
-            h.timestamp,
-          ]);
-          return [header, ...lines]
-            .map((row) =>
-              row
-                .map((value) => {
-                  const v = String(value ?? "");
-                  return `"${v.replaceAll('"', '""')}"`;
-                })
-                .join(","),
-            )
-            .join("\n");
-        }
-
-        function bootstrapProfile() {
-          const saved = loadProfile();
-          if (saved) {
-            setupFromProfile(saved);
-            ui.playerNameInput.value = saved.name;
-          }
-        }
-
-        function enterGame() {
+        function startMode(mode) {
           const name = ui.playerNameInput.value.trim();
           if (!name) {
+            ui.nameHint.textContent = "Please enter a name before choosing a mode.";
+            ui.nameHint.className = "mt-1 text-xs font-bold text-rose-600";
             ui.playerNameInput.focus();
-            ui.playerNameInput.classList.add("border-rose-400", "ring-rose-100");
-            setTimeout(() => ui.playerNameInput.classList.remove("border-rose-400", "ring-rose-100"), 700);
             return;
           }
           if (!state.profile || state.profile.name !== name) {
-            state.profile = createDefaultProfile(name);
+            state.profile = makeProfile(name);
           }
           state.profile.name = name;
-          setupFromProfile(state.profile);
-          syncConfigInputs();
+          state.mode = mode;
           saveProfile();
-          ui.welcomeScreen.classList.add("hidden");
-          ui.gameScreen.classList.remove("hidden");
-          presentProblem();
-          state.patternChallenge = generatePatternChallenge();
-          renderPatternChallenge();
+          applyTheme(mode);
           updateHud();
-          updateAssessorPanel();
+          setChallenge();
+          ui.landingView.classList.add("hidden");
+          ui.gameView.classList.remove("hidden");
           lucide.createIcons();
         }
 
-        function initEvents() {
-          ui.startBtn.addEventListener("click", enterGame);
-          ui.playerNameInput.addEventListener("keydown", (event) => {
-            if (event.key === "Enter") enterGame();
-          });
+        function backToMenu() {
+          ui.gameView.classList.add("hidden");
+          ui.landingView.classList.remove("hidden");
+          ui.nameHint.textContent = "Choose another game whenever you are ready.";
+          ui.nameHint.className = "mt-1 text-xs font-semibold text-slate-500";
+        }
+
+        function hydrate() {
+          const loaded = loadProfile();
+          if (!loaded) return;
+          state.profile = loaded;
+          ui.playerNameInput.value = loaded.name;
+          ui.nameHint.textContent = `Welcome back ${loaded.name}! Level ${loaded.level}, streak ${loaded.streak}.`;
+        }
+
+        function bind() {
+          ui.modeButtons.forEach((btn) => btn.addEventListener("click", () => startMode(btn.dataset.mode)));
+          ui.homeBtn.addEventListener("click", backToMenu);
 
           ui.numPad.addEventListener("click", (event) => {
             const button = event.target.closest("button[data-key]");
             if (!button) return;
-            handleInputKey(button.dataset.key);
+            handleKey(button.dataset.key);
           });
 
           window.addEventListener("keydown", (event) => {
-            if (ui.welcomeScreen.classList.contains("hidden") === false) return;
             const target = event.target;
-            if (
-              target instanceof HTMLElement &&
-              (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.tagName === "SELECT")
-            ) {
+            if (target instanceof HTMLElement && target.tagName === "INPUT") {
+              if (target === ui.playerNameInput && event.key === "Enter") {
+                event.preventDefault();
+              }
               return;
             }
             if (/^\d$/.test(event.key)) {
               event.preventDefault();
-              handleInputKey(event.key);
+              handleKey(event.key);
             } else if (event.key === "Backspace") {
               event.preventDefault();
-              handleInputKey("backspace");
+              handleKey("backspace");
             } else if (event.key === "Enter") {
               event.preventDefault();
-              handleInputKey("submit");
-            } else if (event.key === "-") {
-              event.preventDefault();
-              handleInputKey("-");
+              handleKey("submit");
             }
           });
 
-          ui.applyConfigBtn.addEventListener("click", () => {
-            audio.ensureContext();
-            applySettingsFromInputs();
-          });
-
-          ui.toggleAssessorBtn.addEventListener("click", () => {
-            state.assessorOpen = !state.assessorOpen;
-            ui.assessorPanel.classList.toggle("hidden", !state.assessorOpen);
-            lucide.createIcons();
-          });
-
-          ui.closeLevelModalBtn.addEventListener("click", hideLevelUpModal);
-          ui.closeScaffoldModalBtn.addEventListener("click", hideScaffoldModal);
-
-          ui.copyJsonBtn.addEventListener("click", () => {
-            copyText(JSON.stringify(state.profile.history, null, 2));
-          });
-          ui.copyCsvBtn.addEventListener("click", () => {
-            copyText(toCSV(state.profile.history));
-          });
-
-          ui.submitPatternBtn.addEventListener("click", submitPatternAnswer);
-          ui.newPatternBtn.addEventListener("click", () => {
-            state.patternChallenge = generatePatternChallenge();
-            renderPatternChallenge();
-            audio.playTap();
-          });
-          ui.patternInput.addEventListener("keydown", (event) => {
-            if (event.key === "Enter") {
-              event.preventDefault();
-              submitPatternAnswer();
-            }
-          });
-
-          ["pointerdown", "keydown"].forEach((type) => {
+          ["pointerdown", "keydown"].forEach((evt) => {
             window.addEventListener(
-              type,
+              evt,
               () => {
-                audio.ensureContext();
+                audio.ensure();
               },
               { once: true },
             );
           });
         }
 
-        bootstrapProfile();
-        initEvents();
+        hydrate();
+        bind();
         lucide.createIcons();
       })();
     </script>
