@@ -259,6 +259,18 @@
               >
                 Apply Challenge Rules
               </button>
+              <div class="rounded-2xl border border-amber-200 bg-amber-50/80 p-3">
+                <div class="mb-2 flex items-center gap-2">
+                  <i data-lucide="group" class="h-4 w-4 text-amber-700"></i>
+                  <p class="text-xs font-bold uppercase tracking-wide text-amber-800">Grouping Coach</p>
+                </div>
+                <p id="groupingPrompt" class="text-xs font-semibold text-slate-700"></p>
+                <div class="mt-2 grid gap-2">
+                  <div id="groupingOptionX" class="rounded-xl bg-white/80 px-2 py-2 text-xs text-slate-700"></div>
+                  <div id="groupingOptionY" class="rounded-xl bg-white/80 px-2 py-2 text-xs text-slate-700"></div>
+                </div>
+                <p id="groupingRecommendation" class="mt-2 rounded-xl bg-emerald-100 px-2 py-2 text-xs font-semibold text-emerald-800"></p>
+              </div>
             </div>
           </aside>
         </section>
@@ -281,6 +293,39 @@
             <button class="numpad-btn rounded-2xl bg-slate-100 p-4 text-2xl font-black text-slate-700 transition hover:bg-slate-200 active:scale-95" data-key="0">0</button>
             <button class="numpad-btn rounded-2xl bg-emerald-500 p-4 text-xl font-black text-white transition hover:bg-emerald-400 active:scale-95" data-key="submit">Submit</button>
           </div>
+        </section>
+        <section class="mx-auto mt-4 max-w-2xl rounded-3xl border border-violet-200 bg-violet-50/70 p-4 shadow-cozy sm:p-5">
+          <div class="mb-3 flex items-center justify-between gap-2">
+            <h3 class="inline-flex items-center gap-2 text-sm font-black uppercase tracking-wide text-violet-800">
+              <i data-lucide="brain-circuit" class="h-4 w-4"></i>
+              Number Pattern Recognition
+            </h3>
+            <button
+              id="newPatternBtn"
+              class="rounded-xl bg-violet-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-violet-500"
+            >
+              New Pattern
+            </button>
+          </div>
+          <p class="text-xs font-semibold text-slate-600">Find the next number in the pattern:</p>
+          <p id="patternSequence" class="mt-2 rounded-2xl bg-white/90 px-3 py-3 text-center text-xl font-black text-violet-700"></p>
+          <div class="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
+            <input
+              id="patternInput"
+              type="number"
+              class="rounded-xl border border-violet-200 bg-white px-3 py-2 text-base outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
+              placeholder="Next number"
+            />
+            <button
+              id="submitPatternBtn"
+              class="rounded-xl bg-emerald-500 px-4 py-2 font-bold text-white transition hover:bg-emerald-400"
+            >
+              Check Pattern
+            </button>
+          </div>
+          <p id="patternFeedback" class="mt-2 rounded-xl bg-violet-100 px-3 py-2 text-sm font-semibold text-violet-700">
+            Spot the rhythm, then enter the next number.
+          </p>
         </section>
       </section>
 
@@ -400,6 +445,15 @@
           feedbackText: document.getElementById("feedbackText"),
           supportHint: document.getElementById("supportHint"),
           badgeToast: document.getElementById("badgeToast"),
+          groupingPrompt: document.getElementById("groupingPrompt"),
+          groupingOptionX: document.getElementById("groupingOptionX"),
+          groupingOptionY: document.getElementById("groupingOptionY"),
+          groupingRecommendation: document.getElementById("groupingRecommendation"),
+          patternSequence: document.getElementById("patternSequence"),
+          patternInput: document.getElementById("patternInput"),
+          submitPatternBtn: document.getElementById("submitPatternBtn"),
+          newPatternBtn: document.getElementById("newPatternBtn"),
+          patternFeedback: document.getElementById("patternFeedback"),
           problemCard: document.getElementById("problemCard"),
           applyConfigBtn: document.getElementById("applyConfigBtn"),
           numPad: document.getElementById("numPad"),
@@ -449,6 +503,7 @@
           bestStreak: 0,
           lockInput: false,
           assessorOpen: false,
+          patternChallenge: null,
           toastTimeout: null,
         };
 
@@ -714,6 +769,7 @@
               badges: Array.isArray(parsed.badges) ? parsed.badges : [],
               bestStreak: Number(parsed.bestStreak) || 0,
               history: Array.isArray(parsed.history) ? parsed.history : [],
+              patternCorrect: Number(parsed.patternCorrect) || 0,
               settings: parsed.settings && typeof parsed.settings === "object" ? parsed.settings : structuredClone(defaults.settings),
             };
           } catch (error) {
@@ -760,6 +816,7 @@
             badges: [],
             bestStreak: 0,
             history: [],
+            patternCorrect: 0,
             settings: structuredClone(defaults.settings),
           };
         }
@@ -826,6 +883,141 @@
           return lines.join("");
         }
 
+        function groupingScore(operation, left, right) {
+          if (operation === "+") {
+            const sum = left + right;
+            const to10 = Math.abs(sum - 10);
+            const to100 = Math.abs(sum - 100);
+            return 60 - Math.min(to10, to100);
+          }
+          if (operation === "*") {
+            const prod = left * right;
+            const friendly = [10, 12, 20, 25, 50, 100];
+            const closeness = Math.min(...friendly.map((n) => Math.abs(prod - n)));
+            return 70 - closeness;
+          }
+          if (operation === "-") {
+            return left - right >= 0 ? 40 - Math.abs(left - right) : -40;
+          }
+          return left % right === 0 ? 45 - Math.abs(left / right - 5) : -45;
+        }
+
+        function renderGroupingCoach(problem) {
+          if (!problem || problem.terms.length < 3) {
+            ui.groupingPrompt.textContent = "Grouping shines most with 3+ terms. Switch complexity to three or four terms to compare options.";
+            ui.groupingOptionX.textContent = "X Group: (a op b) first";
+            ui.groupingOptionY.textContent = "Y Group: (b op c) first";
+            ui.groupingRecommendation.textContent = "Recommendation: Increase complexity to unlock grouping decisions.";
+            return;
+          }
+
+          const op = problem.operation;
+          const pretty = op === "*" ? "×" : op === "/" ? "÷" : op;
+          const [a, b, c] = problem.terms;
+          const xScore = groupingScore(op, a, b);
+          const yScore = groupingScore(op, b, c);
+
+          ui.groupingPrompt.textContent = `Is X or Y more suitable for grouping in ${a} ${pretty} ${b} ${pretty} ${c}?`;
+          ui.groupingOptionX.textContent = `X: (${a} ${pretty} ${b}) ${pretty} ${c}`;
+          ui.groupingOptionY.textContent = `Y: ${a} ${pretty} (${b} ${pretty} ${c})`;
+
+          if (op === "-" || op === "/") {
+            ui.groupingRecommendation.textContent =
+              "Recommendation: For subtraction and division, keep the normal left-to-right order. Use grouping only for estimation checks.";
+            return;
+          }
+
+          const choice = xScore >= yScore ? "X" : "Y";
+          const reason =
+            op === "+"
+              ? "it forms a friendlier benchmark sum for fast mental arithmetic."
+              : "it creates a friendlier product for quicker mental multiplication.";
+          ui.groupingRecommendation.textContent = `Recommendation: ${choice} is more suitable because ${reason}`;
+        }
+
+        function generatePatternChallenge() {
+          const patternType = pickRandom(["arithmetic", "geometric", "fibonacci", "alternating"]);
+          if (patternType === "arithmetic") {
+            const start = randInt(3, 28);
+            const step = randInt(2, 9);
+            const sequence = Array.from({ length: 5 }, (_, i) => start + i * step);
+            return { sequence, answer: start + 5 * step, patternType };
+          }
+          if (patternType === "geometric") {
+            const start = randInt(2, 6);
+            const ratio = randInt(2, 4);
+            const sequence = Array.from({ length: 5 }, (_, i) => start * ratio ** i);
+            return { sequence, answer: start * ratio ** 5, patternType };
+          }
+          if (patternType === "fibonacci") {
+            const first = randInt(1, 7);
+            const second = randInt(2, 9);
+            const sequence = [first, second];
+            while (sequence.length < 5) {
+              sequence.push(sequence[sequence.length - 1] + sequence[sequence.length - 2]);
+            }
+            return { sequence, answer: sequence[3] + sequence[4], patternType };
+          }
+          const start = randInt(8, 25);
+          const jumpA = randInt(2, 8);
+          const jumpB = randInt(3, 9);
+          const sequence = [start];
+          for (let i = 1; i < 5; i += 1) {
+            const jump = i % 2 === 1 ? jumpA : jumpB;
+            sequence.push(sequence[i - 1] + jump);
+          }
+          const answer = sequence[4] + jumpA;
+          return { sequence, answer, patternType };
+        }
+
+        function renderPatternChallenge() {
+          if (!state.patternChallenge) state.patternChallenge = generatePatternChallenge();
+          ui.patternSequence.textContent = `${state.patternChallenge.sequence.join(", ")}, ...`;
+          ui.patternInput.value = "";
+          ui.patternFeedback.textContent = "Spot the rhythm, then enter the next number.";
+          ui.patternFeedback.className = "mt-2 rounded-xl bg-violet-100 px-3 py-2 text-sm font-semibold text-violet-700";
+        }
+
+        function submitPatternAnswer() {
+          if (!state.patternChallenge || !state.profile) return;
+          const value = Number(ui.patternInput.value);
+          if (!Number.isFinite(value)) {
+            ui.patternFeedback.textContent = "Please type a number for the pattern.";
+            ui.patternFeedback.className = "mt-2 rounded-xl bg-amber-100 px-3 py-2 text-sm font-semibold text-amber-700";
+            return;
+          }
+          if (value === state.patternChallenge.answer) {
+            const earned = 6;
+            state.profile.patternCorrect += 1;
+            state.profile.totalXp += earned;
+            state.profile.xp += earned;
+            let leveledUp = false;
+            while (state.profile.xp >= xpNeeded(state.profile.level)) {
+              state.profile.xp -= xpNeeded(state.profile.level);
+              state.profile.level += 1;
+              leveledUp = true;
+            }
+            audio.playSuccess();
+            ui.patternFeedback.textContent = `Pattern solved! +${earned} XP.`;
+            ui.patternFeedback.className = "mt-2 rounded-xl bg-emerald-100 px-3 py-2 text-sm font-semibold text-emerald-700";
+            if (state.profile.patternCorrect >= 5) {
+              unlockBadge("pattern-sleuth", "Pattern Sleuth");
+            }
+            if (leveledUp) {
+              audio.playLevelUp();
+              renderLevelUpModal();
+            }
+            updateHud();
+            saveProfile();
+            state.patternChallenge = generatePatternChallenge();
+            setTimeout(renderPatternChallenge, 550);
+          } else {
+            audio.playTap();
+            ui.patternFeedback.textContent = "Not yet. Look at how each step changes from one number to the next.";
+            ui.patternFeedback.className = "mt-2 rounded-xl bg-rose-100 px-3 py-2 text-sm font-semibold text-rose-700";
+          }
+        }
+
         function createProblem() {
           const ops = getEnabledOperations();
           const operation = pickRandom(ops);
@@ -858,6 +1050,7 @@
           ui.feedbackText.className = "mt-4 rounded-2xl bg-indigo-50 px-4 py-3 text-center text-sm font-semibold text-indigo-700 sm:text-base";
           resetVisualState();
           ui.equationText.textContent = state.currentProblem.equationText;
+          renderGroupingCoach(state.currentProblem);
         }
 
         function setAnswerDisplay() {
@@ -1151,6 +1344,8 @@
           ui.welcomeScreen.classList.add("hidden");
           ui.gameScreen.classList.remove("hidden");
           presentProblem();
+          state.patternChallenge = generatePatternChallenge();
+          renderPatternChallenge();
           updateHud();
           updateAssessorPanel();
           lucide.createIcons();
@@ -1170,6 +1365,13 @@
 
           window.addEventListener("keydown", (event) => {
             if (ui.welcomeScreen.classList.contains("hidden") === false) return;
+            const target = event.target;
+            if (
+              target instanceof HTMLElement &&
+              (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.tagName === "SELECT")
+            ) {
+              return;
+            }
             if (/^\d$/.test(event.key)) {
               event.preventDefault();
               handleInputKey(event.key);
@@ -1204,6 +1406,19 @@
           });
           ui.copyCsvBtn.addEventListener("click", () => {
             copyText(toCSV(state.profile.history));
+          });
+
+          ui.submitPatternBtn.addEventListener("click", submitPatternAnswer);
+          ui.newPatternBtn.addEventListener("click", () => {
+            state.patternChallenge = generatePatternChallenge();
+            renderPatternChallenge();
+            audio.playTap();
+          });
+          ui.patternInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              submitPatternAnswer();
+            }
           });
 
           ["pointerdown", "keydown"].forEach((type) => {
