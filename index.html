@@ -23,13 +23,13 @@
                 "100%": { transform: "translateX(0)" },
               },
               popIn: {
-                "0%": { transform: "scale(0.94)", opacity: "0.75" },
+                "0%": { transform: "scale(0.96)", opacity: "0.8" },
                 "100%": { transform: "scale(1)", opacity: "1" },
               },
             },
             animation: {
               wobble: "wobble 380ms ease-in-out",
-              popIn: "popIn 220ms ease-out",
+              popIn: "popIn 200ms ease-out",
             },
           },
         },
@@ -41,22 +41,30 @@
       }
 
       .numpad-btn {
-        -webkit-tap-highlight-color: transparent;
         user-select: none;
+        -webkit-tap-highlight-color: transparent;
       }
     </style>
   </head>
   <body class="h-screen overflow-hidden bg-gradient-to-br from-amber-100 via-rose-100 to-violet-100 font-display text-slate-800">
     <canvas id="rewardCanvas" class="pointer-events-none fixed inset-0 z-30"></canvas>
 
-    <main class="relative z-10 mx-auto h-screen max-w-6xl p-2 sm:p-3">
+    <main class="relative z-10 mx-auto h-screen max-w-7xl p-2 sm:p-3">
+      <button
+        id="teacherToggleBtn"
+        class="fixed right-3 top-3 z-40 rounded-full bg-violet-600 p-3 text-white shadow-xl transition hover:bg-violet-500"
+        aria-label="Toggle teacher panel"
+      >
+        <i data-lucide="line-chart"></i>
+      </button>
+
       <section id="landingView" class="h-full rounded-3xl border border-white/70 bg-white/75 p-4 shadow-2xl backdrop-blur-sm sm:p-6">
         <div class="flex h-full flex-col gap-4">
           <header class="text-center">
             <p class="text-xs font-bold uppercase tracking-[0.2em] text-violet-600">Mental Math Arcade</p>
             <h1 class="mt-1 text-3xl font-black text-indigo-700 sm:text-4xl">Pick Your Math Quest</h1>
             <p class="mx-auto mt-1 max-w-2xl text-sm font-semibold text-slate-600 sm:text-base">
-              Choose a game mode and jump straight into fast, playful, confidence-building brain training.
+              Choose a game mode, tune difficulty, and train with adaptive guidance.
             </p>
           </header>
 
@@ -68,39 +76,39 @@
               placeholder="Type your name"
               class="w-full rounded-xl border border-violet-200 bg-white px-3 py-2 text-base font-semibold outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
             />
-            <p id="nameHint" class="mt-1 text-xs font-semibold text-slate-500">Your progress is saved automatically.</p>
+            <p id="nameHint" class="mt-1 text-xs font-semibold text-slate-500">Progress is stored locally for each player.</p>
           </div>
 
           <div class="grid flex-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <button class="mode-btn rounded-2xl border border-indigo-200 bg-gradient-to-br from-indigo-100 to-indigo-200 p-4 text-left shadow-md transition hover:scale-[1.01]" data-mode="addition">
+            <button class="mode-btn rounded-2xl border border-indigo-200 bg-gradient-to-br from-indigo-100 to-cyan-200 p-4 text-left shadow-md transition hover:scale-[1.01]" data-mode="addition">
               <div class="mb-1 inline-flex rounded-lg bg-indigo-600 p-2 text-white"><i data-lucide="plus"></i></div>
               <p class="text-lg font-black text-indigo-800">Addition</p>
-              <p class="text-xs font-semibold text-indigo-700">Build speed with happy sums.</p>
+              <p class="text-xs font-semibold text-indigo-700">Build fast number fluency with layered sums.</p>
             </button>
             <button class="mode-btn rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-100 to-orange-200 p-4 text-left shadow-md transition hover:scale-[1.01]" data-mode="subtraction">
               <div class="mb-1 inline-flex rounded-lg bg-amber-600 p-2 text-white"><i data-lucide="minus"></i></div>
               <p class="text-lg font-black text-amber-800">Subtraction</p>
-              <p class="text-xs font-semibold text-amber-700">Stay calm and subtract cleanly.</p>
+              <p class="text-xs font-semibold text-amber-700">Sharpen precision, regrouping, and difference sense.</p>
             </button>
-            <button class="mode-btn rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-100 to-emerald-200 p-4 text-left shadow-md transition hover:scale-[1.01]" data-mode="multiplication">
+            <button class="mode-btn rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-100 to-lime-200 p-4 text-left shadow-md transition hover:scale-[1.01]" data-mode="multiplication">
               <div class="mb-1 inline-flex rounded-lg bg-emerald-600 p-2 text-white"><i data-lucide="x"></i></div>
               <p class="text-lg font-black text-emerald-800">Multiplication</p>
-              <p class="text-xs font-semibold text-emerald-700">Find friendly factors fast.</p>
+              <p class="text-xs font-semibold text-emerald-700">Practice factors, grouping, and product shortcuts.</p>
             </button>
             <button class="mode-btn rounded-2xl border border-rose-200 bg-gradient-to-br from-rose-100 to-pink-200 p-4 text-left shadow-md transition hover:scale-[1.01]" data-mode="division">
               <div class="mb-1 inline-flex rounded-lg bg-rose-600 p-2 text-white"><i data-lucide="divide"></i></div>
               <p class="text-lg font-black text-rose-800">Division</p>
-              <p class="text-xs font-semibold text-rose-700">Practice whole-number quotients.</p>
+              <p class="text-xs font-semibold text-rose-700">Only clean integer outcomes for trustable practice.</p>
             </button>
             <button class="mode-btn rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-100 to-fuchsia-200 p-4 text-left shadow-md transition hover:scale-[1.01]" data-mode="pattern">
               <div class="mb-1 inline-flex rounded-lg bg-violet-600 p-2 text-white"><i data-lucide="brain-circuit"></i></div>
               <p class="text-lg font-black text-violet-800">Pattern Recognition</p>
-              <p class="text-xs font-semibold text-violet-700">Spot number rhythms and predict next.</p>
+              <p class="text-xs font-semibold text-violet-700">Predict sequence rules and strengthen abstract thinking.</p>
             </button>
             <div class="rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-100 to-cyan-200 p-4 shadow-md">
               <div class="mb-1 inline-flex rounded-lg bg-sky-600 p-2 text-white"><i data-lucide="sparkles"></i></div>
-              <p class="text-lg font-black text-sky-800">Bonus Tip</p>
-              <p class="text-xs font-semibold text-sky-700">If 6 and 7 show up together, keep an eye out for a joke drop.</p>
+              <p class="text-lg font-black text-sky-800">Arcade Rule</p>
+              <p class="text-xs font-semibold text-sky-700">If 6 and 7 show up side-by-side, comedy mode might activate.</p>
             </div>
           </div>
         </div>
@@ -124,8 +132,35 @@
             </div>
           </header>
 
-          <section id="challengeCard" class="flex-1 rounded-2xl border border-white/70 bg-white/90 p-3 shadow-lg">
-            <div class="grid h-full gap-2 md:grid-cols-[1fr_330px] md:gap-3">
+          <section id="challengeCard" class="flex-1 rounded-2xl border border-white/70 bg-white/90 p-2 shadow-lg">
+            <div class="grid h-full gap-2 xl:grid-cols-[340px_1fr_330px]">
+              <aside class="flex flex-col gap-2 rounded-2xl bg-slate-50 p-2">
+                <div class="rounded-xl bg-white p-2 shadow-sm">
+                  <div class="mb-1 flex items-center justify-between">
+                    <p class="text-xs font-black uppercase tracking-wide text-slate-600">Difficulty Override</p>
+                    <span id="difficultyTierLabel" class="rounded-full bg-violet-100 px-2 py-1 text-[11px] font-black text-violet-700">Medium</span>
+                  </div>
+                  <input id="difficultySlider" type="range" min="1" max="10" value="5" class="w-full accent-violet-600" />
+                  <div class="mt-1 flex items-center justify-between text-[11px] font-semibold text-slate-500">
+                    <span>1</span><span>10</span>
+                  </div>
+                  <label class="mt-2 inline-flex items-center gap-2 text-xs font-semibold text-slate-700">
+                    <input id="difficultyLock" type="checkbox" class="h-4 w-4 accent-violet-600" />
+                    Lock slider (disable auto-adapt)
+                  </label>
+                </div>
+
+                <div class="rounded-xl bg-white p-2 shadow-sm">
+                  <p class="text-xs font-black uppercase tracking-wide text-slate-600">Expected Equation Examples</p>
+                  <ul id="difficultyExamples" class="mt-1 list-disc pl-4 text-xs font-semibold text-slate-700"></ul>
+                </div>
+
+                <div class="rounded-xl bg-emerald-50 p-2">
+                  <p class="text-xs font-black uppercase tracking-wide text-emerald-700">Auto-Adapt Feedback</p>
+                  <p id="adaptationFeedback" class="mt-1 text-xs font-semibold text-emerald-800">No automatic changes yet for this mode.</p>
+                </div>
+              </aside>
+
               <div class="flex flex-col rounded-2xl bg-slate-50 p-3">
                 <p class="text-center text-xs font-bold uppercase tracking-wide text-slate-500">Current Challenge</p>
                 <p id="challengePrompt" class="mt-1 text-center text-3xl font-black text-slate-800 sm:text-4xl"></p>
@@ -134,13 +169,13 @@
                   <p id="answerDisplay" class="mt-1 min-h-[2.2rem] text-3xl font-black text-indigo-700">—</p>
                 </div>
                 <p id="feedbackText" class="mt-2 rounded-xl bg-indigo-100 px-3 py-2 text-center text-sm font-bold text-indigo-700">
-                  Tap numbers or use your keyboard.
+                  Tap numbers or use keyboard.
                 </p>
-                <p id="coachText" class="mt-2 min-h-[2.5rem] rounded-xl bg-emerald-100 px-3 py-2 text-xs font-semibold text-emerald-800"></p>
                 <div class="mt-2 rounded-xl bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800">
                   <span class="font-black">Grouping Coach:</span>
-                  <span id="groupingText">Grouping insights appear for 3-term expressions.</span>
+                  <span id="groupingText">Grouping insights appear for multi-term expressions.</span>
                 </div>
+                <div id="feedbackThread" class="mt-2 grid max-h-[190px] gap-2 overflow-y-auto pr-1"></div>
               </div>
 
               <div class="flex h-full flex-col rounded-2xl bg-slate-50 p-2">
@@ -164,49 +199,62 @@
           </section>
         </div>
       </section>
+
+      <section id="teacherPanel" class="fixed inset-x-2 bottom-2 z-50 hidden max-h-[62vh] overflow-auto rounded-3xl border border-slate-200 bg-white/95 p-3 shadow-2xl sm:inset-x-6 sm:p-4">
+        <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <h3 class="text-lg font-black text-slate-800">Teacher & Insight Panel</h3>
+          <div class="flex gap-2">
+            <button id="copyJsonBtn" class="rounded-xl bg-indigo-600 px-3 py-2 text-xs font-bold text-white">Copy JSON</button>
+            <button id="copyCsvBtn" class="rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white">Copy CSV</button>
+          </div>
+        </div>
+        <div class="grid gap-2 rounded-2xl bg-slate-50 p-3 text-xs font-semibold sm:grid-cols-3">
+          <p><span class="font-black">Most Common Style:</span> <span id="insightTopStyle">N/A</span></p>
+          <p><span class="font-black">Confidence Trend:</span> <span id="insightTrend">N/A</span></p>
+          <p><span class="font-black">Recommended Focus:</span> <span id="insightFocus">N/A</span></p>
+        </div>
+        <div class="mt-2 overflow-x-auto">
+          <table class="min-w-full text-left text-xs">
+            <thead class="border-b border-slate-200">
+              <tr>
+                <th class="px-2 py-2">Prompt</th>
+                <th class="px-2 py-2">Mode/Diff</th>
+                <th class="px-2 py-2">Attempts</th>
+                <th class="px-2 py-2">Time(s)</th>
+                <th class="px-2 py-2">Error Type</th>
+                <th class="px-2 py-2">Style Tags</th>
+                <th class="px-2 py-2">Auto Change Reason</th>
+              </tr>
+            </thead>
+            <tbody id="teacherTableBody"></tbody>
+          </table>
+        </div>
+      </section>
     </main>
 
     <script>
       (() => {
-        const STORAGE_KEY = "sparkMathArcadeV2";
-
-        const THEMES = {
-          addition: {
-            title: "Addition Arena",
-            shell: "from-indigo-100 via-sky-100 to-cyan-100",
-            titleColor: "text-indigo-700",
-            op: "+",
-          },
-          subtraction: {
-            title: "Subtraction Street",
-            shell: "from-amber-100 via-orange-100 to-yellow-100",
-            titleColor: "text-amber-700",
-            op: "-",
-          },
-          multiplication: {
-            title: "Multiplication Mountain",
-            shell: "from-emerald-100 via-lime-100 to-teal-100",
-            titleColor: "text-emerald-700",
-            op: "×",
-          },
-          division: {
-            title: "Division Dock",
-            shell: "from-rose-100 via-pink-100 to-fuchsia-100",
-            titleColor: "text-rose-700",
-            op: "÷",
-          },
-          pattern: {
-            title: "Pattern Playground",
-            shell: "from-violet-100 via-purple-100 to-fuchsia-100",
-            titleColor: "text-violet-700",
-            op: null,
-          },
+        const STORAGE_KEY = "sparkMathArcadeV3";
+        const MODES = ["addition", "subtraction", "multiplication", "division", "pattern"];
+        const tierLabels = ["Beginner", "Beginner", "Easy", "Easy", "Medium", "Medium", "Challenging", "Challenging", "Expert", "Expert"];
+        const modeTitles = {
+          addition: "Addition Arena",
+          subtraction: "Subtraction Street",
+          multiplication: "Multiplication Mountain",
+          division: "Division Dock",
+          pattern: "Pattern Playground",
         };
-
+        const modeThemes = {
+          addition: "from-indigo-100 via-sky-100 to-cyan-100",
+          subtraction: "from-amber-100 via-orange-100 to-yellow-100",
+          multiplication: "from-emerald-100 via-lime-100 to-teal-100",
+          division: "from-rose-100 via-pink-100 to-fuchsia-100",
+          pattern: "from-violet-100 via-purple-100 to-fuchsia-100",
+        };
         const jokes67 = [
           "Why is 6 nervous around 7? Because 7 8 9.",
-          "6 and 7 walked into the problem; 6 checked if 9 was safe.",
-          "If you see 6 next to 7, lock up your 9s.",
+          "6 and 7 walked into the problem, and 9 went missing.",
+          "If 6 and 7 are neighbors, hide your 9s.",
         ];
 
         const ui = {
@@ -222,12 +270,25 @@
           challengePrompt: document.getElementById("challengePrompt"),
           answerDisplay: document.getElementById("answerDisplay"),
           feedbackText: document.getElementById("feedbackText"),
-          coachText: document.getElementById("coachText"),
           groupingText: document.getElementById("groupingText"),
+          feedbackThread: document.getElementById("feedbackThread"),
           numPad: document.getElementById("numPad"),
           xpText: document.getElementById("xpText"),
           levelText: document.getElementById("levelText"),
           streakText: document.getElementById("streakText"),
+          difficultySlider: document.getElementById("difficultySlider"),
+          difficultyTierLabel: document.getElementById("difficultyTierLabel"),
+          difficultyExamples: document.getElementById("difficultyExamples"),
+          difficultyLock: document.getElementById("difficultyLock"),
+          adaptationFeedback: document.getElementById("adaptationFeedback"),
+          teacherPanel: document.getElementById("teacherPanel"),
+          teacherToggleBtn: document.getElementById("teacherToggleBtn"),
+          teacherTableBody: document.getElementById("teacherTableBody"),
+          insightTopStyle: document.getElementById("insightTopStyle"),
+          insightTrend: document.getElementById("insightTrend"),
+          insightFocus: document.getElementById("insightFocus"),
+          copyJsonBtn: document.getElementById("copyJsonBtn"),
+          copyCsvBtn: document.getElementById("copyCsvBtn"),
           rewardCanvas: document.getElementById("rewardCanvas"),
         };
 
@@ -237,6 +298,10 @@
           currentInput: "",
           currentChallenge: null,
           lockInput: false,
+          generationMemoryByMode: Object.fromEntries(MODES.map((m) => [m, []])),
+          modePerformanceWindow: Object.fromEntries(MODES.map((m) => [m, []])),
+          lastAdjustmentRoundByMode: Object.fromEntries(MODES.map((m) => [m, 0])),
+          teacherOpen: false,
         };
 
         class AudioEngine {
@@ -247,7 +312,7 @@
             if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
             if (this.ctx.state === "suspended") this.ctx.resume();
           }
-          play(freq, duration = 0.1, type = "triangle", gainVal = 0.05, start = 0) {
+          tone(freq, duration = 0.1, type = "triangle", gainLevel = 0.05, start = 0) {
             this.ensure();
             const t = this.ctx.currentTime + start;
             const osc = this.ctx.createOscillator();
@@ -255,22 +320,26 @@
             osc.type = type;
             osc.frequency.setValueAtTime(freq, t);
             gain.gain.setValueAtTime(0.0001, t);
-            gain.gain.exponentialRampToValueAtTime(gainVal, t + 0.02);
+            gain.gain.exponentialRampToValueAtTime(gainLevel, t + 0.02);
             gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
             osc.connect(gain);
             gain.connect(this.ctx.destination);
             osc.start(t);
-            osc.stop(t + duration + 0.03);
+            osc.stop(t + duration + 0.04);
           }
           tap() {
-            this.play(460, 0.05, "square", 0.02);
+            this.tone(460, 0.05, "square", 0.02);
           }
           success() {
-            [261.63, 329.63, 392, 523.25].forEach((f, i) => this.play(f, 0.15, "sine", 0.045, i * 0.07));
+            [261.63, 329.63, 392, 523.25].forEach((f, i) => this.tone(f, 0.15, "sine", 0.045, i * 0.07));
+          }
+          scaffold() {
+            this.tone(392, 0.13, "triangle", 0.04);
+            this.tone(466.16, 0.16, "triangle", 0.04, 0.08);
           }
           levelUp() {
             [[261.63, 329.63, 392], [329.63, 415.3, 523.25]].forEach((chord, step) => {
-              chord.forEach((f) => this.play(f, 0.24, "triangle", 0.035, step * 0.22));
+              chord.forEach((f) => this.tone(f, 0.24, "triangle", 0.035, step * 0.22));
             });
           }
         }
@@ -295,8 +364,8 @@
               this.items.push({
                 x,
                 y,
-                vx: Math.cos(angle) * (1 + Math.random() * 3),
-                vy: Math.sin(angle) * (1 + Math.random() * 3) - 1.2,
+                vx: Math.cos(angle) * (1 + Math.random() * 2.8),
+                vy: Math.sin(angle) * (1 + Math.random() * 2.8) - 1.2,
                 life: 45 + Math.floor(Math.random() * 25),
                 size: 4 + Math.random() * 6,
                 color: colors[Math.floor(Math.random() * colors.length)],
@@ -316,18 +385,15 @@
               p.x += p.vx;
               p.y += p.vy;
               p.vy += 0.04;
-              ctx.globalAlpha = Math.max(0, p.life / 60);
+              ctx.globalAlpha = Math.max(0, p.life / 65);
               ctx.fillStyle = p.color;
               ctx.beginPath();
               ctx.arc(p.x, p.y, p.size * 0.5, 0, Math.PI * 2);
               ctx.fill();
             });
             ctx.globalAlpha = 1;
-            if (this.items.length) {
-              requestAnimationFrame(() => this.loop());
-            } else {
-              this.running = false;
-            }
+            if (this.items.length > 0) requestAnimationFrame(() => this.loop());
+            else this.running = false;
           }
         }
 
@@ -336,6 +402,49 @@
 
         function xpForLevel(level) {
           return 80 + (level - 1) * 35;
+        }
+
+        function randInt(min, max) {
+          return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function pick(arr) {
+          return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function clamp(value, min, max) {
+          return Math.max(min, Math.min(max, value));
+        }
+
+        function sixSevenJoke(values) {
+          for (let i = 0; i < values.length - 1; i += 1) {
+            if ((values[i] === 6 && values[i + 1] === 7) || (values[i] === 7 && values[i + 1] === 6)) {
+              return pick(jokes67);
+            }
+          }
+          return "";
+        }
+
+        function defaultDifficultyMap() {
+          return Object.fromEntries(MODES.map((mode) => [mode, 5]));
+        }
+
+        function defaultLockMap() {
+          return Object.fromEntries(MODES.map((mode) => [mode, false]));
+        }
+
+        function createProfile(name) {
+          return {
+            name,
+            xp: 0,
+            totalXp: 0,
+            level: 1,
+            streakByMode: Object.fromEntries(MODES.map((mode) => [mode, 0])),
+            difficultyByMode: defaultDifficultyMap(),
+            difficultyLockByMode: defaultLockMap(),
+            adaptationLog: [],
+            challengeHistory: [],
+          };
         }
 
         function loadProfile() {
@@ -349,7 +458,11 @@
               xp: Number(p.xp) || 0,
               totalXp: Number(p.totalXp) || 0,
               level: Number(p.level) || 1,
-              streak: Number(p.streak) || 0,
+              streakByMode: { ...Object.fromEntries(MODES.map((mode) => [mode, 0])), ...(p.streakByMode || {}) },
+              difficultyByMode: { ...defaultDifficultyMap(), ...(p.difficultyByMode || {}) },
+              difficultyLockByMode: { ...defaultLockMap(), ...(p.difficultyLockByMode || {}) },
+              adaptationLog: Array.isArray(p.adaptationLog) ? p.adaptationLog : [],
+              challengeHistory: Array.isArray(p.challengeHistory) ? p.challengeHistory : [],
             };
           } catch {
             return null;
@@ -361,169 +474,342 @@
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state.profile));
         }
 
-        function makeProfile(name) {
+        function difficultyTierLabel(level) {
+          return tierLabels[clamp(level, 1, 10) - 1];
+        }
+
+        function difficultyConfig(mode, level) {
+          const d = clamp(level, 1, 10);
+          if (mode === "addition") {
+            return {
+              termCount: d < 4 ? 2 : d < 8 ? pick([2, 3]) : pick([3, 4]),
+              min: d < 4 ? 1 : d < 8 ? 5 : 12,
+              max: 10 + d * 12,
+              maxAbsAnswer: 1500 + d * 300,
+            };
+          }
+          if (mode === "subtraction") {
+            return {
+              termCount: d < 5 ? 2 : d < 9 ? pick([2, 3]) : pick([3, 4]),
+              minStart: 18 + d * 8,
+              maxStart: 80 + d * 25,
+              subMax: 12 + d * 10,
+              allowNegative: d >= 9,
+              maxAbsAnswer: 1600 + d * 300,
+            };
+          }
+          if (mode === "multiplication") {
+            return {
+              termCount: d < 4 ? 2 : d < 8 ? pick([2, 3]) : pick([3, 4]),
+              minFactor: d < 5 ? 2 : 3,
+              maxFactor: d < 4 ? 8 : d < 8 ? 12 : 16,
+              maxAbsAnswer: 30000 + d * 10000,
+            };
+          }
+          if (mode === "division") {
+            return {
+              termCount: d < 5 ? 2 : d < 9 ? pick([2, 3]) : pick([3, 4]),
+              divisorMin: 2,
+              divisorMax: d < 5 ? 8 : d < 8 ? 12 : 16,
+              quotientMin: 2,
+              quotientMax: d < 5 ? 14 : d < 8 ? 22 : 35,
+              maxAbsAnswer: 2500 + d * 400,
+            };
+          }
           return {
-            name,
-            xp: 0,
-            totalXp: 0,
-            level: 1,
-            streak: 0,
+            sequenceLength: 5,
+            patternTypes: d < 4 ? ["step", "doubleStep"] : d < 8 ? ["step", "doubleStep", "fib"] : ["step", "doubleStep", "fib", "geo", "altMul"],
+            maxStep: 2 + d,
           };
         }
 
-        function randInt(min, max) {
-          return Math.floor(Math.random() * (max - min + 1)) + min;
+        function examplesForMode(mode, level) {
+          const d = clamp(level, 1, 10);
+          if (mode === "addition") return [`${2 + d} + ${7 + d}`, `${5 + d} + ${8 + d} + ${3 + d}`, `${12 + d * 2} + ${9 + d} + ${6 + d}`];
+          if (mode === "subtraction") return [`${22 + d * 6} - ${4 + d}`, `${40 + d * 8} - ${12 + d} - ${3 + d}`, `${60 + d * 10} - ${15 + d * 2}`];
+          if (mode === "multiplication") return [`${2 + Math.floor(d / 2)} × ${5 + d}`, `${3 + Math.floor(d / 2)} × ${4 + d} × ${2 + Math.floor(d / 3)}`, `${6 + d} × ${7 + Math.floor(d / 2)}`];
+          if (mode === "division") return [`${(4 + d) * (2 + Math.floor(d / 2))} ÷ ${2 + Math.floor(d / 2)}`, `${(6 + d) * (3 + Math.floor(d / 3))} ÷ ${3 + Math.floor(d / 3)}`, `${(5 + d) * (4 + Math.floor(d / 3))} ÷ ${4 + Math.floor(d / 3)}`];
+          return [`${2 + d}, ${4 + d}, ${6 + d}, ...`, `${1 + d}, ${2 + d}, ${3 + d}, ${5 + d}, ...`, `${2 + Math.floor(d / 2)}, ${(2 + Math.floor(d / 2)) * 2}, ${(2 + Math.floor(d / 2)) * 4}, ...`];
         }
 
-        function pick(arr) {
-          return arr[Math.floor(Math.random() * arr.length)];
+        function updateDifficultyUI() {
+          const level = state.profile.difficultyByMode[state.mode];
+          ui.difficultySlider.value = String(level);
+          ui.difficultyTierLabel.textContent = difficultyTierLabel(level);
+          ui.difficultyLock.checked = Boolean(state.profile.difficultyLockByMode[state.mode]);
+          ui.difficultyExamples.innerHTML = "";
+          examplesForMode(state.mode, level).forEach((example) => {
+            const li = document.createElement("li");
+            li.textContent = example;
+            ui.difficultyExamples.appendChild(li);
+          });
+
+          const modeAdaptLog = state.profile.adaptationLog.filter((entry) => entry.mode === state.mode);
+          ui.adaptationFeedback.textContent = modeAdaptLog.length ? modeAdaptLog[modeAdaptLog.length - 1].reason : "No automatic changes yet for this mode.";
         }
 
-        function sixSevenJoke(values) {
-          for (let i = 0; i < values.length - 1; i += 1) {
-            if ((values[i] === 6 && values[i + 1] === 7) || (values[i] === 7 && values[i + 1] === 6)) {
-              return pick(jokes67);
+        function pushGenerationSignature(mode, signature) {
+          const arr = state.generationMemoryByMode[mode];
+          arr.push(signature);
+          if (arr.length > 28) arr.shift();
+        }
+
+        function signatureExists(mode, signature) {
+          return state.generationMemoryByMode[mode].includes(signature);
+        }
+
+        function mathChallenge(mode, difficulty) {
+          const cfg = difficultyConfig(mode, difficulty);
+          const opMap = { addition: "+", subtraction: "-", multiplication: "×", division: "÷" };
+          const op = opMap[mode];
+
+          for (let attempts = 0; attempts < 70; attempts += 1) {
+            let terms = [];
+            let answer = 0;
+            if (mode === "addition") {
+              terms = Array.from({ length: cfg.termCount }, () => randInt(cfg.min, cfg.max));
+              answer = terms.reduce((sum, value) => sum + value, 0);
+            } else if (mode === "subtraction") {
+              const start = randInt(cfg.minStart, cfg.maxStart);
+              terms = [start];
+              let running = start;
+              for (let i = 1; i < cfg.termCount; i += 1) {
+                const maxSub = Math.min(cfg.subMax, running + (cfg.allowNegative ? cfg.subMax : 0));
+                const minSub = cfg.allowNegative ? 1 : 0;
+                const next = randInt(minSub, Math.max(minSub, maxSub));
+                terms.push(next);
+                running -= next;
+              }
+              answer = running;
+              if (!cfg.allowNegative && answer < 0) continue;
+            } else if (mode === "multiplication") {
+              terms = Array.from({ length: cfg.termCount }, () => randInt(cfg.minFactor, cfg.maxFactor));
+              answer = terms.reduce((product, value) => product * value, 1);
+            } else if (mode === "division") {
+              const divisors = Array.from({ length: cfg.termCount - 1 }, () => randInt(cfg.divisorMin, cfg.divisorMax));
+              const quotient = randInt(cfg.quotientMin, cfg.quotientMax);
+              const dividend = divisors.reduce((acc, value) => acc * value, quotient);
+              terms = [dividend, ...divisors];
+              answer = quotient;
             }
+
+            if (Math.abs(answer) > cfg.maxAbsAnswer) continue;
+            const signature = `${op}|${terms.join(":")}`;
+            if (signatureExists(mode, signature)) continue;
+            const prompt = `${terms.join(` ${op} `)} = ?`;
+            pushGenerationSignature(mode, signature);
+            return {
+              kind: "math",
+              mode,
+              prompt,
+              terms,
+              op,
+              answer,
+              signature,
+              joke: sixSevenJoke(terms),
+              startedAt: performance.now(),
+              attempts: [],
+              hintsUsed: 0,
+            };
           }
-          return "";
-        }
 
-        function mathChallenge(mode) {
-          const termCount = Math.random() < 0.48 ? 3 : 2;
-          let terms = [];
-          let answer = 0;
-          let op = "+";
-
-          if (mode === "addition") {
-            op = "+";
-            terms = Array.from({ length: termCount }, () => randInt(2, 45));
-            answer = terms.reduce((s, n) => s + n, 0);
-          } else if (mode === "subtraction") {
-            op = "-";
-            const first = randInt(20, 120);
-            terms = [first];
-            let running = first;
-            for (let i = 1; i < termCount; i += 1) {
-              const next = randInt(1, Math.max(1, Math.min(40, running)));
-              terms.push(next);
-              running -= next;
-            }
-            answer = running;
-          } else if (mode === "multiplication") {
-            op = "×";
-            terms = Array.from({ length: termCount }, () => randInt(2, 12));
-            answer = terms.reduce((p, n) => p * n, 1);
-          } else {
-            op = "÷";
-            const divisor2 = randInt(2, 10);
-            if (termCount === 2) {
-              answer = randInt(2, 16);
-              terms = [answer * divisor2, divisor2];
-            } else {
-              const divisor3 = randInt(2, 8);
-              answer = randInt(2, 12);
-              terms = [answer * divisor2 * divisor3, divisor2, divisor3];
-            }
-          }
-
-          const prompt = `${terms.join(` ${op} `)} = ?`;
           return {
             kind: "math",
-            terms,
-            op,
-            prompt,
-            answer,
-            joke: sixSevenJoke(terms),
+            mode,
+            prompt: "10 + 10 = ?",
+            terms: [10, 10],
+            op: "+",
+            answer: 20,
+            signature: "fallback",
+            joke: "",
             startedAt: performance.now(),
+            attempts: [],
+            hintsUsed: 0,
           };
         }
 
-        function patternChallenge() {
-          const type = pick(["step", "doubleStep", "fib", "geo"]);
-          let seq = [];
-          let answer = 0;
+        function patternSignature(type, seq) {
+          const deltas = [];
+          for (let i = 1; i < seq.length; i += 1) deltas.push(seq[i] - seq[i - 1]);
+          return `${type}|${deltas.join(":")}`;
+        }
 
-          if (type === "step") {
-            const start = randInt(1, 20);
-            const step = randInt(2, 9);
-            seq = Array.from({ length: 5 }, (_, i) => start + i * step);
-            answer = start + 5 * step;
-          } else if (type === "doubleStep") {
-            const start = randInt(2, 18);
-            const a = randInt(2, 7);
-            const b = randInt(3, 8);
-            seq = [start];
-            for (let i = 1; i < 5; i += 1) {
-              seq.push(seq[i - 1] + (i % 2 ? a : b));
+        function patternChallenge(difficulty) {
+          const cfg = difficultyConfig("pattern", difficulty);
+          for (let tries = 0; tries < 70; tries += 1) {
+            const type = pick(cfg.patternTypes);
+            let seq = [];
+            let answer = 0;
+
+            if (type === "step") {
+              const start = randInt(1, 18 + difficulty * 2);
+              const step = randInt(2, cfg.maxStep);
+              seq = Array.from({ length: 5 }, (_, i) => start + i * step);
+              answer = start + 5 * step;
+            } else if (type === "doubleStep") {
+              const start = randInt(2, 20 + difficulty);
+              const a = randInt(2, cfg.maxStep);
+              const b = randInt(3, cfg.maxStep + 2);
+              seq = [start];
+              for (let i = 1; i < 5; i += 1) seq.push(seq[i - 1] + (i % 2 ? a : b));
+              answer = seq[4] + a;
+            } else if (type === "fib") {
+              seq = [randInt(1, 6 + Math.floor(difficulty / 2)), randInt(2, 8 + Math.floor(difficulty / 2))];
+              while (seq.length < 5) seq.push(seq[seq.length - 1] + seq[seq.length - 2]);
+              answer = seq[4] + seq[3];
+            } else if (type === "geo") {
+              const base = randInt(2, difficulty > 7 ? 4 : 3);
+              const start = randInt(1, 4 + Math.floor(difficulty / 2));
+              seq = [start];
+              while (seq.length < 5) seq.push(seq[seq.length - 1] * base);
+              answer = seq[4] * base;
+            } else {
+              const start = randInt(3, 14 + difficulty);
+              const m = randInt(2, 3);
+              seq = [start];
+              for (let i = 1; i < 5; i += 1) seq.push(i % 2 ? seq[i - 1] * m : seq[i - 1] - randInt(1, 4));
+              answer = seq[4] * m;
             }
-            answer = seq[4] + a;
-          } else if (type === "fib") {
-            seq = [randInt(1, 6), randInt(2, 7)];
-            while (seq.length < 5) seq.push(seq.at(-1) + seq.at(-2));
-            answer = seq[4] + seq[3];
-          } else {
-            const base = randInt(2, 4);
-            seq = [randInt(1, 3) * base];
-            while (seq.length < 5) seq.push(seq.at(-1) * base);
-            answer = seq[4] * base;
+
+            const signature = patternSignature(type, seq);
+            if (signatureExists("pattern", signature)) continue;
+            pushGenerationSignature("pattern", signature);
+            return {
+              kind: "pattern",
+              mode: "pattern",
+              type,
+              sequence: seq,
+              prompt: `${seq.join(", ")}, ...`,
+              answer,
+              signature,
+              joke: sixSevenJoke(seq),
+              startedAt: performance.now(),
+              attempts: [],
+              hintsUsed: 0,
+            };
           }
 
           return {
             kind: "pattern",
-            sequence: seq,
-            prompt: `${seq.join(", ")}, ...`,
-            answer,
-            joke: sixSevenJoke(seq),
+            mode: "pattern",
+            type: "fallback",
+            sequence: [2, 4, 6, 8, 10],
+            prompt: "2, 4, 6, 8, 10, ...",
+            answer: 12,
+            signature: "pattern:fallback",
+            joke: "",
             startedAt: performance.now(),
+            attempts: [],
+            hintsUsed: 0,
           };
         }
 
         function groupingHint(challenge) {
-          if (challenge.kind !== "math" || challenge.terms.length < 3) {
-            return "Grouping insights appear when you get a 3-term challenge.";
-          }
-          if (challenge.op === "+") {
-            return `Try (${challenge.terms[0]} + ${challenge.terms[1]}) first, then add ${challenge.terms[2]}.`;
-          }
-          if (challenge.op === "×") {
-            return `Look for easy pairs: (${challenge.terms[0]} × ${challenge.terms[1]}) then × ${challenge.terms[2]}.`;
-          }
-          if (challenge.op === "-") {
-            return "For subtraction, keep left-to-right to avoid accidental sign mistakes.";
-          }
-          return "For division, left-to-right order keeps the result trustworthy.";
+          if (challenge.kind !== "math" || challenge.terms.length < 3) return "Grouping insights appear when you get 3 or 4 terms.";
+          if (challenge.op === "+") return `Try (${challenge.terms[0]} + ${challenge.terms[1]}) then + ${challenge.terms[2]} for cleaner chunks.`;
+          if (challenge.op === "×") return `Check whether (${challenge.terms[0]} × ${challenge.terms[1]}) creates a friendly product before the last factor.`;
+          if (challenge.op === "-") return "Subtraction is safest with strict left-to-right order.";
+          return "Division is safest with strict left-to-right order.";
         }
 
-        function applyTheme(mode) {
-          const theme = THEMES[mode];
-          ui.gameShell.className = `flex h-full flex-col gap-2 rounded-3xl bg-gradient-to-br ${theme.shell} p-2 sm:gap-3 sm:p-3`;
-          ui.modeTitle.textContent = `${theme.title} • ${state.profile.name}`;
-          ui.modeTitle.className = `text-lg font-black ${theme.titleColor}`;
+        function applyTheme() {
+          ui.gameShell.className = `flex h-full flex-col gap-2 rounded-3xl bg-gradient-to-br ${modeThemes[state.mode]} p-2 sm:gap-3 sm:p-3`;
+          ui.modeTitle.textContent = `${modeTitles[state.mode]} • ${state.profile.name}`;
+        }
+
+        function styleTagsForRecord(record) {
+          const tags = [];
+          if (record.firstAttemptSec < 3 && record.attempts.length > 0) tags.push("Fast/Impulsive");
+          if (record.responseTimeSec > 15) tags.push("Methodical");
+          if (record.attempts.length >= 3) tags.push("Guess-and-Check");
+          if (record.hintsUsed > 0 && record.correct) tags.push("Strategy-Shifter");
+          if (record.attempts.length >= 2 && record.correct) tags.push("Persistence-Driven");
+          if (record.mode === "pattern" && record.correct && record.responseTimeSec < 5 && record.attempts.length === 0) tags.push("Pattern-Fluent");
+          return tags.length ? tags : ["Developing"];
         }
 
         function updateHud() {
+          const streak = state.profile.streakByMode[state.mode] || 0;
           ui.xpText.textContent = `${state.profile.xp}/${xpForLevel(state.profile.level)}`;
           ui.levelText.textContent = `${state.profile.level}`;
-          ui.streakText.textContent = `${state.profile.streak}`;
+          ui.streakText.textContent = `${streak}`;
         }
 
         function setChallenge() {
           state.currentInput = "";
           ui.answerDisplay.textContent = "—";
-          if (state.mode === "pattern") {
-            state.currentChallenge = patternChallenge();
-            ui.feedbackText.textContent = "Find the next number in the sequence.";
-          } else {
-            state.currentChallenge = mathChallenge(state.mode);
-            ui.feedbackText.textContent = "Solve it quickly and keep the streak alive.";
-          }
-          ui.feedbackText.className = "mt-2 rounded-xl bg-indigo-100 px-3 py-2 text-center text-sm font-bold text-indigo-700";
+          ui.feedbackThread.innerHTML = "";
+          const difficulty = state.profile.difficultyByMode[state.mode];
+          state.currentChallenge = state.mode === "pattern" ? patternChallenge(difficulty) : mathChallenge(state.mode, difficulty);
           ui.challengePrompt.textContent = state.currentChallenge.prompt;
-          ui.jokeLine.textContent = state.currentChallenge.joke || "";
-          ui.coachText.textContent = `Coach: ${state.currentChallenge.kind === "pattern" ? "Check how each number changes from one step to the next." : "Estimate first, then compute exactly."}`;
-          ui.groupingText.textContent = groupingHint(state.currentChallenge);
           ui.challengePrompt.classList.add("animate-popIn");
-          setTimeout(() => ui.challengePrompt.classList.remove("animate-popIn"), 250);
+          setTimeout(() => ui.challengePrompt.classList.remove("animate-popIn"), 220);
+          ui.feedbackText.textContent = state.currentChallenge.kind === "pattern" ? "Find the next number in the sequence." : "Solve accurately and keep momentum.";
+          ui.feedbackText.className = "mt-2 rounded-xl bg-indigo-100 px-3 py-2 text-center text-sm font-bold text-indigo-700";
+          ui.jokeLine.textContent = state.currentChallenge.joke || "";
+          ui.groupingText.textContent = groupingHint(state.currentChallenge);
+        }
+
+        function pushFeedbackCard(title, bodyLines, tone = "indigo") {
+          const toneClass =
+            tone === "rose"
+              ? "bg-rose-100 text-rose-800"
+              : tone === "emerald"
+                ? "bg-emerald-100 text-emerald-800"
+                : tone === "amber"
+                  ? "bg-amber-100 text-amber-800"
+                  : "bg-indigo-100 text-indigo-800";
+          const card = document.createElement("article");
+          card.className = `rounded-xl p-2 text-xs ${toneClass}`;
+          card.innerHTML = `<p class="font-black">${title}</p>${bodyLines.map((line) => `<p class="mt-1 font-semibold">${line}</p>`).join("")}`;
+          ui.feedbackThread.prepend(card);
+          while (ui.feedbackThread.children.length > 5) ui.feedbackThread.removeChild(ui.feedbackThread.lastChild);
+        }
+
+        function likelyErrorType(challenge, guess) {
+          if (challenge.kind === "pattern") return "Pattern Rule Misread";
+          const diff = guess - challenge.answer;
+          if (Math.abs(diff) <= 2) return "Near Miss (Arithmetic Slip)";
+          if (challenge.op === "-" && guess > challenge.answer) return "Subtraction Sign Drift";
+          if (challenge.op === "÷") return "Division Quotient Estimate Error";
+          if (challenge.op === "×") return "Factor/Product Miscalculation";
+          return "Place-Value or Operation Mix-up";
+        }
+
+        function strategyHints(challenge) {
+          if (challenge.kind === "pattern") {
+            return [
+              "Method 1: Compare consecutive differences and check if they repeat.",
+              "Method 2: Test if each term multiplies by a shared ratio.",
+              "Quick check: verify your answer keeps the same rule from the last two transitions.",
+            ];
+          }
+          if (challenge.op === "+") {
+            return [
+              "Method 1: Group numbers to nearest 10 or 100, then adjust.",
+              "Method 2: Add left-to-right while tracking running total.",
+              "Quick check: reverse estimate by rounding each term and comparing scale.",
+            ];
+          }
+          if (challenge.op === "-") {
+            return [
+              "Method 1: Count up from the smaller number to bridge the gap.",
+              "Method 2: Subtract in chunks (tens first, ones after).",
+              "Quick check: add your result back to the subtrahend to recover the minuend.",
+            ];
+          }
+          if (challenge.op === "×") {
+            return [
+              "Method 1: Split one factor into tens and ones (distributive strategy).",
+              "Method 2: Reorder factors to make friendly products first.",
+              "Quick check: estimate by rounding factors before final exact product.",
+            ];
+          }
+          return [
+            "Method 1: Use factor pairs to find the quotient mentally.",
+            "Method 2: Break dividend into divisible chunks and sum quotients.",
+            "Quick check: multiply quotient by divisor(s) to recover the dividend.",
+          ];
         }
 
         function addXp(amount) {
@@ -538,23 +824,137 @@
           return leveled;
         }
 
-        function onCorrect() {
-          const elapsed = (performance.now() - state.currentChallenge.startedAt) / 1000;
-          state.profile.streak += 1;
-          const reward = Math.max(8, Math.round(10 + state.profile.streak * 1.8 + Math.max(0, 8 - elapsed)));
-          const leveled = addXp(reward);
-          audio.success();
-          if (leveled) {
-            audio.levelUp();
-            ui.feedbackText.textContent = `Perfect! +${reward} XP. Level up to ${state.profile.level}!`;
-          } else {
-            ui.feedbackText.textContent = `Perfect! +${reward} XP.`;
+        function performanceSummaryForMode(mode) {
+          const window = state.modePerformanceWindow[mode];
+          if (!window.length) return null;
+          const accuracy = window.filter((r) => r.correct).length / window.length;
+          const avgTime = window.reduce((sum, r) => sum + r.responseTimeSec, 0) / window.length;
+          const avgAttempts = window.reduce((sum, r) => sum + r.attempts.length, 0) / window.length;
+          const recentWrongStreak = (() => {
+            let count = 0;
+            for (let i = window.length - 1; i >= 0; i -= 1) {
+              if (window[i].correct) break;
+              count += 1;
+            }
+            return count;
+          })();
+          return { accuracy, avgTime, avgAttempts, recentWrongStreak };
+        }
+
+        function maybeAdjustDifficulty(mode) {
+          const lock = state.profile.difficultyLockByMode[mode];
+          if (lock) return null;
+          const window = state.modePerformanceWindow[mode];
+          if (window.length < 5) return null;
+          const rounds = state.profile.challengeHistory.filter((r) => r.mode === mode).length;
+          if (rounds - state.lastAdjustmentRoundByMode[mode] < 3) return null;
+
+          const summary = performanceSummaryForMode(mode);
+          if (!summary) return null;
+          const current = state.profile.difficultyByMode[mode];
+          let next = current;
+          let reason = "";
+
+          if (summary.accuracy >= 0.85 && summary.avgTime <= 6.2 && summary.avgAttempts <= 0.7 && current < 10) {
+            next = current + 1;
+            reason = `Difficulty increased to ${next} because accuracy is ${(summary.accuracy * 100).toFixed(0)}%, average time ${summary.avgTime.toFixed(1)}s, and retries are low.`;
+          } else if ((summary.accuracy < 0.45 || summary.recentWrongStreak >= 3 || summary.avgAttempts > 1.6) && current > 1) {
+            next = current - 1;
+            reason = `Difficulty reduced to ${next} because recent retries suggest this tier will improve confidence before advancing again.`;
           }
-          ui.feedbackText.className = "mt-2 rounded-xl bg-emerald-100 px-3 py-2 text-center text-sm font-bold text-emerald-700";
-          const rect = document.getElementById("challengeCard").getBoundingClientRect();
-          particles.burst(rect.left + rect.width * 0.5, rect.top + rect.height * 0.4, 34);
+
+          if (next !== current) {
+            state.profile.difficultyByMode[mode] = next;
+            state.lastAdjustmentRoundByMode[mode] = rounds;
+            const entry = {
+              mode,
+              from: current,
+              to: next,
+              reason,
+              timestamp: new Date().toISOString(),
+            };
+            state.profile.adaptationLog.push(entry);
+            ui.adaptationFeedback.textContent = reason;
+            pushFeedbackCard("Adaptive Difficulty Update", [reason], next > current ? "emerald" : "amber");
+            if (mode === state.mode) updateDifficultyUI();
+            return reason;
+          }
+          return null;
+        }
+
+        function recordChallengeResult(correct, errorType = "", autoAdjustmentReason = "") {
+          const challenge = state.currentChallenge;
+          const responseTimeSec = (performance.now() - challenge.startedAt) / 1000;
+          const record = {
+            mode: state.mode,
+            prompt: challenge.prompt,
+            difficulty: state.profile.difficultyByMode[state.mode],
+            signature: challenge.signature,
+            correct,
+            attempts: challenge.attempts.map((a) => a.value),
+            firstAttemptSec: challenge.attempts.length ? challenge.attempts[0].elapsedSec : responseTimeSec,
+            responseTimeSec,
+            hintsUsed: challenge.hintsUsed,
+            errorType: errorType || (correct ? "" : "Unknown"),
+            strategiesShown: strategyHints(challenge).slice(0, 2),
+            autoAdjustmentReason,
+            timestamp: new Date().toISOString(),
+          };
+          record.styleTags = styleTagsForRecord(record);
+          state.profile.challengeHistory.push(record);
+          if (state.profile.challengeHistory.length > 240) state.profile.challengeHistory.shift();
+
+          state.modePerformanceWindow[state.mode].push(record);
+          if (state.modePerformanceWindow[state.mode].length > 8) state.modePerformanceWindow[state.mode].shift();
+          return record;
+        }
+
+        function onWrong(guess) {
+          const challenge = state.currentChallenge;
+          const elapsed = (performance.now() - challenge.startedAt) / 1000;
+          challenge.attempts.push({ value: guess, elapsedSec: elapsed });
+          challenge.hintsUsed += 1;
+          state.profile.streakByMode[state.mode] = 0;
+          const errorType = likelyErrorType(challenge, guess);
+          const hints = strategyHints(challenge);
+          audio.scaffold();
+          ui.feedbackText.textContent = "Close. Use the strategy tips below and try again.";
+          ui.feedbackText.className = "mt-2 rounded-xl bg-rose-100 px-3 py-2 text-center text-sm font-bold text-rose-700";
+          document.getElementById("challengeCard").classList.add("animate-wobble");
+          setTimeout(() => document.getElementById("challengeCard").classList.remove("animate-wobble"), 380);
+          pushFeedbackCard("What likely happened", [errorType], "rose");
+          pushFeedbackCard("Try another method", [hints[0], hints[1], hints[2]], "indigo");
+          recordChallengeResult(false, errorType, "");
           saveProfile();
           updateHud();
+          updateTeacherPanel();
+          state.currentInput = "";
+          ui.answerDisplay.textContent = "—";
+        }
+
+        function onCorrect() {
+          const challenge = state.currentChallenge;
+          const elapsed = (performance.now() - challenge.startedAt) / 1000;
+          state.profile.streakByMode[state.mode] = (state.profile.streakByMode[state.mode] || 0) + 1;
+          const streak = state.profile.streakByMode[state.mode];
+          const reward = Math.max(8, Math.round(10 + streak * 1.6 + Math.max(0, 7 - elapsed)));
+          const leveled = addXp(reward);
+          audio.success();
+          const reason = maybeAdjustDifficulty(state.mode) || "";
+          const record = recordChallengeResult(true, "", reason);
+
+          ui.feedbackText.textContent = leveled ? `Correct! +${reward} XP and level up to ${state.profile.level}.` : `Correct! +${reward} XP.`;
+          ui.feedbackText.className = "mt-2 rounded-xl bg-emerald-100 px-3 py-2 text-center text-sm font-bold text-emerald-700";
+          pushFeedbackCard("Success Strategy Summary", [`Solved in ${record.responseTimeSec.toFixed(1)}s`, `Style tags: ${record.styleTags.join(", ")}`], "emerald");
+          if (leveled) audio.levelUp();
+
+          const rect = document.getElementById("challengeCard").getBoundingClientRect();
+          particles.burst(rect.left + rect.width * 0.5, rect.top + rect.height * 0.35, 34);
+
+          saveProfile();
+          updateHud();
+          updateDifficultyUI();
+          updateTeacherPanel();
           state.lockInput = true;
           setTimeout(() => {
             state.lockInput = false;
@@ -562,39 +962,27 @@
           }, 650);
         }
 
-        function onWrong() {
-          state.profile.streak = 0;
-          ui.feedbackText.textContent = "Close! Reset and try again. Your brain is still lifting reps.";
-          ui.feedbackText.className = "mt-2 rounded-xl bg-rose-100 px-3 py-2 text-center text-sm font-bold text-rose-700";
-          document.getElementById("challengeCard").classList.add("animate-wobble");
-          setTimeout(() => document.getElementById("challengeCard").classList.remove("animate-wobble"), 420);
-          state.currentInput = "";
-          ui.answerDisplay.textContent = "—";
-          saveProfile();
-          updateHud();
-        }
-
         function submitInput() {
           if (state.lockInput || !state.currentChallenge) return;
-          if (state.currentInput === "" || state.currentInput === "-") {
-            ui.feedbackText.textContent = "Enter a complete answer first.";
+          if (state.currentInput === "") {
+            ui.feedbackText.textContent = "Enter an answer before submitting.";
             ui.feedbackText.className = "mt-2 rounded-xl bg-amber-100 px-3 py-2 text-center text-sm font-bold text-amber-700";
             return;
           }
           const value = Number(state.currentInput);
           if (!Number.isFinite(value)) return;
           if (value === state.currentChallenge.answer) onCorrect();
-          else onWrong();
+          else onWrong(value);
         }
 
         function setInputDisplay() {
           ui.answerDisplay.textContent = state.currentInput || "—";
         }
 
-        function handleKey(key) {
+        function handleInputKey(key) {
           if (state.lockInput || ui.gameView.classList.contains("hidden")) return;
           if (/^\d$/.test(key)) {
-            if (state.currentInput.length < 8) {
+            if (state.currentInput.length < 9) {
               state.currentInput += key;
               audio.tap();
             }
@@ -610,6 +998,84 @@
           setInputDisplay();
         }
 
+        function jsonToCsv(records) {
+          const header = ["mode", "prompt", "difficulty", "correct", "attempts", "firstAttemptSec", "responseTimeSec", "hintsUsed", "errorType", "styleTags", "autoAdjustmentReason", "timestamp"];
+          const rows = records.map((r) => [
+            r.mode,
+            r.prompt,
+            r.difficulty,
+            r.correct,
+            JSON.stringify(r.attempts),
+            r.firstAttemptSec.toFixed(2),
+            r.responseTimeSec.toFixed(2),
+            r.hintsUsed,
+            r.errorType,
+            r.styleTags.join("|"),
+            r.autoAdjustmentReason || "",
+            r.timestamp,
+          ]);
+          return [header, ...rows]
+            .map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(","))
+            .join("\n");
+        }
+
+        async function copyText(text) {
+          try {
+            await navigator.clipboard.writeText(text);
+            pushFeedbackCard("Clipboard", ["Copied successfully."], "emerald");
+          } catch {
+            const area = document.createElement("textarea");
+            area.value = text;
+            document.body.appendChild(area);
+            area.select();
+            document.execCommand("copy");
+            area.remove();
+            pushFeedbackCard("Clipboard", ["Copied successfully."], "emerald");
+          }
+        }
+
+        function updateTeacherPanel() {
+          const records = state.profile.challengeHistory;
+          const tagCount = new Map();
+          const byMode = new Map();
+          const errorCount = new Map();
+          records.forEach((r) => {
+            r.styleTags.forEach((tag) => tagCount.set(tag, (tagCount.get(tag) || 0) + 1));
+            byMode.set(r.mode, [...(byMode.get(r.mode) || []), r]);
+            if (r.errorType) errorCount.set(r.errorType, (errorCount.get(r.errorType) || 0) + 1);
+          });
+
+          const topStyle = [...tagCount.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
+          ui.insightTopStyle.textContent = topStyle;
+
+          const weakestMode = [...byMode.entries()]
+            .map(([mode, items]) => ({
+              mode,
+              accuracy: items.filter((x) => x.correct).length / items.length,
+            }))
+            .sort((a, b) => a.accuracy - b.accuracy)[0];
+          ui.insightTrend.textContent = weakestMode ? `${weakestMode.mode}: ${(weakestMode.accuracy * 100).toFixed(0)}% accuracy` : "Need more data";
+
+          const topError = [...errorCount.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+          ui.insightFocus.textContent = topError ? `Practice focus: ${topError}` : "Keep building consistent reps.";
+
+          ui.teacherTableBody.innerHTML = "";
+          records.slice().reverse().slice(0, 80).forEach((r) => {
+            const tr = document.createElement("tr");
+            tr.className = "border-b border-slate-100";
+            tr.innerHTML = `
+              <td class="px-2 py-2 font-semibold text-slate-700">${r.prompt}</td>
+              <td class="px-2 py-2 text-slate-600">${r.mode} / ${r.difficulty}</td>
+              <td class="px-2 py-2 text-slate-600">${JSON.stringify(r.attempts)}</td>
+              <td class="px-2 py-2 text-slate-600">${r.responseTimeSec.toFixed(1)}</td>
+              <td class="px-2 py-2 text-slate-600">${r.errorType || "-"}</td>
+              <td class="px-2 py-2 text-slate-600">${r.styleTags.join(", ")}</td>
+              <td class="px-2 py-2 text-slate-600">${r.autoAdjustmentReason || "-"}</td>
+            `;
+            ui.teacherTableBody.appendChild(tr);
+          });
+        }
+
         function startMode(mode) {
           const name = ui.playerNameInput.value.trim();
           if (!name) {
@@ -618,15 +1084,15 @@
             ui.playerNameInput.focus();
             return;
           }
-          if (!state.profile || state.profile.name !== name) {
-            state.profile = makeProfile(name);
-          }
+          if (!state.profile || state.profile.name !== name) state.profile = createProfile(name);
           state.profile.name = name;
           state.mode = mode;
           saveProfile();
-          applyTheme(mode);
+          applyTheme();
           updateHud();
+          updateDifficultyUI();
           setChallenge();
+          updateTeacherPanel();
           ui.landingView.classList.add("hidden");
           ui.gameView.classList.remove("hidden");
           lucide.createIcons();
@@ -635,7 +1101,7 @@
         function backToMenu() {
           ui.gameView.classList.add("hidden");
           ui.landingView.classList.remove("hidden");
-          ui.nameHint.textContent = "Choose another game whenever you are ready.";
+          ui.nameHint.textContent = "Choose any mode and continue improving.";
           ui.nameHint.className = "mt-1 text-xs font-semibold text-slate-500";
         }
 
@@ -644,36 +1110,62 @@
           if (!loaded) return;
           state.profile = loaded;
           ui.playerNameInput.value = loaded.name;
-          ui.nameHint.textContent = `Welcome back ${loaded.name}! Level ${loaded.level}, streak ${loaded.streak}.`;
+          ui.nameHint.textContent = `Welcome back ${loaded.name}. Level ${loaded.level}.`;
         }
 
-        function bind() {
-          ui.modeButtons.forEach((btn) => btn.addEventListener("click", () => startMode(btn.dataset.mode)));
+        function bindEvents() {
+          ui.modeButtons.forEach((button) => button.addEventListener("click", () => startMode(button.dataset.mode)));
           ui.homeBtn.addEventListener("click", backToMenu);
 
           ui.numPad.addEventListener("click", (event) => {
             const button = event.target.closest("button[data-key]");
             if (!button) return;
-            handleKey(button.dataset.key);
+            handleInputKey(button.dataset.key);
           });
+
+          ui.difficultySlider.addEventListener("input", () => {
+            if (!state.mode || !state.profile) return;
+            state.profile.difficultyByMode[state.mode] = clamp(Number(ui.difficultySlider.value), 1, 10);
+            updateDifficultyUI();
+            saveProfile();
+          });
+
+          ui.difficultyLock.addEventListener("change", () => {
+            if (!state.mode || !state.profile) return;
+            state.profile.difficultyLockByMode[state.mode] = ui.difficultyLock.checked;
+            ui.adaptationFeedback.textContent = ui.difficultyLock.checked
+              ? "Manual lock enabled. Auto-adapt paused for this mode."
+              : "Manual lock disabled. Auto-adapt can resume.";
+            saveProfile();
+          });
+
+          ui.teacherToggleBtn.addEventListener("click", () => {
+            state.teacherOpen = !state.teacherOpen;
+            ui.teacherPanel.classList.toggle("hidden", !state.teacherOpen);
+            updateTeacherPanel();
+            lucide.createIcons();
+          });
+
+          ui.copyJsonBtn.addEventListener("click", () => copyText(JSON.stringify(state.profile.challengeHistory, null, 2)));
+          ui.copyCsvBtn.addEventListener("click", () => copyText(jsonToCsv(state.profile.challengeHistory)));
 
           window.addEventListener("keydown", (event) => {
             const target = event.target;
-            if (target instanceof HTMLElement && target.tagName === "INPUT") {
-              if (target === ui.playerNameInput && event.key === "Enter") {
-                event.preventDefault();
-              }
+            if (
+              target instanceof HTMLElement &&
+              (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.tagName === "SELECT")
+            ) {
               return;
             }
             if (/^\d$/.test(event.key)) {
               event.preventDefault();
-              handleKey(event.key);
+              handleInputKey(event.key);
             } else if (event.key === "Backspace") {
               event.preventDefault();
-              handleKey("backspace");
+              handleInputKey("backspace");
             } else if (event.key === "Enter") {
               event.preventDefault();
-              handleKey("submit");
+              handleInputKey("submit");
             }
           });
 
@@ -689,7 +1181,7 @@
         }
 
         hydrate();
-        bind();
+        bindEvents();
         lucide.createIcons();
       })();
     </script>
