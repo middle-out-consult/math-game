@@ -213,7 +213,10 @@
       margin-top: 8px;
       font-family: "Chewy", "Fredoka", sans-serif;
       font-size: clamp(1.6rem, 6vw, 3rem);
-      word-spacing: 0.35em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.42em;
       color: var(--chalk-pink);
       opacity: 0;
       transform: translateY(8px);
@@ -439,7 +442,7 @@
           <div class="equation-wrap">
             <div>
               <div id="equation" aria-live="polite"></div>
-              <div id="sixSevenWords">six seven</div>
+              <div id="sixSevenWords"><span>six</span><span>seven</span></div>
             </div>
           </div>
           <div id="answerDisplay" class="answer-display" aria-live="polite">?</div>
