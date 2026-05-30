@@ -252,6 +252,13 @@
     #scaffoldBox {
       border-color: color-mix(in srgb, var(--chalk-yellow) 65%, white 10%);
       color: var(--chalk-yellow);
+      position: fixed;
+      left: 50%;
+      bottom: 74px;
+      z-index: 45;
+      width: min(640px, calc(100% - 24px));
+      transform: translateX(-50%);
+      text-align: center;
     }
     .admin-overlay, .pin-overlay {
       position: fixed;
