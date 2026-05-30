@@ -1135,9 +1135,9 @@
         const style = profile?.supportStyle || "deconstructive";
         const q = state.question;
         const messages = {
-          deconstructive: `Break ${escapeHtml(q.prompt)} into one small step, check that mini-answer, then finish.`,
-          visual: `Picture chalk groups, circle equal sets, then count what the groups make.`,
-          narrative: `Make it a crayon story: what final count belongs in the supply box?`,
+          deconstructive: `Break ${escapeHtml(q.prompt)} into one small step, then finish.`,
+          visual: `Picture chalk groups. Count the equal sets.`,
+          narrative: `Make a crayon story. Count the supplies.`,
         };
         ui.scaffoldBox.innerHTML = `<strong>Coach Chalk says:</strong><br>${messages[style]}`;
         ui.scaffoldBox.classList.remove("hidden");
