@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -77,14 +77,51 @@
     </script>
     <style>
       :root {
-        --chalk-bg-a: #1f2428;
-        --chalk-bg-b: #2a3138;
-        --chalk-bg-c: #232a31;
         --chalk-primary: #7dd3fc;
         --chalk-secondary: #fef08a;
         --chalk-accent: #f9a8d4;
         --chalk-good: #86efac;
         --chalk-warn: #fda4af;
+        --focus-ring: rgba(125, 211, 252, 0.85);
+      }
+
+      html[data-theme="dark"] {
+        --bg-a: #1f2428;
+        --bg-b: #2a3138;
+        --bg-c: #232a31;
+        --text-main: #f1f5f9;
+        --text-muted: #cbd5e1;
+        --card-bg: rgba(20, 25, 30, 0.78);
+        --card-border: rgba(255, 255, 255, 0.17);
+        --card-shadow: inset 0 0 24px rgba(255, 255, 255, 0.04), 0 10px 24px rgba(0, 0, 0, 0.35);
+        --input-bg: rgba(15, 20, 24, 0.72);
+        --input-border: rgba(255, 255, 255, 0.2);
+        --input-text: #f8fafc;
+        --overlay-strong: rgba(0, 0, 0, 0.7);
+        --grain-light: rgba(255, 255, 255, 0.06);
+        --grain-border: rgba(255, 255, 255, 0.2);
+        --scrollbar: rgba(255, 255, 255, 0.24);
+        --dust-opacity: 0.24;
+      }
+
+      html[data-theme="light"] {
+        --bg-a: #fff7ed;
+        --bg-b: #fef3c7;
+        --bg-c: #fce7f3;
+        --text-main: #334155;
+        --text-muted: #475569;
+        --card-bg: rgba(255, 255, 255, 0.88);
+        --card-border: rgba(99, 102, 241, 0.22);
+        --card-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8), 0 10px 22px rgba(244, 114, 182, 0.18);
+        --input-bg: rgba(255, 255, 255, 0.95);
+        --input-border: rgba(56, 189, 248, 0.35);
+        --input-text: #1e293b;
+        --overlay-strong: rgba(255, 247, 237, 0.82);
+        --grain-light: rgba(255, 255, 255, 0.45);
+        --grain-border: rgba(99, 102, 241, 0.25);
+        --scrollbar: rgba(99, 102, 241, 0.35);
+        --dust-opacity: 0.14;
+        --focus-ring: rgba(236, 72, 153, 0.75);
       }
 
       * {
@@ -96,13 +133,14 @@
         min-height: 100vh;
         min-height: 100dvh;
         font-family: "Patrick Hand", cursive;
-        color: #f1f5f9;
+        color: var(--text-main);
         background:
-          radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.05), transparent 40%),
-          radial-gradient(circle at 80% 15%, rgba(255, 255, 255, 0.035), transparent 35%),
-          radial-gradient(circle at 30% 80%, rgba(255, 255, 255, 0.04), transparent 38%),
-          linear-gradient(140deg, var(--chalk-bg-a), var(--chalk-bg-b), var(--chalk-bg-c));
+          radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.22), transparent 42%),
+          radial-gradient(circle at 82% 14%, rgba(255, 255, 255, 0.16), transparent 36%),
+          radial-gradient(circle at 28% 82%, rgba(255, 255, 255, 0.14), transparent 40%),
+          linear-gradient(140deg, var(--bg-a), var(--bg-b), var(--bg-c));
         overflow: hidden;
+        transition: background 320ms ease, color 220ms ease;
       }
 
       body::before {
@@ -111,11 +149,19 @@
         inset: 0;
         pointer-events: none;
         background-image:
-          radial-gradient(rgba(255, 255, 255, 0.055) 0.7px, transparent 0.9px),
-          radial-gradient(rgba(255, 255, 255, 0.03) 0.6px, transparent 0.8px);
+          radial-gradient(rgba(255, 255, 255, 0.08) 0.7px, transparent 0.9px),
+          radial-gradient(rgba(255, 255, 255, 0.05) 0.6px, transparent 0.8px);
         background-size: 3px 3px, 5px 5px;
         mix-blend-mode: screen;
-        opacity: 0.24;
+        opacity: var(--dust-opacity);
+      }
+
+      html[data-theme="light"] body::before {
+        background-image:
+          radial-gradient(rgba(56, 189, 248, 0.16) 0.8px, transparent 1px),
+          radial-gradient(rgba(244, 114, 182, 0.14) 0.7px, transparent 1px),
+          radial-gradient(rgba(250, 204, 21, 0.12) 0.6px, transparent 1px);
+        mix-blend-mode: multiply;
       }
 
       body::after {
@@ -124,35 +170,61 @@
         inset: 0;
         pointer-events: none;
         background:
-          radial-gradient(ellipse at 50% 10%, rgba(255, 255, 255, 0.085), transparent 52%),
-          radial-gradient(ellipse at 10% 60%, rgba(255, 255, 255, 0.055), transparent 42%),
-          radial-gradient(ellipse at 85% 72%, rgba(255, 255, 255, 0.05), transparent 38%);
+          radial-gradient(ellipse at 50% 10%, rgba(255, 255, 255, 0.12), transparent 52%),
+          radial-gradient(ellipse at 10% 60%, rgba(255, 255, 255, 0.08), transparent 42%),
+          radial-gradient(ellipse at 85% 72%, rgba(255, 255, 255, 0.07), transparent 38%);
+      }
+
+      html[data-theme="light"] body::after {
+        background:
+          radial-gradient(ellipse at 50% 8%, rgba(255, 255, 255, 0.75), transparent 55%),
+          radial-gradient(ellipse at 12% 70%, rgba(125, 211, 252, 0.2), transparent 45%),
+          radial-gradient(ellipse at 88% 68%, rgba(251, 113, 133, 0.18), transparent 42%);
       }
 
       .chalk-card {
         background:
-          linear-gradient(145deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.06)),
-          radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1), transparent 40%),
-          radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.06), transparent 50%),
-          rgba(20, 25, 30, 0.78);
-        border: 1px solid rgba(255, 255, 255, 0.17);
+          linear-gradient(145deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05)),
+          radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.12), transparent 40%),
+          radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.08), transparent 50%),
+          var(--card-bg);
+        border: 1px solid var(--card-border);
         border-radius: 20px 28px 22px 30px / 28px 20px 30px 22px;
-        box-shadow: inset 0 0 24px rgba(255, 255, 255, 0.04), 0 10px 24px rgba(0, 0, 0, 0.35);
+        box-shadow: var(--card-shadow);
+        transition: background 280ms ease, border-color 220ms ease, box-shadow 220ms ease;
+      }
+
+      html[data-theme="light"] .chalk-card {
+        background:
+          linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(254, 243, 199, 0.75)),
+          radial-gradient(circle at 18% 24%, rgba(186, 230, 253, 0.45), transparent 42%),
+          radial-gradient(circle at 82% 18%, rgba(251, 207, 232, 0.4), transparent 48%),
+          var(--card-bg);
       }
 
       .crayon-btn {
         position: relative;
         border-radius: 22px 14px 20px 16px / 18px 24px 14px 22px;
         background:
-          linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.05)),
-          repeating-linear-gradient(110deg, rgba(255, 255, 255, 0.06) 0px, rgba(255, 255, 255, 0.06) 2px, transparent 2px, transparent 7px),
+          linear-gradient(145deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08)),
+          repeating-linear-gradient(110deg, var(--grain-light) 0px, var(--grain-light) 2px, transparent 2px, transparent 7px),
           var(--button-color, rgba(125, 211, 252, 0.25));
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.2), 0 5px 12px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--grain-border);
+        box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.28), 0 5px 12px rgba(15, 23, 42, 0.18);
+        color: var(--text-main);
+        transition: transform 120ms ease, box-shadow 120ms ease;
+      }
+
+      html[data-theme="light"] .crayon-btn {
+        box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.9), 0 4px 10px rgba(99, 102, 241, 0.16);
       }
 
       .crayon-btn:active {
         transform: translateY(2px);
+      }
+
+      .theme-toggle-btn {
+        backdrop-filter: blur(4px);
       }
 
       .crayon-numpad {
@@ -191,9 +263,9 @@
       }
 
       .chalk-input {
-        background: rgba(15, 20, 24, 0.72);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: #f8fafc;
+        background: var(--input-bg);
+        border: 1px solid var(--input-border);
+        color: var(--input-text);
         border-radius: 14px 18px 12px 20px / 18px 14px 20px 12px;
       }
 
@@ -203,18 +275,86 @@
         box-shadow: 0 0 0 2px rgba(125, 211, 252, 0.3);
       }
 
+      html[data-theme="light"] .chalk-input:focus {
+        border-color: rgba(236, 72, 153, 0.65);
+        box-shadow: 0 0 0 2px rgba(251, 207, 232, 0.65);
+      }
+
+      html[data-theme="light"] .border-white\/20 {
+        border-color: rgba(99, 102, 241, 0.2) !important;
+      }
+
+      html[data-theme="light"] .border-white\/30 {
+        border-color: rgba(99, 102, 241, 0.28) !important;
+      }
+
+      html[data-theme="light"] .bg-white\/10 {
+        background-color: rgba(255, 255, 255, 0.72) !important;
+      }
+
+      html[data-theme="light"] .bg-black\/50,
+      html[data-theme="light"] .bg-black\/60,
+      html[data-theme="light"] .bg-black\/70,
+      html[data-theme="light"] .bg-black\/75 {
+        background-color: var(--overlay-strong) !important;
+      }
+
+      html[data-theme="light"] .text-slate-50,
+      html[data-theme="light"] .text-slate-100,
+      html[data-theme="light"] .text-slate-200 {
+        color: #334155 !important;
+      }
+
+      html[data-theme="light"] .text-sky-100,
+      html[data-theme="light"] .text-sky-200 {
+        color: #0369a1 !important;
+      }
+
+      html[data-theme="light"] .text-emerald-100,
+      html[data-theme="light"] .text-emerald-200 {
+        color: #047857 !important;
+      }
+
+      html[data-theme="light"] .text-amber-100,
+      html[data-theme="light"] .text-amber-200 {
+        color: #b45309 !important;
+      }
+
+      html[data-theme="light"] .text-yellow-100 {
+        color: #a16207 !important;
+      }
+
+      html[data-theme="light"] .text-pink-100,
+      html[data-theme="light"] .text-pink-200,
+      html[data-theme="light"] .text-rose-100 {
+        color: #be185d !important;
+      }
+
+      html[data-theme="light"] .text-teal-200 {
+        color: #0f766e !important;
+      }
+
+      html[data-theme="light"] .text-violet-100 {
+        color: #6d28d9 !important;
+      }
+
+      html[data-theme="light"] #adminPanel .text-slate-50,
+      html[data-theme="light"] #adminPanel .text-slate-100 {
+        color: #1e293b !important;
+      }
+
       .scroll-lite::-webkit-scrollbar {
         width: 8px;
       }
 
       .scroll-lite::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.22);
+        background: var(--scrollbar);
         border-radius: 999px;
       }
 
       .scroll-lite {
         scrollbar-width: thin;
-        scrollbar-color: rgba(255, 255, 255, 0.24) transparent;
+        scrollbar-color: var(--scrollbar) transparent;
       }
 
       .app-frame {
@@ -227,7 +367,7 @@
       button:focus-visible,
       select:focus-visible,
       input:focus-visible {
-        outline: 2px solid rgba(125, 211, 252, 0.85);
+        outline: 2px solid var(--focus-ring);
         outline-offset: 2px;
       }
     </style>
@@ -236,6 +376,18 @@
     <canvas id="dustCanvas" class="fixed inset-0 pointer-events-none z-20"></canvas>
 
     <main id="appRoot" class="app-frame relative z-10 overflow-hidden p-2 pt-14 sm:p-3 sm:pt-16">
+      <button
+        id="themeToggleBtn"
+        class="theme-toggle-btn crayon-btn fixed left-3 top-3 z-40 px-3 py-2 text-xs font-header"
+        style="--button-color: rgba(251, 191, 36, 0.35)"
+        type="button"
+        aria-label="Toggle color theme"
+      >
+        <span class="inline-flex items-center gap-2">
+          <i data-lucide="palette" class="h-4 w-4"></i>
+          <span id="themeToggleLabel">Pastel Fun Mode</span>
+        </span>
+      </button>
       <button
         id="educatorAccessBtn"
         class="crayon-btn fixed right-3 top-3 z-40 px-3 py-2 text-xs font-header font-semibold tracking-wide text-sky-100"
@@ -559,6 +711,8 @@
           scaffoldTitle: document.getElementById("scaffoldTitle"),
           scaffoldBody: document.getElementById("scaffoldBody"),
           closeScaffoldBtn: document.getElementById("closeScaffoldBtn"),
+          themeToggleBtn: document.getElementById("themeToggleBtn"),
+          themeToggleLabel: document.getElementById("themeToggleLabel"),
           educatorAccessBtn: document.getElementById("educatorAccessBtn"),
           pinModal: document.getElementById("pinModal"),
           pinDisplay: document.getElementById("pinDisplay"),
@@ -2271,6 +2425,7 @@
           });
 
           ui.closeScaffoldBtn.addEventListener("click", closeScaffold);
+          ui.themeToggleBtn.addEventListener("click", toggleTheme);
           ui.educatorAccessBtn.addEventListener("click", openPinModal);
           ui.closePinModalBtn.addEventListener("click", closePinModal);
           ui.adminCloseBtn.addEventListener("click", closeAdminPanel);
@@ -2333,7 +2488,40 @@
           });
         }
 
+
+        const THEME_STORAGE_KEY = "sparkMathTheme";
+
+        function getStoredTheme() {
+          try {
+            const saved = localStorage.getItem(THEME_STORAGE_KEY);
+            return saved === "light" ? "light" : "dark";
+          } catch {
+            return "dark";
+          }
+        }
+
+        function applyTheme(theme) {
+          const next = theme === "light" ? "light" : "dark";
+          document.documentElement.setAttribute("data-theme", next);
+          ui.themeToggleLabel.textContent = next === "dark" ? "Pastel Fun Mode" : "Chalkboard Mode";
+          ui.themeToggleBtn.style.setProperty(
+            "--button-color",
+            next === "dark" ? "rgba(251, 191, 36, 0.35)" : "rgba(244, 114, 182, 0.35)",
+          );
+          try {
+            localStorage.setItem(THEME_STORAGE_KEY, next);
+          } catch {
+            // Keep runtime stable if storage is unavailable.
+          }
+        }
+
+        function toggleTheme() {
+          const current = document.documentElement.getAttribute("data-theme") || "dark";
+          applyTheme(current === "dark" ? "light" : "dark");
+        }
+
         function bootstrap() {
+          applyTheme(getStoredTheme());
           syncViewportHeight();
           window.addEventListener("resize", syncViewportHeight);
           if (window.visualViewport) window.visualViewport.addEventListener("resize", syncViewportHeight);
