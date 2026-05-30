@@ -1389,6 +1389,7 @@
         ui.pinOverlay.classList.remove("hidden");
       }
       function pressPin(value) {
+        ensureAudio();
         playClick();
         if (value === "clear") state.pin = "";
         else if (value === "back") state.pin = state.pin.slice(0, -1);
@@ -1475,6 +1476,18 @@
         ui.skipQuestion.addEventListener("click", skipQuestion);
         ui.resetChainBtn.addEventListener("click", () => activeProfile() && startChain(activeProfile()));
         window.addEventListener("keydown", (event) => {
+          if (!ui.pinOverlay.classList.contains("hidden")) {
+            if (/^\d$/.test(event.key)) pressPin(event.key);
+            if (event.key === "Backspace") pressPin("back");
+            if (event.key.toLowerCase() === "c") pressPin("clear");
+            if (event.key === "Escape") ui.pinOverlay.classList.add("hidden");
+            return;
+          }
+          if (!ui.adminPanel.classList.contains("hidden")) {
+            if (event.key === "Escape") ui.adminPanel.classList.add("hidden");
+            return;
+          }
+          if (["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName)) return;
           if (ui.gameScreen.classList.contains("hidden")) return;
           if (/^\d$/.test(event.key)) pressKey(event.key);
           if (event.key === "Backspace") pressKey("back");
