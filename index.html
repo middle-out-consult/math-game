@@ -989,9 +989,11 @@
             ui.chainTitle.textContent = "Quest Chain Complete!";
             ui.chainSubtitle.textContent = "All assigned blocks are finished.";
             ui.chainBlockBadge.textContent = `${state.chain.blocks.length} of ${state.chain.blocks.length}`;
-            ui.equation.innerHTML = "Quest Complete!";
+            ui.equation.innerHTML = `<span style="display:inline-block;font-size:clamp(2.2rem,9vw,5.2rem);line-height:1.05;color:var(--chalk-green)">Quest Complete!</span>`;
             ui.sixSevenWords.classList.remove("show");
             ui.answerDisplay.textContent = "★";
+            ui.numpad.classList.add("hidden");
+            ui.skipQuestion.classList.add("hidden");
             state.question = null;
             showToast("Assigned task chain complete!");
             return;
@@ -1007,6 +1009,8 @@
         state.answer = "";
         state.keyTimes = [];
         state.questionStartedAt = performance.now();
+        ui.numpad.classList.remove("hidden");
+        ui.skipQuestion.classList.remove("hidden");
         ui.answerDisplay.textContent = "?";
         ui.feedback.textContent = "Solve it, then tap ✓.";
         ui.scaffoldBox.classList.add("hidden");
