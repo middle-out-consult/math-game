@@ -1,2606 +1,1549 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SparkMath Arcade - Chalkboard Odyssey</title>
-    <link
-      rel="preconnect"
-      href="https://fonts.googleapis.com"
-    />
-    <link
-      rel="preconnect"
-      href="https://fonts.gstatic.com"
-      crossorigin
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Patrick+Hand&display=swap"
-      rel="stylesheet"
-    />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              header: ["Fredoka", "ui-rounded", "sans-serif"],
-              chalk: ["Patrick Hand", "cursive"],
-            },
-            keyframes: {
-              wobble: {
-                "0%": { transform: "translateX(0)" },
-                "20%": { transform: "translateX(-6px) rotate(-2deg)" },
-                "40%": { transform: "translateX(5px) rotate(2deg)" },
-                "60%": { transform: "translateX(-3px) rotate(-1deg)" },
-                "80%": { transform: "translateX(2px) rotate(1deg)" },
-                "100%": { transform: "translateX(0)" },
-              },
-              pullDown: {
-                "0%": { transform: "translateY(-110%)" },
-                "100%": { transform: "translateY(0)" },
-              },
-              rainbowFlash: {
-                "0%": { color: "#7dd3fc" },
-                "16%": { color: "#fef08a" },
-                "33%": { color: "#fda4af" },
-                "50%": { color: "#86efac" },
-                "66%": { color: "#c4b5fd" },
-                "83%": { color: "#fb923c" },
-                "100%": { color: "#7dd3fc" },
-              },
-              pulseWord: {
-                "0%, 100%": { transform: "scale(1)", opacity: "0.88" },
-                "50%": { transform: "scale(1.08)", opacity: "1" },
-              },
-              neonBorder: {
-                "0%, 100%": { boxShadow: "0 0 10px rgba(45,212,191,0.45), inset 0 0 12px rgba(99,102,241,0.35)" },
-                "50%": { boxShadow: "0 0 16px rgba(217,70,239,0.65), inset 0 0 18px rgba(34,211,238,0.5)" },
-              },
-              pressCrayon: {
-                "0%": { transform: "translateY(0)" },
-                "100%": { transform: "translateY(2px)" },
-              },
-            },
-            animation: {
-              wobble: "wobble 420ms ease-in-out",
-              pullDown: "pullDown 520ms cubic-bezier(0.2,0.7,0.2,1)",
-              rainbowFlash: "rainbowFlash 650ms linear infinite",
-              pulseWord: "pulseWord 900ms ease-in-out infinite",
-              neonBorder: "neonBorder 1.6s ease-in-out infinite",
-              pressCrayon: "pressCrayon 120ms ease-in-out forwards",
-            },
-          },
-        },
-      };
-    </script>
-    <style>
-      :root {
-        --chalk-primary: #7dd3fc;
-        --chalk-secondary: #fef08a;
-        --chalk-accent: #f9a8d4;
-        --chalk-good: #86efac;
-        --chalk-warn: #fda4af;
-        --focus-ring: rgba(125, 211, 252, 0.85);
-      }
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SparkMath Arcade - Chalkboard Odyssey</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Fredoka:wght@500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --board: #1d2428;
+      --board-2: #273036;
+      --board-3: #12191d;
+      --chalk-blue: #7dd3fc;
+      --chalk-yellow: #fde68a;
+      --chalk-pink: #f9a8d4;
+      --chalk-green: #86efac;
+      --chalk-orange: #fdba74;
+      --chalk-purple: #c4b5fd;
+      --chalk-red: #fda4af;
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+      --panel: rgba(13, 20, 24, 0.78);
+      --line: rgba(255, 255, 255, 0.2);
+      --accent: #7dd3fc;
+      --accent-2: #22d3ee;
+      --radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    }
 
-      html[data-theme="dark"] {
-        --bg-a: #1f2428;
-        --bg-b: #2a3138;
-        --bg-c: #232a31;
-        --text-main: #f1f5f9;
-        --text-muted: #cbd5e1;
-        --card-bg: rgba(20, 25, 30, 0.78);
-        --card-border: rgba(255, 255, 255, 0.17);
-        --card-shadow: inset 0 0 24px rgba(255, 255, 255, 0.04), 0 10px 24px rgba(0, 0, 0, 0.35);
-        --input-bg: rgba(15, 20, 24, 0.72);
-        --input-border: rgba(255, 255, 255, 0.2);
-        --input-text: #f8fafc;
-        --overlay-strong: rgba(0, 0, 0, 0.7);
-        --grain-light: rgba(255, 255, 255, 0.06);
-        --grain-border: rgba(255, 255, 255, 0.2);
-        --scrollbar: rgba(255, 255, 255, 0.24);
-        --dust-opacity: 0.24;
-      }
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--board-3); }
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--text);
+      font-family: "Patrick Hand", "Comic Sans MS", cursive;
+      font-size: 19px;
+      background:
+        radial-gradient(circle at 14% 18%, rgba(255,255,255,0.09), transparent 24%),
+        radial-gradient(circle at 82% 12%, rgba(255,255,255,0.07), transparent 22%),
+        radial-gradient(circle at 38% 78%, rgba(255,255,255,0.06), transparent 27%),
+        linear-gradient(140deg, var(--board), var(--board-2) 54%, var(--board-3));
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      opacity: 0.24;
+      background-image:
+        radial-gradient(rgba(255,255,255,0.14) 0.7px, transparent 1px),
+        radial-gradient(rgba(255,255,255,0.08) 0.6px, transparent 1px),
+        linear-gradient(90deg, transparent 0 48%, rgba(255,255,255,0.025) 49% 50%, transparent 51%);
+      background-size: 4px 4px, 7px 7px, 82px 82px;
+      mix-blend-mode: screen;
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 48% 10%, rgba(255,255,255,0.11), transparent 48%),
+        radial-gradient(ellipse at 8% 64%, rgba(255,255,255,0.07), transparent 36%),
+        radial-gradient(ellipse at 89% 70%, rgba(255,255,255,0.07), transparent 38%);
+    }
 
-      html[data-theme="light"] {
-        --bg-a: #fff7ed;
-        --bg-b: #fef3c7;
-        --bg-c: #fce7f3;
-        --text-main: #334155;
-        --text-muted: #475569;
-        --card-bg: rgba(255, 255, 255, 0.88);
-        --card-border: rgba(99, 102, 241, 0.22);
-        --card-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8), 0 10px 22px rgba(244, 114, 182, 0.18);
-        --input-bg: rgba(255, 255, 255, 0.95);
-        --input-border: rgba(56, 189, 248, 0.35);
-        --input-text: #1e293b;
-        --overlay-strong: rgba(255, 247, 237, 0.82);
-        --grain-light: rgba(255, 255, 255, 0.45);
-        --grain-border: rgba(99, 102, 241, 0.25);
-        --scrollbar: rgba(99, 102, 241, 0.35);
-        --dust-opacity: 0.14;
-        --focus-ring: rgba(236, 72, 153, 0.75);
-      }
+    h1, h2, h3, .brand, .big-number {
+      font-family: "Chewy", "Fredoka", ui-rounded, sans-serif;
+      letter-spacing: 0.02em;
+      margin: 0;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.25), 0 0 18px color-mix(in srgb, var(--accent) 34%, transparent);
+    }
+    button, input, select, textarea {
+      font: inherit;
+      color: inherit;
+    }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: 0.55; }
+    .screen { width: min(1180px, calc(100% - 24px)); margin: 0 auto; padding: 18px 0 28px; }
+    .hidden { display: none !important; }
+    .chalk-card {
+      position: relative;
+      overflow: hidden;
+      border: 2px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04)),
+        repeating-linear-gradient(112deg, rgba(255,255,255,0.026) 0 2px, transparent 2px 9px),
+        var(--panel);
+      box-shadow: inset 0 0 25px rgba(255,255,255,0.04), 0 20px 45px rgba(0,0,0,0.28);
+    }
+    .chalk-card::before {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      pointer-events: none;
+      border-radius: inherit;
+      border: 1px dashed rgba(255,255,255,0.14);
+    }
+    .pad { padding: clamp(16px, 3vw, 28px); }
+    .stack { display: grid; gap: 14px; }
+    .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .between { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .grid { display: grid; gap: 14px; }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .muted { color: var(--muted); }
+    .tiny { font-size: 0.82rem; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 34px;
+      padding: 5px 12px;
+      border: 1px solid color-mix(in srgb, var(--accent) 60%, white 12%);
+      border-radius: var(--radius);
+      color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 16%, transparent);
+    }
+    .btn {
+      position: relative;
+      min-height: 44px;
+      border: 1px solid color-mix(in srgb, var(--btn, var(--accent)) 62%, white 15%);
+      border-radius: var(--radius);
+      padding: 9px 15px;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,0.26), rgba(255,255,255,0.06)),
+        repeating-linear-gradient(110deg, rgba(255,255,255,0.13) 0 2px, rgba(255,255,255,0.02) 2px 7px),
+        color-mix(in srgb, var(--btn, var(--accent)) 28%, #111827);
+      box-shadow: inset 0 3px 0 rgba(255,255,255,0.24), inset 0 -4px 8px rgba(0,0,0,0.16), 0 8px 18px rgba(0,0,0,0.2);
+      transition: transform 120ms ease, box-shadow 120ms ease, filter 160ms ease;
+    }
+    .btn:hover { filter: brightness(1.09); transform: translateY(-1px) rotate(-0.2deg); }
+    .btn:active, .btn.pressed {
+      transform: translateY(3px) scale(0.98);
+      box-shadow: inset 0 4px 10px rgba(0,0,0,0.28), 0 3px 8px rgba(0,0,0,0.22);
+    }
+    .input, select, textarea {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 26px 18px 24px 16px / 16px 26px 18px 24px;
+      padding: 9px 12px;
+      background: rgba(8, 13, 17, 0.66);
+      outline: none;
+      box-shadow: inset 0 0 12px rgba(0,0,0,0.18);
+    }
+    textarea { resize: vertical; min-height: 104px; }
+    .input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent), inset 0 0 12px rgba(0,0,0,0.18);
+    }
+    .brand { color: var(--chalk-yellow); font-size: clamp(2.1rem, 8vw, 5.1rem); line-height: 0.9; }
+    .subtitle { color: var(--chalk-blue); font-size: clamp(1.1rem, 3vw, 1.6rem); }
+    .profile-card { text-align: left; min-height: 118px; }
+    .profile-card strong { display: block; font-family: "Fredoka", sans-serif; color: var(--chalk-yellow); font-size: 1.2rem; }
+    .educator-link {
+      position: fixed;
+      right: 12px;
+      bottom: 10px;
+      z-index: 30;
+      border: 0;
+      color: rgba(255,255,255,0.72);
+      background: transparent;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+    .mode-btn.active { outline: 3px solid color-mix(in srgb, var(--accent) 60%, white); }
+    .slider {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+    .tier-track-labels {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+    .equation-wrap {
+      min-height: 190px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+    }
+    #equation {
+      font-family: "Patrick Hand", cursive;
+      font-size: clamp(3.4rem, 14vw, 8.7rem);
+      color: var(--chalk-yellow);
+      line-height: 1;
+      word-break: break-word;
+    }
+    .equation-token { display: inline-block; transition: transform 220ms ease; }
+    .equation-token.pop67 {
+      transform: scale(1.5) translateY(-6px);
+      animation: rainbowFlash 650ms linear infinite;
+      text-shadow: 0 0 8px currentColor, 0 0 22px currentColor;
+    }
+    #sixSevenWords {
+      height: 44px;
+      margin-top: 8px;
+      font-family: "Chewy", "Fredoka", sans-serif;
+      font-size: clamp(1.6rem, 6vw, 3rem);
+      color: var(--chalk-pink);
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+    }
+    #sixSevenWords.show {
+      opacity: 1;
+      transform: translateY(0);
+      animation: pulseWord 880ms ease-in-out infinite, rainbowFlash 650ms linear infinite;
+    }
+    .answer-display {
+      min-height: 68px;
+      display: grid;
+      place-items: center;
+      border: 1px dashed color-mix(in srgb, var(--accent) 45%, white 15%);
+      border-radius: var(--radius);
+      color: var(--chalk-blue);
+      font-size: clamp(2rem, 7vw, 3.7rem);
+      background: rgba(0,0,0,0.16);
+    }
+    .numpad { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .numpad .btn { min-height: 58px; font-family: "Fredoka", sans-serif; font-size: 1.35rem; }
+    .progress-shell {
+      height: 18px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(0,0,0,0.24);
+      overflow: hidden;
+    }
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--chalk-blue), var(--chalk-green), var(--chalk-yellow), var(--chalk-pink));
+      transition: width 360ms ease;
+    }
+    #scaffoldBox {
+      border-color: color-mix(in srgb, var(--chalk-yellow) 65%, white 10%);
+      color: var(--chalk-yellow);
+    }
+    .admin-overlay, .pin-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: grid;
+      place-items: start center;
+      padding: 14px;
+      overflow: auto;
+      background: rgba(0,0,0,0.72);
+    }
+    .projector {
+      width: min(1240px, 100%);
+      margin-top: 10px;
+      animation: pullDown 520ms cubic-bezier(0.2,0.75,0.15,1);
+      transform-origin: top center;
+    }
+    .admin-layout { grid-template-columns: 0.9fr 1.15fr 1fr; align-items: start; }
+    .list {
+      max-height: 320px;
+      overflow: auto;
+      padding-right: 5px;
+    }
+    .list-item {
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 24px 14px 28px 16px / 18px 30px 16px 26px;
+      padding: 10px;
+      background: rgba(255,255,255,0.055);
+    }
+    .log-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    .log-table th, .log-table td {
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      padding: 7px 5px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .tab-row { display: none; }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      z-index: 80;
+      max-width: min(560px, calc(100% - 24px));
+      transform: translate(-50%, 20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: 180ms ease;
+    }
+    .toast.show { transform: translate(-50%, 0); opacity: 1; }
+    #dustCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 24;
+    }
+    .neon-boss {
+      animation: neonBorder 1.6s ease-in-out infinite;
+      border-color: rgba(217,70,239,0.7);
+    }
+    @keyframes pullDown {
+      from { transform: translateY(-110%) scaleY(0.94); opacity: 0.65; }
+      to { transform: translateY(0) scaleY(1); opacity: 1; }
+    }
+    @keyframes rainbowFlash {
+      0% { color: #7dd3fc; }
+      16% { color: #fde68a; }
+      33% { color: #f9a8d4; }
+      50% { color: #86efac; }
+      66% { color: #c4b5fd; }
+      83% { color: #fdba74; }
+      100% { color: #7dd3fc; }
+    }
+    @keyframes pulseWord {
+      0%, 100% { transform: scale(1); opacity: 0.88; }
+      50% { transform: scale(1.1); opacity: 1; }
+    }
+    @keyframes neonBorder {
+      0%, 100% { box-shadow: 0 0 12px rgba(34,211,238,0.45), inset 0 0 18px rgba(99,102,241,0.32); }
+      50% { box-shadow: 0 0 24px rgba(217,70,239,0.75), inset 0 0 22px rgba(34,211,238,0.45); }
+    }
+    @media (max-width: 980px) {
+      .admin-layout { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .tab-row { display: flex; }
+      .admin-section[data-tab-panel] { display: none; }
+      .admin-section[data-tab-panel].active { display: block; }
+    }
+    @media (max-width: 680px) {
+      body { font-size: 17px; }
+      .screen { width: min(100% - 14px, 1180px); padding-top: 8px; }
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .pad { padding: 14px; }
+      .educator-link { position: static; display: block; margin: 0 auto 14px; }
+      .numpad { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .numpad .btn { min-height: 54px; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="dustCanvas" aria-hidden="true"></canvas>
 
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        margin: 0;
-        min-height: 100vh;
-        min-height: 100dvh;
-        font-family: "Patrick Hand", cursive;
-        color: var(--text-main);
-        background:
-          radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.22), transparent 42%),
-          radial-gradient(circle at 82% 14%, rgba(255, 255, 255, 0.16), transparent 36%),
-          radial-gradient(circle at 28% 82%, rgba(255, 255, 255, 0.14), transparent 40%),
-          linear-gradient(140deg, var(--bg-a), var(--bg-b), var(--bg-c));
-        overflow: hidden;
-        transition: background 320ms ease, color 220ms ease;
-      }
-
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        background-image:
-          radial-gradient(rgba(255, 255, 255, 0.08) 0.7px, transparent 0.9px),
-          radial-gradient(rgba(255, 255, 255, 0.05) 0.6px, transparent 0.8px);
-        background-size: 3px 3px, 5px 5px;
-        mix-blend-mode: screen;
-        opacity: var(--dust-opacity);
-      }
-
-      html[data-theme="light"] body::before {
-        background-image:
-          radial-gradient(rgba(56, 189, 248, 0.16) 0.8px, transparent 1px),
-          radial-gradient(rgba(244, 114, 182, 0.14) 0.7px, transparent 1px),
-          radial-gradient(rgba(250, 204, 21, 0.12) 0.6px, transparent 1px);
-        mix-blend-mode: multiply;
-      }
-
-      body::after {
-        content: "";
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        background:
-          radial-gradient(ellipse at 50% 10%, rgba(255, 255, 255, 0.12), transparent 52%),
-          radial-gradient(ellipse at 10% 60%, rgba(255, 255, 255, 0.08), transparent 42%),
-          radial-gradient(ellipse at 85% 72%, rgba(255, 255, 255, 0.07), transparent 38%);
-      }
-
-      html[data-theme="light"] body::after {
-        background:
-          radial-gradient(ellipse at 50% 8%, rgba(255, 255, 255, 0.75), transparent 55%),
-          radial-gradient(ellipse at 12% 70%, rgba(125, 211, 252, 0.2), transparent 45%),
-          radial-gradient(ellipse at 88% 68%, rgba(251, 113, 133, 0.18), transparent 42%);
-      }
-
-      .chalk-card {
-        background:
-          linear-gradient(145deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05)),
-          radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.12), transparent 40%),
-          radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.08), transparent 50%),
-          var(--card-bg);
-        border: 1px solid var(--card-border);
-        border-radius: 20px 28px 22px 30px / 28px 20px 30px 22px;
-        box-shadow: var(--card-shadow);
-        transition: background 280ms ease, border-color 220ms ease, box-shadow 220ms ease;
-      }
-
-      html[data-theme="light"] .chalk-card {
-        background:
-          linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(254, 243, 199, 0.75)),
-          radial-gradient(circle at 18% 24%, rgba(186, 230, 253, 0.45), transparent 42%),
-          radial-gradient(circle at 82% 18%, rgba(251, 207, 232, 0.4), transparent 48%),
-          var(--card-bg);
-      }
-
-      .crayon-btn {
-        position: relative;
-        border-radius: 22px 14px 20px 16px / 18px 24px 14px 22px;
-        background:
-          linear-gradient(145deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08)),
-          repeating-linear-gradient(110deg, var(--grain-light) 0px, var(--grain-light) 2px, transparent 2px, transparent 7px),
-          var(--button-color, rgba(125, 211, 252, 0.25));
-        border: 1px solid var(--grain-border);
-        box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.28), 0 5px 12px rgba(15, 23, 42, 0.18);
-        color: var(--text-main);
-        transition: transform 120ms ease, box-shadow 120ms ease;
-      }
-
-      html[data-theme="light"] .crayon-btn {
-        box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.9), 0 4px 10px rgba(99, 102, 241, 0.16);
-      }
-
-      .crayon-btn:active {
-        transform: translateY(2px);
-      }
-
-      .theme-toggle-btn {
-        backdrop-filter: blur(4px);
-      }
-
-      .crayon-numpad {
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
-      }
-
-      .equation-token {
-        display: inline-block;
-        transition: transform 0.25s ease;
-      }
-
-      .equation-token.pop67 {
-        transform: scale(1.5) translateY(-4px);
-        animation: rainbowFlash 650ms linear infinite;
-      }
-
-      .hidden-easter {
-        opacity: 0;
-        pointer-events: none;
-        transform: translateY(10px);
-      }
-
-      .hidden-easter.show {
-        opacity: 1;
-        transform: translateY(0);
-        transition: all 220ms ease-out;
-      }
-
-      .projector-panel {
-        transform: translateY(-110%);
-      }
-
-      .projector-panel.show {
-        animation: pullDown 520ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
-      }
-
-      .chalk-input {
-        background: var(--input-bg);
-        border: 1px solid var(--input-border);
-        color: var(--input-text);
-        border-radius: 14px 18px 12px 20px / 18px 14px 20px 12px;
-      }
-
-      .chalk-input:focus {
-        outline: none;
-        border-color: rgba(125, 211, 252, 0.72);
-        box-shadow: 0 0 0 2px rgba(125, 211, 252, 0.3);
-      }
-
-      html[data-theme="light"] .chalk-input:focus {
-        border-color: rgba(236, 72, 153, 0.65);
-        box-shadow: 0 0 0 2px rgba(251, 207, 232, 0.65);
-      }
-
-      html[data-theme="light"] .border-white\/20 {
-        border-color: rgba(99, 102, 241, 0.2) !important;
-      }
-
-      html[data-theme="light"] .border-white\/30 {
-        border-color: rgba(99, 102, 241, 0.28) !important;
-      }
-
-      html[data-theme="light"] .bg-white\/10 {
-        background-color: rgba(255, 255, 255, 0.72) !important;
-      }
-
-      html[data-theme="light"] .bg-black\/50,
-      html[data-theme="light"] .bg-black\/60,
-      html[data-theme="light"] .bg-black\/70,
-      html[data-theme="light"] .bg-black\/75 {
-        background-color: var(--overlay-strong) !important;
-      }
-
-      html[data-theme="light"] .text-slate-50,
-      html[data-theme="light"] .text-slate-100,
-      html[data-theme="light"] .text-slate-200 {
-        color: #334155 !important;
-      }
-
-      html[data-theme="light"] .text-sky-100,
-      html[data-theme="light"] .text-sky-200 {
-        color: #0369a1 !important;
-      }
-
-      html[data-theme="light"] .text-emerald-100,
-      html[data-theme="light"] .text-emerald-200 {
-        color: #047857 !important;
-      }
-
-      html[data-theme="light"] .text-amber-100,
-      html[data-theme="light"] .text-amber-200 {
-        color: #b45309 !important;
-      }
-
-      html[data-theme="light"] .text-yellow-100 {
-        color: #a16207 !important;
-      }
-
-      html[data-theme="light"] .text-pink-100,
-      html[data-theme="light"] .text-pink-200,
-      html[data-theme="light"] .text-rose-100 {
-        color: #be185d !important;
-      }
-
-      html[data-theme="light"] .text-teal-200 {
-        color: #0f766e !important;
-      }
-
-      html[data-theme="light"] .text-violet-100 {
-        color: #6d28d9 !important;
-      }
-
-      html[data-theme="light"] #adminPanel .text-slate-50,
-      html[data-theme="light"] #adminPanel .text-slate-100 {
-        color: #1e293b !important;
-      }
-
-      .scroll-lite::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      .scroll-lite::-webkit-scrollbar-thumb {
-        background: var(--scrollbar);
-        border-radius: 999px;
-      }
-
-      .scroll-lite {
-        scrollbar-width: thin;
-        scrollbar-color: var(--scrollbar) transparent;
-      }
-
-      .app-frame {
-        height: calc(var(--app-vh, 1vh) * 100);
-      }
-      .safe-top {
-        padding-top: max(3.5rem, calc(env(safe-area-inset-top, 0px) + 3.25rem));
-      }
-
-      #adminPanel {
-        overflow: hidden;
-        overscroll-behavior: contain;
-      }
-
-      #adminPanel .admin-panel-shell {
-        height: 100%;
-        max-height: 100%;
-        min-height: 0;
-      }
-
-      #adminPanel .admin-panel-body {
-        flex: 1 1 auto;
-        min-height: 0;
-        overflow-y: auto;
-        overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior: contain;
-      }
-
-      #scaffoldModal .scaffold-panel,
-      #pinModal .pin-panel {
-        max-height: min(92vh, calc(var(--app-vh, 1vh) * 92));
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-      }
-
-      @media (max-width: 640px) {
-        #equationPrompt {
-          font-size: 2.25rem !important;
-          line-height: 1.1;
-        }
-
-        #answerDisplay {
-          font-size: 2rem !important;
-        }
-
-        #adminPanel .admin-panel-body {
-          padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
-        }
-
-        #adminPanel .admin-action-row {
-          width: 100%;
-        }
-
-        #adminPanel .admin-action-row .crayon-btn {
-          flex: 1 1 auto;
-          min-width: 7.5rem;
-        }
-      }
-
-
-      .focus-ring:focus-visible,
-      .crayon-btn:focus-visible,
-      .chalk-input:focus-visible,
-      button:focus-visible,
-      select:focus-visible,
-      input:focus-visible {
-        outline: 2px solid var(--focus-ring);
-        outline-offset: 2px;
-      }
-    </style>
-  </head>
-  <body>
-    <canvas id="dustCanvas" class="fixed inset-0 pointer-events-none z-20"></canvas>
-
-    <main id="appRoot" class="app-frame safe-top relative z-10 overflow-hidden p-2 sm:p-3 sm:pt-16">
-      <button
-        id="themeToggleBtn"
-        class="theme-toggle-btn crayon-btn fixed left-3 top-3 z-40 max-w-[46vw] px-3 py-2 text-xs font-header"
-        style="--button-color: rgba(251, 191, 36, 0.35)"
-        type="button"
-        aria-label="Toggle color theme"
-      >
-        <span class="inline-flex items-center gap-2">
-          <i data-lucide="palette" class="h-4 w-4"></i>
-          <span id="themeToggleLabel">Pastel Fun Mode</span>
-        </span>
-      </button>
-      <button
-        id="educatorAccessBtn"
-        class="crayon-btn fixed right-3 top-3 z-40 max-w-[46vw] px-2 py-2 text-xs font-header font-semibold tracking-wide text-sky-100 sm:max-w-none sm:px-3"
-        style="--button-color: rgba(56, 189, 248, 0.28)"
-      >
-        <span class="inline-flex items-center gap-2">
-          <i data-lucide="lock" class="h-4 w-4"></i>
-          Educator Access
-        </span>
-      </button>
-
-      <section id="profileGate" class="chalk-card flex h-full flex-col gap-4 overflow-auto p-4 sm:p-5">
-        <header class="text-center">
-          <h1 class="font-header text-4xl text-sky-200 sm:text-5xl">SparkMath Arcade</h1>
-          <p class="mt-1 text-xl text-yellow-100">Chalkboard Odyssey</p>
-          <p class="mt-2 text-base text-slate-100">Pick a learner profile or add a new student to begin.</p>
-        </header>
-
-        <div class="grid min-h-0 flex-1 gap-4 lg:grid-cols-2">
-          <div class="chalk-card min-h-0 p-3">
-            <h2 class="font-header text-xl text-teal-200">Returning Students</h2>
-            <div id="profileList" class="scroll-lite mt-2 grid max-h-[52vh] gap-2 overflow-auto pr-1"></div>
-          </div>
-
-          <div class="chalk-card p-3">
-            <h2 class="font-header text-xl text-pink-200">Add New Student</h2>
-            <label class="mt-3 block text-sm text-slate-200">Name</label>
-            <input id="newProfileName" class="chalk-input mt-1 w-full px-3 py-2 text-lg" maxlength="28" />
-            <label class="mt-3 block text-sm text-slate-200">Support Preference</label>
-            <select id="supportPreference" class="chalk-input mt-1 w-full px-3 py-2 text-lg">
-              <option value="adaptive">Adaptive Rotation</option>
-              <option value="deconstructive">Deconstructive</option>
-              <option value="visual">Visual/Spatial</option>
-              <option value="narrative">Narrative/Context</option>
-            </select>
-            <button
-              id="createProfileBtn"
-              class="crayon-btn mt-4 w-full px-4 py-3 text-xl font-header text-emerald-100"
-              style="--button-color: rgba(16, 185, 129, 0.28)"
-            >
-              Create Profile
-            </button>
-            <p id="profileGateHint" class="mt-2 text-sm text-amber-100"></p>
-          </div>
+  <main id="profileScreen" class="screen">
+    <section class="chalk-card pad stack">
+      <div class="between">
+        <div>
+          <p class="subtitle">Chalkboard & Crayon Odyssey</p>
+          <h1 class="brand">SparkMath Arcade</h1>
         </div>
-      </section>
-
-      <section id="gameView" class="chalk-card hidden h-full min-h-0 flex-col gap-3 overflow-auto p-3">
-        <header class="grid gap-2 lg:grid-cols-[auto_1fr_auto] lg:items-center">
-          <div class="flex items-center gap-2">
-            <button
-              id="backToProfilesBtn"
-              class="crayon-btn px-3 py-2 text-sm font-header text-slate-100"
-              style="--button-color: rgba(148, 163, 184, 0.28)"
-            >
-              Profiles
-            </button>
-            <p id="activeProfilePill" class="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-sm text-slate-100"></p>
-          </div>
-          <div class="text-center">
-            <h2 id="modeTitle" class="font-header text-3xl text-sky-200"></h2>
-            <p id="modeSubtitle" class="text-sm text-slate-200"></p>
-            <p id="activePresetBadge" class="mt-1 text-xs font-header text-amber-200"></p>
-          </div>
-          <div class="grid grid-cols-3 gap-2 text-center text-sm">
-            <div class="rounded-xl border border-white/20 bg-white/10 px-2 py-2">
-              <p class="text-slate-200">XP</p>
-              <p id="xpStat" class="font-header text-sky-100">0</p>
-            </div>
-            <div class="rounded-xl border border-white/20 bg-white/10 px-2 py-2">
-              <p class="text-slate-200">Level</p>
-              <p id="levelStat" class="font-header text-violet-100">1</p>
-            </div>
-            <div class="rounded-xl border border-white/20 bg-white/10 px-2 py-2">
-              <p class="text-slate-200">Streak</p>
-              <p id="streakStat" class="font-header text-amber-100">0</p>
-            </div>
-          </div>
-        </header>
-
-        <div class="grid min-h-0 flex-1 gap-3 md:grid-cols-2 lg:grid-cols-[250px_1fr_330px]">
-          <aside class="chalk-card order-2 min-h-0 p-3 md:order-none">
-            <h3 class="font-header text-xl text-sky-200">Game Modes</h3>
-            <div id="modeButtons" class="mt-2 grid gap-2 text-sm"></div>
-
-            <div id="tierPanel" class="mt-3 rounded-xl border border-white/20 bg-white/10 p-2">
-              <div class="flex items-center justify-between">
-                <p class="text-sm text-slate-100">Difficulty Tier</p>
-                <span id="tierBadge" class="rounded-full border border-white/30 px-2 py-1 text-xs font-header"></span>
-              </div>
-              <input id="tierSlider" type="range" min="1" max="30" value="1" class="mt-2 w-full accent-cyan-300" />
-              <p id="tierDescription" class="mt-1 text-xs text-slate-200"></p>
-              <ul id="tierExamples" class="mt-2 list-disc pl-4 text-xs text-yellow-100"></ul>
-            </div>
-
-            <div class="mt-3 rounded-xl border border-white/20 bg-white/10 p-2 text-xs">
-              <p class="font-header text-lg text-emerald-200">Adaptive Notes</p>
-              <p id="adaptiveMessage" class="mt-1 text-slate-200">Tier adjustments will be explained here.</p>
-              <ul id="adaptationTimeline" class="mt-2 max-h-28 space-y-1 overflow-auto pr-1 text-[11px] text-amber-100"></ul>
-            </div>
-          </aside>
-
-          <section id="challengePanel" class="chalk-card order-1 min-h-0 p-3 md:order-none">
-            <div class="flex h-full flex-col">
-              <p class="text-center text-sm uppercase tracking-wide text-slate-200">Current Challenge</p>
-              <div id="equationPrompt" class="mt-1 text-center font-header text-4xl text-yellow-100 sm:text-5xl"></div>
-              <div class="mx-auto mt-2 w-full max-w-xs rounded-2xl border border-white/30 bg-white/10 p-3 text-center">
-                <p class="text-sm text-slate-200">Your Answer</p>
-                <p id="answerDisplay" class="font-header text-4xl text-sky-100">—</p>
-              </div>
-              <p id="resultBanner" class="mt-2 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-center text-sm text-slate-100">
-                Enter an answer using keyboard or crayon pad.
-              </p>
-              <div id="feedbackThread" class="scroll-lite mt-2 min-h-0 flex-1 space-y-2 overflow-auto pr-1"></div>
-              <div id="easterStage" class="hidden-easter mt-2 text-center">
-                <div class="font-header text-6xl">
-                  <span id="easterDigit6" class="inline-block align-middle">6</span>
-                  <span id="easterDigit7" class="inline-block align-middle">7</span>
-                </div>
-                <p id="easterText" class="font-header text-2xl text-pink-200">six seven</p>
-              </div>
-            </div>
-          </section>
-
-          <aside class="chalk-card order-3 flex min-h-0 flex-col p-3 md:order-none">
-            <p class="text-center text-sm uppercase tracking-wide text-slate-200">Crayon Number Pad</p>
-            <div id="numberPad" class="mt-2 grid min-h-[220px] grid-cols-3 gap-2 sm:min-h-0 sm:flex-1"></div>
-          </aside>
-        </div>
-      </section>
-    </main>
-
-    <div id="scaffoldModal" class="fixed inset-0 z-40 hidden items-center justify-center bg-black/50 px-3" role="dialog" aria-modal="true" aria-labelledby="scaffoldTitle">
-      <div class="scaffold-panel chalk-card w-full max-w-lg p-4">
-        <h3 class="font-header text-2xl text-emerald-200">Support Window</h3>
-        <p id="scaffoldTitle" class="mt-1 text-lg text-sky-100"></p>
-        <div id="scaffoldBody" class="mt-2 space-y-1 text-base text-slate-100"></div>
-        <button
-          id="closeScaffoldBtn"
-          class="crayon-btn mt-3 w-full px-4 py-2 text-lg font-header text-emerald-100"
-          style="--button-color: rgba(16, 185, 129, 0.3)"
-        >
-          Got It
-        </button>
+        <span class="badge">30-tier adaptive math quests</span>
       </div>
-    </div>
+      <p class="muted">Choose a learner profile. Assigned task chains launch automatically; everyone else can play free practice.</p>
+      <div id="profileList" class="grid grid-3"></div>
+      <form id="addProfileForm" class="chalk-card pad grid grid-3" autocomplete="off">
+        <label>New player name<input id="newProfileName" class="input" maxlength="32" placeholder="Avery" /></label>
+        <label>Support style
+          <select id="newProfileStyle">
+            <option value="deconstructive">Deconstructive: step-by-step</option>
+            <option value="visual">Visual/Spatial: grouping and patterns</option>
+            <option value="narrative">Narrative/Context: story prompts</option>
+          </select>
+        </label>
+        <button class="btn" style="--btn: var(--chalk-green)" type="submit">Add New Player</button>
+      </form>
+    </section>
+  </main>
 
-    <div id="pinModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 px-3" role="dialog" aria-modal="true" aria-labelledby="pinDisplay">
-      <div class="pin-panel chalk-card w-full max-w-sm p-4">
-        <h3 class="font-header text-center text-2xl text-sky-200">Educator PIN</h3>
-        <p id="pinDisplay" class="mt-2 text-center font-header text-3xl tracking-[0.5em] text-yellow-100">----</p>
-        <p id="pinHint" class="mt-2 text-center text-sm text-slate-200">Enter 4 digits.</p>
-        <div id="pinPad" class="mt-3 grid grid-cols-3 gap-2"></div>
-        <button
-          id="closePinModalBtn"
-          class="crayon-btn mt-3 w-full px-4 py-2 text-lg font-header text-slate-100"
-          style="--button-color: rgba(148, 163, 184, 0.28)"
-        >
-          Cancel
-        </button>
+  <main id="gameScreen" class="screen hidden">
+    <section class="chalk-card pad stack" id="gameShell">
+      <div class="between">
+        <div>
+          <button id="backToProfiles" class="btn" style="--btn: var(--chalk-blue)">Profiles</button>
+          <span id="playerBadge" class="badge"></span>
+        </div>
+        <div class="row">
+          <span id="tierBadge" class="badge">Tier 1 Beginner</span>
+          <button id="resetChainBtn" class="btn hidden" style="--btn: var(--chalk-orange)">Restart Chain</button>
+        </div>
       </div>
-    </div>
 
-    <div id="projectorOverlay" class="fixed inset-0 z-[60] hidden bg-black/70">
-      <div id="projectorPanel" class="projector-panel h-full w-full bg-gradient-to-b from-slate-100 via-slate-50 to-slate-200"></div>
-    </div>
-
-    <section id="adminPanel" class="fixed inset-0 z-[70] hidden overflow-hidden bg-black/75 p-2 sm:p-3" role="dialog" aria-modal="true" aria-labelledby="adminDashboardTitle">
-      <div class="admin-panel-shell chalk-card flex min-h-0 flex-col overflow-hidden p-2 sm:p-3">
-        <header class="shrink-0 flex flex-wrap items-center justify-between gap-2 border-b border-white/15 pb-2">
-          <h2 id="adminDashboardTitle" class="font-header text-2xl text-slate-50 sm:text-3xl">Administrator Dashboard</h2>
-          <div class="admin-action-row flex flex-wrap gap-2">
-            <button id="adminCopyJson" class="crayon-btn px-3 py-2 text-sm text-sky-100" style="--button-color: rgba(14, 165, 233, 0.28)">Copy JSON</button>
-            <button id="adminCopyCsv" class="crayon-btn px-3 py-2 text-sm text-emerald-100" style="--button-color: rgba(16, 185, 129, 0.28)">Copy CSV</button>
-            <button id="adminCloseBtn" class="crayon-btn px-3 py-2 text-sm text-slate-100" style="--button-color: rgba(148, 163, 184, 0.28)">Close</button>
+      <div id="chainPanel" class="chalk-card pad stack hidden">
+        <div class="between">
+          <div>
+            <h2 id="chainTitle" style="color: var(--chalk-green)">Assigned Quest Chain</h2>
+            <p id="chainSubtitle" class="muted"></p>
           </div>
-        </header>
+          <span id="chainBlockBadge" class="badge"></span>
+        </div>
+        <div class="progress-shell"><div id="chainProgress" class="progress-fill"></div></div>
+      </div>
 
-        <div class="admin-panel-body scroll-lite mt-2 min-h-0 flex-1 pr-1">
-        <div class="grid gap-3 lg:grid-cols-[260px_1fr] xl:grid-cols-[260px_1fr_320px]">
-          <aside class="chalk-card min-h-0 p-3 xl:sticky xl:top-0">
-            <h3 class="font-header text-xl text-sky-200">Learners</h3>
-            <select id="adminProfileSelect" class="chalk-input mt-2 w-full px-2 py-2 text-lg"></select>
-            <div id="adminStatsCards" class="mt-3 grid gap-2"></div>
-            <div class="mt-3 rounded-xl border border-white/20 bg-white/10 p-2 text-sm">
-              <p class="font-header text-lg text-yellow-100">Pedagogical Profile Summary</p>
-              <p id="pedagogicalSummary" class="mt-1 text-slate-100"></p>
-            </div>
-            <div class="mt-3 rounded-xl border border-white/20 bg-white/10 p-2 text-sm">
-              <p class="font-header text-lg text-emerald-200">Assigned Practice Set</p>
-              <p id="assignedPresetSummary" class="mt-1 text-xs text-slate-100">No custom set for selected learner.</p>
-            </div>
-          </aside>
-          <section class="chalk-card min-h-0 overflow-auto p-3 lg:col-span-1 xl:col-span-1">
-            <h3 class="font-header text-xl text-amber-200">Practice Set Builder</h3>
-            <p class="mt-1 text-xs text-slate-200">Create focused drills (e.g. multiply by 3 up to 3×12) and assign them to learners.</p>
-            <div class="mt-2 grid gap-2 sm:grid-cols-2">
-              <div>
-                <label class="text-xs text-slate-200">Set Name</label>
-                <input id="presetNameInput" class="chalk-input mt-1 w-full px-2 py-1 text-base" placeholder="Times Table x3" />
-              </div>
-              <div>
-                <label class="text-xs text-slate-200">Game Mode</label>
-                <select id="presetModeSelect" class="chalk-input mt-1 w-full px-2 py-1 text-base">
-                  <option value="multiplication">Multiplication</option>
-                  <option value="addition">Addition</option>
-                  <option value="subtraction">Subtraction</option>
-                  <option value="division">Division</option>
-                  <option value="pattern">Pattern</option>
-                </select>
-              </div>
-              <div>
-                <label class="text-xs text-slate-200">Focus Number (0 = none)</label>
-                <input id="presetFocusInput" type="number" min="0" max="999" value="3" class="chalk-input mt-1 w-full px-2 py-1 text-base" />
-              </div>
-              <div>
-                <label class="text-xs text-slate-200">Other Operand Min</label>
-                <input id="presetOtherMinInput" type="number" min="0" max="999" value="1" class="chalk-input mt-1 w-full px-2 py-1 text-base" />
-              </div>
-              <div>
-                <label class="text-xs text-slate-200">Other Operand Max</label>
-                <input id="presetOtherMaxInput" type="number" min="0" max="999" value="12" class="chalk-input mt-1 w-full px-2 py-1 text-base" />
-              </div>
-              <div>
-                <label class="text-xs text-slate-200">Max Answer Cap (0 = none)</label>
-                <input id="presetAnswerCapInput" type="number" min="0" max="99999" value="0" class="chalk-input mt-1 w-full px-2 py-1 text-base" />
-              </div>
-            </div>
-            <label class="mt-2 inline-flex items-center gap-2 text-xs text-slate-200">
-              <input id="presetShuffleOrder" type="checkbox" class="h-4 w-4" checked />
-              Shuffle operand order (3×7 and 7×3)
-            </label>
-            <p id="presetPreview" class="mt-2 rounded-lg border border-white/20 bg-white/10 px-2 py-1 text-xs text-yellow-100">Preview: 3 × 7 = ?</p>
-            <div class="mt-2 flex flex-wrap gap-2">
-              <button id="savePresetBtn" class="crayon-btn px-3 py-2 text-sm text-emerald-100" style="--button-color: rgba(16, 185, 129, 0.28)">Save Set</button>
-              <button id="assignPresetBtn" class="crayon-btn px-3 py-2 text-sm text-sky-100" style="--button-color: rgba(14, 165, 233, 0.28)">Assign to Learner</button>
-              <button id="clearPresetAssignmentBtn" class="crayon-btn px-3 py-2 text-sm text-rose-100" style="--button-color: rgba(244, 63, 94, 0.28)">Clear Assignment</button>
-            </div>
-            <p id="presetBuilderHint" class="mt-2 text-xs text-slate-200"></p>
-            <div class="scroll-lite mt-3 max-h-none overflow-visible pr-1 sm:max-h-44 sm:overflow-auto">
-              <ul id="presetList" class="space-y-2 text-xs text-slate-100"></ul>
-            </div>
-          </section>
-          <section class="grid min-h-0 gap-3 xl:grid-cols-[1fr_1fr]">
-            <div class="chalk-card min-h-0 p-3">
-              <h3 class="font-header text-xl text-emerald-200">Trend Snapshot</h3>
-              <canvas id="adminChart" class="mt-2 h-[210px] w-full"></canvas>
-            </div>
-            <div class="chalk-card min-h-0 p-3">
-              <h3 class="font-header text-xl text-pink-200">Attempt Log</h3>
-              <div class="scroll-lite mt-2 overflow-x-auto pr-1">
-                <table class="w-full text-left text-xs text-slate-100">
-                  <thead>
-                    <tr class="border-b border-white/20">
-                      <th class="py-1">Time</th>
-                      <th class="py-1">Prompt</th>
-                      <th class="py-1">Keys</th>
-                      <th class="py-1">Result</th>
-                      <th class="py-1">Err</th>
-                      <th class="py-1">Conf</th>
-                      <th class="py-1">ms</th>
-                    </tr>
-                  </thead>
-                  <tbody id="adminLogBody"></tbody>
-                </table>
-              </div>
-            </div>
-          </section>
+      <div id="freePlayPanel" class="chalk-card pad stack">
+        <div class="between">
+          <h2 style="color: var(--chalk-pink)">Free Practice Studio</h2>
+          <span class="badge">Drag Tier 1-30</span>
         </div>
+        <div class="grid grid-2">
+          <label>Difficulty tier
+            <input id="tierSlider" class="slider" type="range" min="1" max="30" step="1" value="1" list="tierMarks" />
+            <datalist id="tierMarks"></datalist>
+            <div class="tier-track-labels"><span>1</span><span>5</span><span>10</span><span>15</span><span>20</span><span>25</span><span>30</span></div>
+          </label>
+          <div>
+            <p class="muted" id="tierDescription"></p>
+            <div class="row" id="modeButtons"></div>
+          </div>
         </div>
+      </div>
+
+      <div class="grid grid-2">
+        <section class="chalk-card pad stack">
+          <div class="equation-wrap">
+            <div>
+              <div id="equation" aria-live="polite"></div>
+              <div id="sixSevenWords">six seven</div>
+            </div>
+          </div>
+          <div id="answerDisplay" class="answer-display" aria-live="polite">?</div>
+          <div id="scaffoldBox" class="chalk-card pad hidden"></div>
+        </section>
+        <section class="chalk-card pad stack">
+          <div class="grid numpad" id="numpad"></div>
+          <div class="between">
+            <span id="feedback" class="badge">Ready for chalk magic.</span>
+            <button id="skipQuestion" class="btn" style="--btn: var(--chalk-red)">Skip</button>
+          </div>
+        </section>
       </div>
     </section>
+  </main>
 
-    <script>
-      (() => {
-        const STORAGE_KEY = "sparkMathOdysseyV1";
-        const SECURITY_PIN = "6767";
-        const MODES = ["addition", "subtraction", "multiplication", "division", "pattern"];
-        const MODE_LABEL = {
-          addition: "Addition",
-          subtraction: "Subtraction",
-          multiplication: "Multiplication",
-          division: "Division",
-          pattern: "Pattern",
+  <button id="educatorAccess" class="educator-link" type="button">🔒 Educator Access</button>
+
+  <section id="pinOverlay" class="pin-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="pinTitle">
+    <div class="chalk-card pad stack" style="width:min(420px,100%); margin-top:10vh;">
+      <div class="between">
+        <h2 id="pinTitle" style="color: var(--chalk-yellow)">Educator PIN</h2>
+        <button id="closePin" class="btn" style="--btn: var(--chalk-red)">Close</button>
+      </div>
+      <div id="pinDots" class="answer-display">----</div>
+      <div id="pinPad" class="grid numpad"></div>
+      <p id="pinHint" class="muted tiny"></p>
+    </div>
+  </section>
+
+  <section id="adminPanel" class="admin-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+    <div class="projector chalk-card pad stack">
+      <div class="between">
+        <div>
+          <p class="subtitle">Teacher's Custom Lesson Planner & Task Chain Engine</p>
+          <h2 id="adminTitle" style="color: var(--chalk-yellow)">Educator Dashboard</h2>
+        </div>
+        <button id="closeAdmin" class="btn" style="--btn: var(--chalk-red)">Close</button>
+      </div>
+      <div class="tab-row row">
+        <button class="btn admin-tab active" data-tab="student" style="--btn: var(--chalk-blue)">Student</button>
+        <button class="btn admin-tab" data-tab="sets" style="--btn: var(--chalk-pink)">Equation Sets</button>
+        <button class="btn admin-tab" data-tab="analytics" style="--btn: var(--chalk-green)">Analytics</button>
+      </div>
+      <div class="grid admin-layout">
+        <section class="admin-section stack active" data-tab-panel="student">
+          <div class="chalk-card pad stack">
+            <h3 style="color: var(--chalk-blue)">Student Task Chain</h3>
+            <label>Selected learner<select id="adminProfileSelect"></select></label>
+            <div class="grid grid-2">
+              <label>Block type
+                <select id="blockType">
+                  <option value="generated">Tier generated block</option>
+                  <option value="set">Saved custom equation set</option>
+                </select>
+              </label>
+              <label>Block title<input id="blockTitle" class="input" placeholder="Warm Up" /></label>
+            </div>
+            <div id="generatedBlockFields" class="grid grid-3">
+              <label>Operation<select id="blockOperation"></select></label>
+              <label>Tier<input id="blockTier" class="input" type="number" min="1" max="30" value="3" /></label>
+              <label>Questions<input id="blockCount" class="input" type="number" min="1" max="60" value="5" /></label>
+            </div>
+            <div id="setBlockFields" class="hidden">
+              <label>Equation set<select id="blockSetSelect"></select></label>
+            </div>
+            <button id="addBlockBtn" class="btn" style="--btn: var(--chalk-green)">Add Block to Chain</button>
+            <div id="chainList" class="list stack"></div>
+          </div>
+        </section>
+
+        <section class="admin-section stack" data-tab-panel="sets">
+          <div class="chalk-card pad stack">
+            <h3 style="color: var(--chalk-pink)">Custom Equation Bank Creator</h3>
+            <label>Set name<input id="setName" class="input" maxlength="48" placeholder="Table of 7s Mastery" /></label>
+            <label>Creation method
+              <select id="setMethod">
+                <option value="manual">Hardcoded comma-separated equations</option>
+                <option value="generator">Generator rule</option>
+              </select>
+            </label>
+            <div id="manualSetFields">
+              <label>Equations<textarea id="manualEquations" placeholder="6x7, 7x8, 12x7"></textarea></label>
+            </div>
+            <div id="generatorSetFields" class="grid grid-3 hidden">
+              <label>Operation<select id="setOperation"></select></label>
+              <label>Tier<input id="setTier" class="input" type="number" min="1" max="30" value="7" /></label>
+              <label>Questions<input id="setCount" class="input" type="number" min="1" max="80" value="10" /></label>
+            </div>
+            <button id="saveSetBtn" class="btn" style="--btn: var(--chalk-pink)">Save Equation Set</button>
+            <div id="setList" class="list stack"></div>
+          </div>
+        </section>
+
+        <section class="admin-section stack" data-tab-panel="analytics">
+          <div class="chalk-card pad stack">
+            <h3 style="color: var(--chalk-green)">Statistical Trends</h3>
+            <div id="statsCards" class="grid grid-2"></div>
+            <div id="insightSummary" class="chalk-card pad"></div>
+          </div>
+          <div class="chalk-card pad stack">
+            <div class="between">
+              <h3 style="color: var(--chalk-orange)">Chronological Log</h3>
+              <button id="exportData" class="btn" style="--btn: var(--chalk-blue)">Copy JSON</button>
+            </div>
+            <div class="list">
+              <table class="log-table">
+                <thead><tr><th>When</th><th>Prompt</th><th>Answer</th><th>Result</th><th>Error Tag</th></tr></thead>
+                <tbody id="logBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <div id="toast" class="toast chalk-card pad"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const STORAGE_KEY = "sparkMathOdysseyV2";
+      const PIN = "6767";
+      const OPERATIONS = ["addition", "subtraction", "multiplication", "division", "mixed"];
+      const OP_LABEL = {
+        addition: "Addition",
+        subtraction: "Subtraction",
+        multiplication: "Multiplication",
+        division: "Division",
+        mixed: "Mixed",
+      };
+      const OP_SYMBOL = {
+        addition: "+",
+        subtraction: "-",
+        multiplication: "×",
+        division: "÷",
+      };
+      const TIER_GROUPS = [
+        { max: 5, name: "Beginner", c1: "#7dd3fc", c2: "#2dd4bf", desc: "tiny sums and subtraction inside 10" },
+        { max: 10, name: "Easy", c1: "#a7f3d0", c2: "#34d399", desc: "single digits and friendly facts up to 12" },
+        { max: 15, name: "Medium", c1: "#fde68a", c2: "#fb923c", desc: "double digits mixed with single digits" },
+        { max: 20, name: "Hard", c1: "#c4b5fd", c2: "#6366f1", desc: "larger double digits and careful borrowing" },
+        { max: 25, name: "Extra Hard", c1: "#fda4af", c2: "#e11d48", desc: "advanced double digits from 20 to 100" },
+        { max: 29, name: "Extra Extra Hard", c1: "#d8b4fe", c2: "#d946ef", desc: "multi-term calculations and negatives" },
+        { max: 30, name: "Math Boss", c1: "#22d3ee", c2: "#a855f7", desc: "cosmic four-factor boss equations" },
+      ];
+
+      const $ = (id) => document.getElementById(id);
+      const ui = {
+        profileScreen: $("profileScreen"),
+        gameScreen: $("gameScreen"),
+        gameShell: $("gameShell"),
+        profileList: $("profileList"),
+        addProfileForm: $("addProfileForm"),
+        newProfileName: $("newProfileName"),
+        newProfileStyle: $("newProfileStyle"),
+        playerBadge: $("playerBadge"),
+        educatorAccess: $("educatorAccess"),
+        pinOverlay: $("pinOverlay"),
+        closePin: $("closePin"),
+        pinDots: $("pinDots"),
+        pinPad: $("pinPad"),
+        pinHint: $("pinHint"),
+        adminPanel: $("adminPanel"),
+        closeAdmin: $("closeAdmin"),
+        adminProfileSelect: $("adminProfileSelect"),
+        statsCards: $("statsCards"),
+        insightSummary: $("insightSummary"),
+        logBody: $("logBody"),
+        exportData: $("exportData"),
+        setName: $("setName"),
+        setMethod: $("setMethod"),
+        manualSetFields: $("manualSetFields"),
+        generatorSetFields: $("generatorSetFields"),
+        manualEquations: $("manualEquations"),
+        setOperation: $("setOperation"),
+        setTier: $("setTier"),
+        setCount: $("setCount"),
+        saveSetBtn: $("saveSetBtn"),
+        setList: $("setList"),
+        blockType: $("blockType"),
+        blockTitle: $("blockTitle"),
+        blockOperation: $("blockOperation"),
+        blockTier: $("blockTier"),
+        blockCount: $("blockCount"),
+        generatedBlockFields: $("generatedBlockFields"),
+        setBlockFields: $("setBlockFields"),
+        blockSetSelect: $("blockSetSelect"),
+        addBlockBtn: $("addBlockBtn"),
+        chainList: $("chainList"),
+        freePlayPanel: $("freePlayPanel"),
+        chainPanel: $("chainPanel"),
+        chainTitle: $("chainTitle"),
+        chainSubtitle: $("chainSubtitle"),
+        chainBlockBadge: $("chainBlockBadge"),
+        chainProgress: $("chainProgress"),
+        resetChainBtn: $("resetChainBtn"),
+        tierSlider: $("tierSlider"),
+        tierMarks: $("tierMarks"),
+        tierBadge: $("tierBadge"),
+        tierDescription: $("tierDescription"),
+        modeButtons: $("modeButtons"),
+        equation: $("equation"),
+        sixSevenWords: $("sixSevenWords"),
+        answerDisplay: $("answerDisplay"),
+        scaffoldBox: $("scaffoldBox"),
+        numpad: $("numpad"),
+        feedback: $("feedback"),
+        skipQuestion: $("skipQuestion"),
+        backToProfiles: $("backToProfiles"),
+        toast: $("toast"),
+        dustCanvas: $("dustCanvas"),
+      };
+
+      const state = {
+        data: safeReadStorage(),
+        activeProfileId: null,
+        operation: "addition",
+        tier: 1,
+        answer: "",
+        question: null,
+        questionStartedAt: 0,
+        keyTimes: [],
+        consecutiveErrors: 0,
+        chain: null,
+        pin: "",
+        audio: null,
+        particles: [],
+        easterTimer: null,
+      };
+
+      function defaultData() {
+        return { profiles: {}, equationSets: {}, activeProfileId: null, version: 2 };
+      }
+      function safeReadStorage() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return defaultData();
+          const parsed = JSON.parse(raw);
+          if (!parsed || typeof parsed !== "object") return defaultData();
+          return normalizeData(parsed);
+        } catch {
+          return defaultData();
+        }
+      }
+      function normalizeData(data) {
+        const clean = defaultData();
+        if (data.profiles && typeof data.profiles === "object") {
+          Object.values(data.profiles).forEach((profile) => {
+            if (!profile || typeof profile !== "object") return;
+            const id = String(profile.id || makeId("p"));
+            clean.profiles[id] = normalizeProfile({ ...profile, id });
+          });
+        }
+        if (data.equationSets && typeof data.equationSets === "object") {
+          Object.values(data.equationSets).forEach((set) => {
+            const normalized = normalizeEquationSet(set);
+            if (normalized) clean.equationSets[normalized.id] = normalized;
+          });
+        }
+        clean.activeProfileId = clean.profiles[data.activeProfileId] ? data.activeProfileId : null;
+        return clean;
+      }
+      function normalizeProfile(profile) {
+        return {
+          id: String(profile.id || makeId("p")),
+          name: String(profile.name || "Player").slice(0, 32),
+          supportStyle: ["deconstructive", "visual", "narrative"].includes(profile.supportStyle) ? profile.supportStyle : "deconstructive",
+          taskChain: Array.isArray(profile.taskChain) ? profile.taskChain.filter(Boolean).map(normalizeBlock).filter(Boolean) : [],
+          stats: normalizeStats(profile.stats),
+          logs: Array.isArray(profile.logs) ? profile.logs.slice(-250).filter((x) => x && typeof x === "object") : [],
+          createdAt: profile.createdAt || new Date().toISOString(),
         };
-        const MODE_SYMBOL = {
-          addition: "+",
-          subtraction: "-",
-          multiplication: "×",
-          division: "÷",
-          pattern: "◊",
+      }
+      function normalizeStats(stats = {}) {
+        return {
+          total: Number(stats.total) || 0,
+          correct: Number(stats.correct) || 0,
+          byOperation: sanitizeNumberMap(stats.byOperation),
+          errors: sanitizeNumberMap(stats.errors),
+          answerTimes: Array.isArray(stats.answerTimes) ? stats.answerTimes.slice(-100).map(Number).filter(Number.isFinite) : [],
+          typingIntervals: Array.isArray(stats.typingIntervals) ? stats.typingIntervals.slice(-100).map(Number).filter(Number.isFinite) : [],
         };
-
-        const ui = {
-          profileGate: document.getElementById("profileGate"),
-          profileList: document.getElementById("profileList"),
-          newProfileName: document.getElementById("newProfileName"),
-          supportPreference: document.getElementById("supportPreference"),
-          createProfileBtn: document.getElementById("createProfileBtn"),
-          profileGateHint: document.getElementById("profileGateHint"),
-          gameView: document.getElementById("gameView"),
-          activeProfilePill: document.getElementById("activeProfilePill"),
-          backToProfilesBtn: document.getElementById("backToProfilesBtn"),
-          modeButtons: document.getElementById("modeButtons"),
-          modeTitle: document.getElementById("modeTitle"),
-          modeSubtitle: document.getElementById("modeSubtitle"),
-          xpStat: document.getElementById("xpStat"),
-          levelStat: document.getElementById("levelStat"),
-          streakStat: document.getElementById("streakStat"),
-          tierSlider: document.getElementById("tierSlider"),
-          tierBadge: document.getElementById("tierBadge"),
-          tierDescription: document.getElementById("tierDescription"),
-          tierExamples: document.getElementById("tierExamples"),
-          adaptiveMessage: document.getElementById("adaptiveMessage"),
-          adaptationTimeline: document.getElementById("adaptationTimeline"),
-          equationPrompt: document.getElementById("equationPrompt"),
-          answerDisplay: document.getElementById("answerDisplay"),
-          resultBanner: document.getElementById("resultBanner"),
-          feedbackThread: document.getElementById("feedbackThread"),
-          numberPad: document.getElementById("numberPad"),
-          dustCanvas: document.getElementById("dustCanvas"),
-          scaffoldModal: document.getElementById("scaffoldModal"),
-          scaffoldTitle: document.getElementById("scaffoldTitle"),
-          scaffoldBody: document.getElementById("scaffoldBody"),
-          closeScaffoldBtn: document.getElementById("closeScaffoldBtn"),
-          themeToggleBtn: document.getElementById("themeToggleBtn"),
-          themeToggleLabel: document.getElementById("themeToggleLabel"),
-          educatorAccessBtn: document.getElementById("educatorAccessBtn"),
-          pinModal: document.getElementById("pinModal"),
-          pinDisplay: document.getElementById("pinDisplay"),
-          pinHint: document.getElementById("pinHint"),
-          pinPad: document.getElementById("pinPad"),
-          closePinModalBtn: document.getElementById("closePinModalBtn"),
-          projectorOverlay: document.getElementById("projectorOverlay"),
-          projectorPanel: document.getElementById("projectorPanel"),
-          adminPanel: document.getElementById("adminPanel"),
-          adminProfileSelect: document.getElementById("adminProfileSelect"),
-          adminStatsCards: document.getElementById("adminStatsCards"),
-          pedagogicalSummary: document.getElementById("pedagogicalSummary"),
-          adminLogBody: document.getElementById("adminLogBody"),
-          adminCopyJson: document.getElementById("adminCopyJson"),
-          adminCopyCsv: document.getElementById("adminCopyCsv"),
-          adminCloseBtn: document.getElementById("adminCloseBtn"),
-          adminChart: document.getElementById("adminChart"),
-          easterStage: document.getElementById("easterStage"),
-          easterDigit6: document.getElementById("easterDigit6"),
-          easterDigit7: document.getElementById("easterDigit7"),
-          easterText: document.getElementById("easterText"),
-          activePresetBadge: document.getElementById("activePresetBadge"),
-          assignedPresetSummary: document.getElementById("assignedPresetSummary"),
-          presetNameInput: document.getElementById("presetNameInput"),
-          presetModeSelect: document.getElementById("presetModeSelect"),
-          presetFocusInput: document.getElementById("presetFocusInput"),
-          presetOtherMinInput: document.getElementById("presetOtherMinInput"),
-          presetOtherMaxInput: document.getElementById("presetOtherMaxInput"),
-          presetAnswerCapInput: document.getElementById("presetAnswerCapInput"),
-          presetShuffleOrder: document.getElementById("presetShuffleOrder"),
-          presetPreview: document.getElementById("presetPreview"),
-          savePresetBtn: document.getElementById("savePresetBtn"),
-          assignPresetBtn: document.getElementById("assignPresetBtn"),
-          clearPresetAssignmentBtn: document.getElementById("clearPresetAssignmentBtn"),
-          presetBuilderHint: document.getElementById("presetBuilderHint"),
-          presetList: document.getElementById("presetList"),
+      }
+      function sanitizeNumberMap(map) {
+        const out = {};
+        if (!map || typeof map !== "object") return out;
+        Object.entries(map).forEach(([key, value]) => out[key] = Number(value) || 0);
+        return out;
+      }
+      function normalizeEquationSet(set) {
+        if (!set || typeof set !== "object") return null;
+        const id = String(set.id || makeId("set"));
+        const method = set.method === "generator" ? "generator" : "manual";
+        const name = String(set.name || "Untitled Set").slice(0, 48);
+        if (method === "manual") {
+          const equations = Array.isArray(set.equations) ? set.equations.map(normalizeManualEquation).filter(Boolean) : [];
+          return { id, name, method, equations, createdAt: set.createdAt || new Date().toISOString() };
+        }
+        return {
+          id, name, method,
+          rule: {
+            operation: OPERATIONS.includes(set.rule?.operation) ? set.rule.operation : "addition",
+            tier: clamp(Number(set.rule?.tier) || 1, 1, 30),
+            count: clamp(Number(set.rule?.count) || 10, 1, 80),
+          },
+          createdAt: set.createdAt || new Date().toISOString(),
         };
-
-        const state = {
-          data: { profiles: {}, activeProfileId: null },
-          activeMode: "addition",
-          currentChallenge: null,
-          inputValue: "",
-          inputKeystrokes: [],
-          queuedInputValue: "",
-          queuedSubmit: false,
-          pinValue: "",
-          lockInput: false,
-          activeModal: null,
-          lastFocusedElement: null,
-          debugEasterOnce: false,
-          memoryByMode: Object.fromEntries(MODES.map((mode) => [mode, []])),
-          perfByMode: Object.fromEntries(MODES.map((mode) => [mode, []])),
-          chart: null,
-          easterTimer: null,
-          easterActive: false,
+      }
+      function normalizeManualEquation(eq) {
+        if (!eq || typeof eq !== "object") return null;
+        const answer = Number(eq.answer);
+        if (!Number.isFinite(answer)) return null;
+        return { prompt: String(eq.prompt || "").slice(0, 80), answer, operation: eq.operation || "custom", operands: Array.isArray(eq.operands) ? eq.operands : [] };
+      }
+      function normalizeBlock(block) {
+        if (!block || typeof block !== "object") return null;
+        const type = block.type === "set" ? "set" : "generated";
+        const base = { id: String(block.id || makeId("block")), title: String(block.title || (type === "set" ? "Custom Set" : "Practice Block")).slice(0, 48), type };
+        if (type === "set") return { ...base, setId: String(block.setId || "") };
+        return {
+          ...base,
+          operation: OPERATIONS.includes(block.operation) ? block.operation : "addition",
+          tier: clamp(Number(block.tier) || 1, 1, 30),
+          count: clamp(Number(block.count) || 5, 1, 60),
         };
+      }
+      function safeWriteStorage() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
+          return true;
+        } catch {
+          showToast("Storage is full or unavailable. Progress is kept for this session only.");
+          return false;
+        }
+      }
+      function makeId(prefix) {
+        return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      }
+      function clamp(value, min, max) {
+        return Math.min(max, Math.max(min, value));
+      }
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#039;" }[char]));
+      }
 
-        function safeReadStorage() {
-          try {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            if (!raw) return { profiles: {}, activeProfileId: null, practicePresets: {} };
-            const parsed = JSON.parse(raw);
-            if (!parsed || typeof parsed !== "object") return { profiles: {}, activeProfileId: null, practicePresets: {} };
-            const profiles = parsed.profiles && typeof parsed.profiles === "object" ? parsed.profiles : {};
-            const practicePresets = parsed.practicePresets && typeof parsed.practicePresets === "object" ? parsed.practicePresets : {};
-            return { profiles, activeProfileId: parsed.activeProfileId || null, practicePresets };
-          } catch {
-            return { profiles: {}, activeProfileId: null, practicePresets: {} };
+      function tierInfo(tier) {
+        const value = clamp(Number(tier) || 1, 1, 30);
+        const group = TIER_GROUPS.find((item) => value <= item.max) || TIER_GROUPS.at(-1);
+        const maxOperand = value === 1 ? 1 : value <= 5 ? value * 2 : value <= 10 ? value + 2 : value <= 15 ? 12 + value * 2 : value <= 20 ? 50 : value <= 25 ? 20 + value * 3 : 80 + value * 4;
+        return {
+          tier: value,
+          name: group.name,
+          color: group.c1,
+          color2: group.c2,
+          desc: group.desc,
+          maxOperand,
+          terms: value === 30 ? 4 : value >= 26 ? 3 : 2,
+          negatives: value >= 26,
+          multiplicationMax: value < 8 ? 5 : value < 16 ? 12 : value < 26 ? 20 : 30,
+        };
+      }
+      function setAccent(tier) {
+        const info = tierInfo(tier);
+        document.documentElement.style.setProperty("--accent", info.color);
+        document.documentElement.style.setProperty("--accent-2", info.color2);
+        ui.tierBadge.textContent = `Tier ${info.tier} ${info.name}`;
+        ui.tierDescription.textContent = `${info.desc}; max operand ${info.maxOperand}${info.negatives ? "; negatives can appear" : ""}.`;
+        ui.gameShell.classList.toggle("neon-boss", info.tier === 30);
+      }
+      function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+      function choose(array) {
+        return array[randomInt(0, array.length - 1)];
+      }
+      function generateEquation(operation, tier) {
+        const info = tierInfo(tier);
+        const op = operation === "mixed" ? choose(["addition", "subtraction", "multiplication", "division"]) : operation;
+        if (info.tier === 1 && op === "addition") return enrichQuestion({ prompt: "1 + 1", answer: 2, operation: op, operands: [1, 1], operators: ["+"] });
+        if (info.tier === 30) {
+          const operands = Array.from({ length: 4 }, () => randomInt(2, 9));
+          return enrichQuestion({ prompt: operands.join(" × "), answer: operands.reduce((a, b) => a * b, 1), operation: "multiplication", operands, operators: ["×", "×", "×"] });
+        }
+        if (info.terms > 2 && op !== "division") return generateMultiTerm(op, info);
+        if (op === "addition") {
+          const a = randomSigned(1, info.maxOperand, info.negatives);
+          const b = randomSigned(1, info.maxOperand, info.negatives);
+          return enrichQuestion({ prompt: `${a} + ${b}`, answer: a + b, operation: op, operands: [a, b], operators: ["+"] });
+        }
+        if (op === "subtraction") {
+          let a = randomInt(1, info.maxOperand);
+          let b = randomInt(1, info.maxOperand);
+          if (!info.negatives && b > a) [a, b] = [b, a];
+          if (info.negatives && Math.random() < 0.35) a *= -1;
+          return enrichQuestion({ prompt: `${a} - ${b}`, answer: a - b, operation: op, operands: [a, b], operators: ["-"] });
+        }
+        if (op === "multiplication") {
+          const a = randomSigned(1, info.multiplicationMax, info.negatives && Math.random() < 0.35);
+          const b = randomSigned(1, info.multiplicationMax, info.negatives && Math.random() < 0.35);
+          return enrichQuestion({ prompt: `${a} × ${b}`, answer: a * b, operation: op, operands: [a, b], operators: ["×"] });
+        }
+        const divisor = randomInt(1, Math.max(2, Math.min(info.multiplicationMax, 18)));
+        const quotient = randomSigned(1, Math.max(3, Math.min(info.maxOperand, 24)), info.negatives && Math.random() < 0.3);
+        return enrichQuestion({ prompt: `${divisor * quotient} ÷ ${divisor}`, answer: quotient, operation: op, operands: [divisor * quotient, divisor], operators: ["÷"] });
+      }
+      function randomSigned(min, max, allowNegative) {
+        const value = randomInt(min, max);
+        return allowNegative && Math.random() < 0.35 ? -value : value;
+      }
+      function generateMultiTerm(operation, info) {
+        const operators = [];
+        const operands = [];
+        const ops = operation === "mixed" ? ["+", "-", "×"] : [OP_SYMBOL[operation] || "+"];
+        for (let i = 0; i < info.terms; i++) operands.push(randomSigned(1, Math.min(info.maxOperand, operation === "multiplication" ? 12 : info.maxOperand), info.negatives));
+        for (let i = 1; i < operands.length; i++) operators.push(choose(ops));
+        const prompt = operands.map((n, i) => i === 0 ? String(n) : `${operators[i - 1]} ${n}`).join(" ");
+        return enrichQuestion({ prompt, answer: evaluateTokens(operands, operators), operation, operands, operators });
+      }
+      function evaluateTokens(operands, operators) {
+        const nums = operands.slice();
+        const ops = operators.slice();
+        for (let i = 0; i < ops.length; i++) {
+          if (ops[i] === "×" || ops[i] === "÷") {
+            const value = ops[i] === "×" ? nums[i] * nums[i + 1] : nums[i] / nums[i + 1];
+            nums.splice(i, 2, value);
+            ops.splice(i, 1);
+            i--;
           }
         }
+        return ops.reduce((total, op, i) => op === "+" ? total + nums[i + 1] : total - nums[i + 1], nums[0]);
+      }
+      function enrichQuestion(question) {
+        return { ...question, answer: Number(question.answer), id: makeId("q") };
+      }
 
-        function safeWriteStorage() {
-          try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
-          } catch {
-            // Ignore quota or parsing failures to keep runtime stable.
+      function parseManualEquations(text) {
+        return String(text || "")
+          .split(/[\n,]+/)
+          .map((part) => part.trim())
+          .filter(Boolean)
+          .map(parseEquationExpression)
+          .filter(Boolean);
+      }
+      function parseEquationExpression(input) {
+        const cleaned = input.replace(/[=].*$/, "").replace(/x/gi, "×").replace(/\*/g, "×").replace(/\//g, "÷");
+        if (!/^-?\d+(?:\s*[+\-×÷]\s*-?\d+)+$/.test(cleaned)) return null;
+        const tokens = cleaned.match(/-?\d+|[+\-×÷]/g);
+        if (!tokens || tokens.length < 3) return null;
+        const operands = [];
+        const operators = [];
+        tokens.forEach((token) => /[+\-×÷]/.test(token) && token.length === 1 ? operators.push(token) : operands.push(Number(token)));
+        if (operands.some((n) => !Number.isFinite(n)) || operators.length !== operands.length - 1) return null;
+        const answer = evaluateTokens(operands, operators);
+        if (!Number.isInteger(answer)) return null;
+        const first = operators[0];
+        const operation = first === "+" ? "addition" : first === "-" ? "subtraction" : first === "×" ? "multiplication" : "division";
+        return enrichQuestion({ prompt: cleaned.replace(/\s+/g, " "), answer, operation, operands, operators });
+      }
+
+      function renderProfiles() {
+        const profiles = Object.values(state.data.profiles).sort((a, b) => a.name.localeCompare(b.name));
+        ui.profileList.innerHTML = profiles.length ? "" : `<div class="chalk-card pad"><strong>No learners yet.</strong><p class="muted">Add a player to begin.</p></div>`;
+        profiles.forEach((profile) => {
+          const accuracy = profile.stats.total ? Math.round((profile.stats.correct / profile.stats.total) * 100) : 0;
+          const button = document.createElement("button");
+          button.className = "btn profile-card";
+          button.style.setProperty("--btn", "var(--chalk-blue)");
+          button.innerHTML = `<strong>${escapeHtml(profile.name)}</strong><span>${profile.taskChain.length ? `${profile.taskChain.length} assigned chain block${profile.taskChain.length === 1 ? "" : "s"}` : "Free practice ready"}</span><br><span class="muted tiny">${profile.stats.total} attempts · ${accuracy}% accuracy</span>`;
+          button.addEventListener("click", () => selectProfile(profile.id));
+          ui.profileList.appendChild(button);
+        });
+      }
+      function createProfile(name, supportStyle) {
+        const id = makeId("p");
+        state.data.profiles[id] = normalizeProfile({ id, name, supportStyle });
+        state.data.activeProfileId = id;
+        safeWriteStorage();
+        renderProfiles();
+        refreshAdmin();
+        selectProfile(id);
+      }
+      function activeProfile() {
+        return state.data.profiles[state.activeProfileId] || null;
+      }
+      function selectProfile(id) {
+        const profile = state.data.profiles[id];
+        if (!profile) return;
+        state.activeProfileId = id;
+        state.data.activeProfileId = id;
+        safeWriteStorage();
+        ui.playerBadge.textContent = profile.name;
+        ui.profileScreen.classList.add("hidden");
+        ui.gameScreen.classList.remove("hidden");
+        state.consecutiveErrors = 0;
+        if (profile.taskChain.length) startChain(profile);
+        else startFreePlay();
+      }
+      function startFreePlay() {
+        state.chain = null;
+        ui.freePlayPanel.classList.remove("hidden");
+        ui.chainPanel.classList.add("hidden");
+        ui.resetChainBtn.classList.add("hidden");
+        nextQuestion(generateEquation(state.operation, state.tier));
+      }
+      function startChain(profile) {
+        const blocks = profile.taskChain.map((block) => ({ block, questions: questionsForBlock(block), index: 0 })).filter((item) => item.questions.length);
+        if (!blocks.length) {
+          showToast("This assigned chain has no playable questions yet.");
+          startFreePlay();
+          return;
+        }
+        state.chain = { blocks, blockIndex: 0, completed: 0, total: blocks.reduce((sum, block) => sum + block.questions.length, 0) };
+        ui.freePlayPanel.classList.add("hidden");
+        ui.chainPanel.classList.remove("hidden");
+        ui.resetChainBtn.classList.remove("hidden");
+        updateChainPanel();
+        nextQuestion(currentChainQuestion());
+      }
+      function questionsForBlock(block) {
+        if (block.type === "set") {
+          const set = state.data.equationSets[block.setId];
+          if (!set) return [];
+          if (set.method === "manual") return set.equations.map((eq) => enrichQuestion({ ...eq }));
+          return Array.from({ length: set.rule.count }, () => generateEquation(set.rule.operation, set.rule.tier));
+        }
+        return Array.from({ length: block.count }, () => generateEquation(block.operation, block.tier));
+      }
+      function currentChainQuestion() {
+        const block = state.chain.blocks[state.chain.blockIndex];
+        return block.questions[block.index];
+      }
+      function updateChainPanel(message = "") {
+        if (!state.chain) return;
+        const blockWrap = state.chain.blocks[state.chain.blockIndex];
+        const blockNumber = state.chain.blockIndex + 1;
+        ui.chainTitle.textContent = blockWrap.block.title;
+        ui.chainSubtitle.textContent = message || `Question ${blockWrap.index + 1} of ${blockWrap.questions.length} in this block.`;
+        ui.chainBlockBadge.textContent = `Block ${blockNumber} of ${state.chain.blocks.length}`;
+        ui.chainProgress.style.width = `${Math.round((state.chain.completed / state.chain.total) * 100)}%`;
+      }
+      function advanceChain() {
+        if (!state.chain) return startFreePlay();
+        const blockWrap = state.chain.blocks[state.chain.blockIndex];
+        blockWrap.index++;
+        state.chain.completed++;
+        if (blockWrap.index >= blockWrap.questions.length) {
+          const completeText = `Block ${state.chain.blockIndex + 1} of ${state.chain.blocks.length} complete!`;
+          state.chain.blockIndex++;
+          if (state.chain.blockIndex >= state.chain.blocks.length) {
+            ui.chainProgress.style.width = "100%";
+            ui.feedback.textContent = "Quest chain complete! Brilliant chalk work.";
+            ui.chainTitle.textContent = "Quest Chain Complete!";
+            ui.chainSubtitle.textContent = "All assigned blocks are finished.";
+            ui.chainBlockBadge.textContent = `${state.chain.blocks.length} of ${state.chain.blocks.length}`;
+            ui.equation.innerHTML = "Quest Complete!";
+            ui.sixSevenWords.classList.remove("show");
+            ui.answerDisplay.textContent = "★";
+            state.question = null;
+            showToast("Assigned task chain complete!");
+            return;
           }
+          updateChainPanel(completeText);
+        } else {
+          updateChainPanel();
         }
-
-        function modeCountsTemplate(defaultValue) {
-          return Object.fromEntries(MODES.map((mode) => [mode, defaultValue]));
+        nextQuestion(currentChainQuestion());
+      }
+      function nextQuestion(question) {
+        state.question = question;
+        state.answer = "";
+        state.keyTimes = [];
+        state.questionStartedAt = performance.now();
+        ui.answerDisplay.textContent = "?";
+        ui.feedback.textContent = "Solve it, then tap ✓.";
+        ui.scaffoldBox.classList.add("hidden");
+        renderEquation(question);
+        setAccent(state.chain ? tierFromQuestion(question) : state.tier);
+      }
+      function tierFromQuestion(question) {
+        const largest = Math.max(...(question.operands || [1]).map((n) => Math.abs(n)));
+        if ((question.operands || []).length >= 4) return 30;
+        if ((question.operands || []).length >= 3) return 26;
+        if (largest <= 10) return 5;
+        if (largest <= 12) return 10;
+        if (largest <= 42) return 15;
+        if (largest <= 60) return 20;
+        return 25;
+      }
+      function renderEquation(question) {
+        const shouldPop = triggersSixSeven(question);
+        if (state.easterTimer) clearTimeout(state.easterTimer);
+        ui.sixSevenWords.classList.toggle("show", shouldPop);
+        ui.equation.innerHTML = escapeHtml(question.prompt).split("").map((char) => {
+          const pop = shouldPop && (char === "6" || char === "7") ? " pop67" : "";
+          return `<span class="equation-token${pop}">${char === " " ? "&nbsp;" : char}</span>`;
+        }).join("");
+        if (shouldPop) {
+          state.easterTimer = setTimeout(() => {
+            ui.sixSevenWords.classList.remove("show");
+            ui.equation.querySelectorAll(".pop67").forEach((node) => node.classList.remove("pop67"));
+          }, 10000);
         }
+      }
+      function triggersSixSeven(question) {
+        const prompt = String(question.prompt);
+        const noSpaces = prompt.replace(/\s+/g, "");
+        return /6(?:[+\-×÷x*/])?7/.test(noSpaces) || /7(?:[+\-×÷x*/])?6/.test(noSpaces) || String(question.answer).includes("67");
+      }
 
-        function createProfile(name, supportStyle) {
-          const id = `p_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-          return {
-            id,
-            name,
-            supportStyle,
-            preferredSupportStylesSeen: [],
-            xp: 0,
-            level: 1,
-            streakByMode: modeCountsTemplate(0),
-            totalQuestions: 0,
-            totalCorrect: 0,
-            totalResponseMs: 0,
-            modeUsage: modeCountsTemplate(0),
-            modeCorrect: modeCountsTemplate(0),
-            difficultyByMode: modeCountsTemplate(1),
-            logs: [],
-            logArchive: { totalArchived: 0, byMode: modeCountsTemplate(0), byError: {} },
-            adaptationLog: [],
-            presetByMode: modeCountsTemplate(null),
-          };
+      function pressKey(value) {
+        ensureAudio();
+        playClick();
+        if (value === "clear") state.answer = "";
+        else if (value === "back") state.answer = state.answer.slice(0, -1);
+        else if (value === "submit") return submitAnswer();
+        else if (value === "-") {
+          if (!state.answer.startsWith("-")) state.answer = `-${state.answer}`;
+        } else if (state.answer.length < 8) {
+          state.answer += value;
+          playScribble();
         }
-
-        function getActiveProfile() {
-          return state.data.profiles[state.data.activeProfileId] || null;
+        state.keyTimes.push(performance.now());
+        ui.answerDisplay.textContent = state.answer || "?";
+      }
+      function submitAnswer() {
+        if (!state.question) return;
+        const value = Number(state.answer);
+        if (state.answer.trim() === "" || !Number.isFinite(value)) {
+          ui.feedback.textContent = "Write a number first.";
+          return;
         }
-
-        function ensureProfileShape(profile) {
-          if (!profile.presetByMode) profile.presetByMode = modeCountsTemplate(null);
-          if (!profile.logArchive) profile.logArchive = { totalArchived: 0, byMode: modeCountsTemplate(0), byError: {} };
-          return profile;
+        const elapsed = Math.round(performance.now() - state.questionStartedAt);
+        const typingInterval = medianInterval(state.keyTimes);
+        const correct = value === state.question.answer;
+        const errorTag = correct ? "" : classifyError(state.question, value);
+        recordAttempt({ answer: value, correct, elapsed, typingInterval, errorTag });
+        if (correct) {
+          state.consecutiveErrors = 0;
+          ui.feedback.textContent = choose(["Correct! Chalk puff unlocked.", "Yes! That one sparkles.", "Brilliant. Keep rolling."]);
+          puffFromEquation();
+          playSuccess();
+          setTimeout(() => state.chain ? advanceChain() : nextQuestion(generateEquation(state.operation, state.tier)), 650);
+        } else {
+          state.consecutiveErrors++;
+          ui.feedback.textContent = `${errorTag}. Try that one again.`;
+          if (state.consecutiveErrors === 3 || state.consecutiveErrors === 6) showScaffold();
         }
+      }
+      function medianInterval(times) {
+        if (!times || times.length < 2) return 0;
+        const intervals = times.slice(1).map((time, index) => time - times[index]).sort((a, b) => a - b);
+        return Math.round(intervals[Math.floor(intervals.length / 2)]);
+      }
+      function classifyError(question, value) {
+        if (Math.abs(value - question.answer) <= 2) return "Off-By-One/Two";
+        if (String(Math.abs(value)) === String(Math.abs(question.answer)).split("").reverse().join("")) return "Transposition";
+        const alt = operationSwapAnswers(question);
+        if (alt.includes(value)) return "Operation Swap";
+        return "Calculation Breakdown";
+      }
+      function operationSwapAnswers(question) {
+        const operands = question.operands || [];
+        if (operands.length !== 2) return [];
+        const [a, b] = operands;
+        return [a + b, a - b, b - a, a * b, b !== 0 ? a / b : NaN, a !== 0 ? b / a : NaN].filter(Number.isInteger);
+      }
+      function recordAttempt(entry) {
+        const profile = activeProfile();
+        if (!profile) return;
+        profile.stats.total++;
+        if (entry.correct) profile.stats.correct++;
+        profile.stats.byOperation[state.question.operation] = (profile.stats.byOperation[state.question.operation] || 0) + 1;
+        if (entry.errorTag) profile.stats.errors[entry.errorTag] = (profile.stats.errors[entry.errorTag] || 0) + 1;
+        profile.stats.answerTimes.push(entry.elapsed);
+        profile.stats.typingIntervals.push(entry.typingInterval);
+        profile.stats.answerTimes = profile.stats.answerTimes.slice(-100);
+        profile.stats.typingIntervals = profile.stats.typingIntervals.slice(-100);
+        profile.logs.push({
+          at: new Date().toISOString(),
+          prompt: state.question.prompt,
+          target: state.question.answer,
+          answer: entry.answer,
+          correct: entry.correct,
+          operation: state.question.operation,
+          errorTag: entry.errorTag,
+          elapsed: entry.elapsed,
+          chainBlock: state.chain ? state.chain.blocks[state.chain.blockIndex]?.block.title || "" : "",
+        });
+        profile.logs = profile.logs.slice(-250);
+        safeWriteStorage();
+      }
+      function showScaffold() {
+        const profile = activeProfile();
+        const style = profile?.supportStyle || "deconstructive";
+        const q = state.question;
+        const messages = {
+          deconstructive: `Pause and split it: solve the left side first, write that mini-answer in your head, then finish ${escapeHtml(q.prompt)} one step at a time.`,
+          visual: `Picture the numbers as chalk groups. Circle equal groups, pair leftovers, and compare the shape to ${escapeHtml(q.prompt)} before answering.`,
+          narrative: `Turn it into a quick story: a crayon crew has ${escapeHtml(q.prompt)} supplies. What final count belongs in their box?`,
+        };
+        ui.scaffoldBox.innerHTML = `<strong>Coach Chalk says:</strong><br>${messages[style]}`;
+        ui.scaffoldBox.classList.remove("hidden");
+      }
+      function skipQuestion() {
+        if (!state.question) return;
+        recordAttempt({ answer: "", correct: false, elapsed: Math.round(performance.now() - state.questionStartedAt), typingInterval: medianInterval(state.keyTimes), errorTag: "Skipped" });
+        state.consecutiveErrors = 0;
+        state.chain ? advanceChain() : nextQuestion(generateEquation(state.operation, state.tier));
+      }
 
-        function ensureStorageShape() {
-          if (!state.data.practicePresets || typeof state.data.practicePresets !== "object") {
-            state.data.practicePresets = {};
-          }
-          Object.values(state.data.profiles).forEach((profile) => ensureProfileShape(profile));
-        }
-
-        function buildPresetConfigFromForm() {
-          const mode = ui.presetModeSelect.value;
-          const focus = Math.max(0, Number(ui.presetFocusInput.value) || 0);
-          const otherMin = Math.max(0, Number(ui.presetOtherMinInput.value) || 0);
-          const otherMax = Math.max(otherMin, Number(ui.presetOtherMaxInput.value) || otherMin);
-          const answerCap = Math.max(0, Number(ui.presetAnswerCapInput.value) || 0);
-          return {
-            focus,
-            otherMin,
-            otherMax,
-            answerCap,
-            shuffleOrder: ui.presetShuffleOrder.checked,
-            termCount: 2,
-          };
-        }
-
-        function presetPreviewText(mode, config) {
-          const focus = config.focus;
-          const partner = Math.min(config.otherMax, Math.max(config.otherMin, config.otherMin));
-          if (mode === "multiplication" && focus > 0) {
-            const sample = config.shuffleOrder ? `${focus} × ${partner} or ${partner} × ${focus}` : `${focus} × ${partner}`;
-            return `Preview: ${sample} = ?`;
-          }
-          if (mode === "addition" && focus > 0) {
-            return `Preview: ${focus} + ${partner} = ?`;
-          }
-          if (mode === "subtraction" && focus > 0) {
-            const minuend = focus + partner;
-            return `Preview: ${minuend} - ${focus} = ?`;
-          }
-          if (mode === "division" && focus > 0) {
-            const dividend = focus * partner;
-            return `Preview: ${dividend} ÷ ${focus} = ?`;
-          }
-          if (mode === "pattern") {
-            return `Preview: ${partner}, ${partner + 2}, ${partner + 4}, ...`;
-          }
-          return `Preview: random ${MODE_LABEL[mode]} within ${config.otherMin}-${config.otherMax}`;
-        }
-
-        function createPracticePreset(name, mode, config) {
-          const id = `preset_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
-          return {
-            id,
-            name: name.trim(),
-            mode,
-            config,
+      function renderAdminProfileOptions() {
+        const profiles = Object.values(state.data.profiles).sort((a, b) => a.name.localeCompare(b.name));
+        ui.adminProfileSelect.innerHTML = profiles.map((profile) => `<option value="${profile.id}">${escapeHtml(profile.name)}</option>`).join("");
+        if (state.activeProfileId && state.data.profiles[state.activeProfileId]) ui.adminProfileSelect.value = state.activeProfileId;
+      }
+      function refreshAdmin() {
+        renderAdminProfileOptions();
+        renderSetOptions();
+        renderSetList();
+        renderChainList();
+        renderAnalytics();
+      }
+      function selectedAdminProfile() {
+        return state.data.profiles[ui.adminProfileSelect.value] || Object.values(state.data.profiles)[0] || null;
+      }
+      function renderSetOptions() {
+        const sets = Object.values(state.data.equationSets).sort((a, b) => a.name.localeCompare(b.name));
+        const html = sets.map((set) => `<option value="${set.id}">${escapeHtml(set.name)}</option>`).join("");
+        ui.blockSetSelect.innerHTML = html || `<option value="">No saved sets yet</option>`;
+      }
+      function renderSetList() {
+        const sets = Object.values(state.data.equationSets).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+        ui.setList.innerHTML = sets.length ? "" : `<div class="list-item muted">No custom equation sets yet.</div>`;
+        sets.forEach((set) => {
+          const item = document.createElement("div");
+          item.className = "list-item";
+          const detail = set.method === "manual" ? `${set.equations.length} explicit equations` : `${OP_LABEL[set.rule.operation]} · Tier ${set.rule.tier} · ${set.rule.count} questions`;
+          item.innerHTML = `<div class="between"><strong>${escapeHtml(set.name)}</strong><button class="btn tiny" data-delete-set="${set.id}" style="--btn: var(--chalk-red)">Delete</button></div><div class="muted tiny">${detail}</div>`;
+          ui.setList.appendChild(item);
+        });
+      }
+      function saveEquationSet() {
+        const name = ui.setName.value.trim();
+        if (!name) return showToast("Name the equation set first.");
+        const method = ui.setMethod.value;
+        let set;
+        if (method === "manual") {
+          const equations = parseManualEquations(ui.manualEquations.value);
+          if (!equations.length) return showToast("Add at least one valid equation, like 6x7 or 18 - 9.");
+          set = { id: makeId("set"), name, method, equations, createdAt: new Date().toISOString() };
+        } else {
+          set = {
+            id: makeId("set"), name, method,
+            rule: {
+              operation: ui.setOperation.value,
+              tier: clamp(Number(ui.setTier.value) || 1, 1, 30),
+              count: clamp(Number(ui.setCount.value) || 10, 1, 80),
+            },
             createdAt: new Date().toISOString(),
           };
         }
-
-        function getPresetById(id) {
-          return state.data.practicePresets[id] || null;
+        state.data.equationSets[set.id] = normalizeEquationSet(set);
+        ui.setName.value = "";
+        ui.manualEquations.value = "";
+        safeWriteStorage();
+        refreshAdmin();
+        showToast(`Saved "${set.name}".`);
+      }
+      function deleteEquationSet(id) {
+        delete state.data.equationSets[id];
+        Object.values(state.data.profiles).forEach((profile) => {
+          profile.taskChain = profile.taskChain.filter((block) => block.type !== "set" || block.setId !== id);
+        });
+        safeWriteStorage();
+        refreshAdmin();
+      }
+      function renderChainList() {
+        const profile = selectedAdminProfile();
+        if (!profile) {
+          ui.chainList.innerHTML = `<div class="list-item muted">Create a learner profile first.</div>`;
+          renderAnalytics();
+          return;
         }
-
-        function getAssignedPreset(profile, mode) {
-          const presetId = profile?.presetByMode?.[mode];
-          if (!presetId) return null;
-          const preset = getPresetById(presetId);
-          if (!preset || preset.mode !== mode) return null;
-          return preset;
-        }
-
-        function describePreset(preset) {
-          if (!preset) return "None";
-          const c = preset.config;
-          if (preset.mode === "multiplication" && c.focus > 0) {
-            return `${preset.name}: ×${c.focus} with partners ${c.otherMin}-${c.otherMax}`;
-          }
-          if (c.focus > 0) {
-            return `${preset.name}: focus ${c.focus}, range ${c.otherMin}-${c.otherMax}`;
-          }
-          return `${preset.name}: ${MODE_LABEL[preset.mode]} range ${c.otherMin}-${c.otherMax}`;
-        }
-
-        function renderPresetList() {
-          const presets = Object.values(state.data.practicePresets).sort((a, b) => a.name.localeCompare(b.name));
-          if (!presets.length) {
-            ui.presetList.innerHTML = "<li>No saved practice sets yet.</li>";
-            return;
-          }
-          ui.presetList.innerHTML = presets
-            .map((preset) => {
-              const selected = state.selectedPresetId === preset.id ? "ring-2 ring-sky-300" : "";
-              return `<li class="rounded-lg border border-white/20 bg-white/10 p-2 ${selected}">
-                <button data-preset-id="${preset.id}" class="preset-select-btn w-full text-left">
-                  <p class="font-header text-sm text-sky-100">${preset.name}</p>
-                  <p class="text-[11px] text-slate-200">${describePreset(preset)}</p>
-                </button>
-                <div class="mt-1 flex gap-1">
-                  <button data-preset-edit="${preset.id}" class="crayon-btn px-2 py-1 text-[11px] text-amber-100" style="--button-color: rgba(245, 158, 11, 0.25)">Edit</button>
-                  <button data-preset-delete="${preset.id}" class="crayon-btn px-2 py-1 text-[11px] text-rose-100" style="--button-color: rgba(244, 63, 94, 0.25)">Delete</button>
-                </div>
-              </li>`;
-            })
-            .join("");
-
-          ui.presetList.querySelectorAll(".preset-select-btn").forEach((btn) => {
-            btn.addEventListener("click", () => {
-              state.selectedPresetId = btn.dataset.presetId;
-              renderPresetList();
-            });
-          });
-          ui.presetList.querySelectorAll("[data-preset-edit]").forEach((btn) => {
-            btn.addEventListener("click", () => loadPresetIntoForm(btn.dataset.presetEdit));
-          });
-          ui.presetList.querySelectorAll("[data-preset-delete]").forEach((btn) => {
-            btn.addEventListener("click", () => deletePracticePreset(btn.dataset.presetDelete));
-          });
-        }
-
-        function loadPresetIntoForm(presetId) {
-          const preset = getPresetById(presetId);
-          if (!preset) return;
-          state.editingPresetId = preset.id;
-          state.selectedPresetId = preset.id;
-          ui.presetNameInput.value = preset.name;
-          ui.presetModeSelect.value = preset.mode;
-          ui.presetFocusInput.value = String(preset.config.focus || 0);
-          ui.presetOtherMinInput.value = String(preset.config.otherMin || 1);
-          ui.presetOtherMaxInput.value = String(preset.config.otherMax || 12);
-          ui.presetAnswerCapInput.value = String(preset.config.answerCap || 0);
-          ui.presetShuffleOrder.checked = !!preset.config.shuffleOrder;
-          updatePresetPreview();
-          renderPresetList();
-          ui.presetBuilderHint.textContent = `Editing "${preset.name}". Save to update.`;
-        }
-
-        function updatePresetPreview() {
-          const mode = ui.presetModeSelect.value;
-          const config = buildPresetConfigFromForm();
-          ui.presetPreview.textContent = presetPreviewText(mode, config);
-        }
-
-        function savePracticePresetFromForm() {
-          const name = ui.presetNameInput.value.trim();
-          if (!name) {
-            ui.presetBuilderHint.textContent = "Enter a practice set name.";
-            return;
-          }
-          const mode = ui.presetModeSelect.value;
-          const config = buildPresetConfigFromForm();
-          if (config.otherMax < config.otherMin) {
-            ui.presetBuilderHint.textContent = "Other operand max must be >= min.";
-            return;
-          }
-          let preset;
-          if (state.editingPresetId && state.data.practicePresets[state.editingPresetId]) {
-            preset = state.data.practicePresets[state.editingPresetId];
-            preset.name = name;
-            preset.mode = mode;
-            preset.config = config;
-            preset.updatedAt = new Date().toISOString();
-          } else {
-            preset = createPracticePreset(name, mode, config);
-            state.data.practicePresets[preset.id] = preset;
-          }
-          state.selectedPresetId = preset.id;
-          state.editingPresetId = null;
-          safeWriteStorage();
-          renderPresetList();
-          updateAdminPanel(ui.adminProfileSelect.value);
-          ui.presetBuilderHint.textContent = `Saved practice set "${preset.name}".`;
-        }
-
-        function deletePracticePreset(presetId) {
-          const preset = getPresetById(presetId);
-          if (!preset) return;
-          delete state.data.practicePresets[presetId];
-          Object.values(state.data.profiles).forEach((profile) => {
-            MODES.forEach((mode) => {
-              if (profile.presetByMode[mode] === presetId) profile.presetByMode[mode] = null;
-            });
-          });
-          if (state.selectedPresetId === presetId) state.selectedPresetId = null;
-          if (state.editingPresetId === presetId) state.editingPresetId = null;
-          safeWriteStorage();
-          renderPresetList();
-          updateAdminPanel(ui.adminProfileSelect.value);
-          refreshGameChrome();
-          ui.presetBuilderHint.textContent = `Deleted "${preset.name}".`;
-        }
-
-        function assignSelectedPresetToLearner() {
-          const profileId = ui.adminProfileSelect.value;
-          const profile = state.data.profiles[profileId];
-          const presetId = state.selectedPresetId;
-          const preset = getPresetById(presetId);
-          if (!profile || !preset) {
-            ui.presetBuilderHint.textContent = "Select a learner and a saved practice set first.";
-            return;
-          }
-          profile.presetByMode[preset.mode] = preset.id;
-          state.data.activeProfileId = profile.id;
-          state.activeMode = preset.mode;
-          safeWriteStorage();
-          updateAdminPanel(profileId);
-          if (!ui.gameView.classList.contains("hidden")) {
-            renderModeButtons();
-            refreshGameChrome();
-            generateChallenge();
-          }
-          ui.presetBuilderHint.textContent = `Assigned "${preset.name}" to ${profile.name} for ${MODE_LABEL[preset.mode]}.`;
-        }
-
-        function clearPresetAssignmentForLearner() {
-          const profileId = ui.adminProfileSelect.value;
-          const profile = state.data.profiles[profileId];
-          if (!profile) return;
-          const mode = ui.presetModeSelect.value;
-          profile.presetByMode[mode] = null;
-          safeWriteStorage();
-          updateAdminPanel(profileId);
-          refreshGameChrome();
-          generateChallenge();
-          ui.presetBuilderHint.textContent = `Cleared custom set for ${profile.name} in ${MODE_LABEL[mode]}.`;
-        }
-
-        function generateChallengeFromPreset(preset) {
-          const mode = preset.mode;
-          const c = preset.config;
-          const op = MODE_SYMBOL[mode];
-          const partner = Math.floor(Math.random() * (c.otherMax - c.otherMin + 1)) + c.otherMin;
-          let terms = [];
-          let answer = 0;
-          let prompt = "";
-
-          if (mode === "multiplication") {
-            const a = c.focus > 0 ? c.focus : partner;
-            const b = c.focus > 0 ? partner : Math.floor(Math.random() * (c.otherMax - c.otherMin + 1)) + c.otherMin;
-            terms = c.shuffleOrder && Math.random() > 0.5 ? [b, a] : [a, b];
-            answer = terms[0] * terms[1];
-            prompt = `${terms.join(" × ")} = ?`;
-          } else if (mode === "addition") {
-            const a = c.focus > 0 ? c.focus : partner;
-            const b = c.focus > 0 ? partner : Math.floor(Math.random() * (c.otherMax - c.otherMin + 1)) + c.otherMin;
-            terms = c.shuffleOrder && Math.random() > 0.5 ? [b, a] : [a, b];
-            answer = terms[0] + terms[1];
-            prompt = `${terms.join(" + ")} = ?`;
-          } else if (mode === "subtraction") {
-            const sub = c.focus > 0 ? c.focus : partner;
-            const minuend = sub + Math.floor(Math.random() * (c.otherMax - c.otherMin + 1)) + c.otherMin;
-            terms = [minuend, sub];
-            answer = minuend - sub;
-            prompt = `${terms.join(" - ")} = ?`;
-          } else if (mode === "division") {
-            const divisor = c.focus > 0 ? c.focus : partner;
-            const quotient = Math.floor(Math.random() * (c.otherMax - c.otherMin + 1)) + c.otherMin;
-            const dividend = divisor * quotient;
-            terms = [dividend, divisor];
-            answer = quotient;
-            prompt = `${dividend} ÷ ${divisor} = ?`;
-          } else {
-            const start = Math.floor(Math.random() * (c.otherMax - c.otherMin + 1)) + c.otherMin;
-            const step = c.focus > 0 ? c.focus : 2;
-            const seq = [start, start + step, start + step * 2, start + step * 3, start + step * 4];
-            answer = start + step * 5;
-            return {
-              kind: "pattern",
-              mode: "pattern",
-              tier: currentTier(getActiveProfile()),
-              patternType: "custom",
-              sequence: seq,
-              prompt: `${seq.join(", ")}, ...`,
-              answer,
-              signature: normalizeSignature("pattern", "custom", seq, `p${answer}`),
-              presetId: preset.id,
-            };
-          }
-
-          if (c.answerCap > 0 && Math.abs(answer) > c.answerCap) {
-            return null;
-          }
-
-          const signature = normalizeSignature(mode, op, terms, `preset:${preset.id}`);
-          return {
-            kind: "math",
-            mode,
-            tier: currentTier(getActiveProfile()),
-            op,
-            terms,
-            prompt,
-            answer,
-            signature,
-            presetId: preset.id,
+        ui.chainList.innerHTML = profile.taskChain.length ? "" : `<div class="list-item muted">No assigned chain. Free practice will launch for this learner.</div>`;
+        profile.taskChain.forEach((block, index) => {
+          const item = document.createElement("div");
+          item.className = "list-item";
+          const detail = block.type === "set"
+            ? `Custom set: ${escapeHtml(state.data.equationSets[block.setId]?.name || "Missing set")}`
+            : `${OP_LABEL[block.operation]} · Tier ${block.tier} · ${block.count} questions`;
+          item.innerHTML = `<div class="between"><strong>${index + 1}. ${escapeHtml(block.title)}</strong><span class="row"><button class="btn tiny" data-move="${index}:-1" style="--btn: var(--chalk-blue)">↑</button><button class="btn tiny" data-move="${index}:1" style="--btn: var(--chalk-blue)">↓</button><button class="btn tiny" data-delete-block="${block.id}" style="--btn: var(--chalk-red)">Delete</button></span></div><div class="muted tiny">${detail}</div>`;
+          ui.chainList.appendChild(item);
+        });
+        renderAnalytics();
+      }
+      function addBlock() {
+        const profile = selectedAdminProfile();
+        if (!profile) return showToast("Create a learner first.");
+        const type = ui.blockType.value;
+        const title = ui.blockTitle.value.trim() || (type === "set" ? "Custom Equation Set" : "Practice Block");
+        let block;
+        if (type === "set") {
+          const setId = ui.blockSetSelect.value;
+          if (!state.data.equationSets[setId]) return showToast("Save an equation set before adding this block.");
+          block = { id: makeId("block"), type, title, setId };
+        } else {
+          block = {
+            id: makeId("block"),
+            type,
+            title,
+            operation: ui.blockOperation.value,
+            tier: clamp(Number(ui.blockTier.value) || 1, 1, 30),
+            count: clamp(Number(ui.blockCount.value) || 5, 1, 60),
           };
         }
-
-
-
-        function levelXpNeeded(level) {
-          return 90 + (level - 1) * 45;
+        profile.taskChain.push(normalizeBlock(block));
+        ui.blockTitle.value = "";
+        safeWriteStorage();
+        renderChainList();
+        showToast(`Added "${title}" to ${profile.name}'s chain.`);
+      }
+      function moveBlock(index, direction) {
+        const profile = selectedAdminProfile();
+        if (!profile) return;
+        const next = index + direction;
+        if (next < 0 || next >= profile.taskChain.length) return;
+        [profile.taskChain[index], profile.taskChain[next]] = [profile.taskChain[next], profile.taskChain[index]];
+        safeWriteStorage();
+        renderChainList();
+      }
+      function deleteBlock(id) {
+        const profile = selectedAdminProfile();
+        if (!profile) return;
+        profile.taskChain = profile.taskChain.filter((block) => block.id !== id);
+        safeWriteStorage();
+        renderChainList();
+      }
+      function renderAnalytics() {
+        const profile = selectedAdminProfile();
+        if (!profile) {
+          ui.statsCards.innerHTML = `<div class="list-item muted">No learner selected.</div>`;
+          ui.insightSummary.textContent = "";
+          ui.logBody.innerHTML = "";
+          return;
         }
+        const stats = profile.stats;
+        const accuracy = stats.total ? Math.round((stats.correct / stats.total) * 100) : 0;
+        const favorite = Object.entries(stats.byOperation).sort((a, b) => b[1] - a[1])[0]?.[0] || "None yet";
+        const style = behaviorStyle(profile);
+        ui.statsCards.innerHTML = [
+          ["Questions solved", stats.correct],
+          ["Overall accuracy", `${accuracy}%`],
+          ["Favorite operation", OP_LABEL[favorite] || favorite],
+          ["Behavior tag", style.tag],
+        ].map(([label, value]) => `<div class="list-item"><strong>${label}</strong><br><span class="badge">${escapeHtml(value)}</span></div>`).join("");
+        const topError = Object.entries(stats.errors).sort((a, b) => b[1] - a[1])[0];
+        ui.insightSummary.innerHTML = `<strong>Pedagogical Insight Summary</strong><p>${escapeHtml(style.tip)}</p><p class="muted tiny">Most common error: ${topError ? `${escapeHtml(topError[0])} (${topError[1]})` : "not enough data yet"}. This is a learning-behavior cue, not a clinical label.</p>`;
+        ui.logBody.innerHTML = profile.logs.slice(-80).reverse().map((log) => `<tr><td>${new Date(log.at).toLocaleString()}</td><td>${escapeHtml(log.prompt)}</td><td>${escapeHtml(log.answer)}</td><td>${log.correct ? "Correct" : "Try again"}</td><td>${escapeHtml(log.errorTag || "")}</td></tr>`).join("");
+      }
+      function behaviorStyle(profile) {
+        const avgTime = average(profile.stats.answerTimes);
+        const avgType = average(profile.stats.typingIntervals);
+        const accuracy = profile.stats.total ? profile.stats.correct / profile.stats.total : 0;
+        if (!profile.stats.total) return { tag: "Observing", tip: "Gather a few attempts before drawing conclusions. Start with short, confidence-building blocks." };
+        if (accuracy >= 0.85 && avgTime < 6500) return { tag: "Fluent", tip: "This learner answers quickly and accurately. Offer mixed-operation challenge blocks and ask for explanation after mastery." };
+        if (avgTime >= 9000 || avgType >= 900) return { tag: "Methodical", tip: "This learner takes time between entries. Keep steps visible, use deconstructive scaffolds, and avoid rushing transitions." };
+        return { tag: "Action-Oriented", tip: "This learner responds rapidly. Use visual checking routines and brief reflection prompts before submit." };
+      }
+      function average(values) {
+        const nums = values.filter((n) => Number.isFinite(n) && n > 0);
+        return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : 0;
+      }
 
-        class AudioEngine {
-          constructor() {
-            this.ctx = null;
-          }
-
-          ensure() {
-            if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-            if (this.ctx.state === "suspended") this.ctx.resume();
-          }
-
-          playScribble() {
-            this.ensure();
-            const duration = 0.07;
-            const bufferSize = Math.floor(this.ctx.sampleRate * duration);
-            const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i += 1) {
-              const env = 1 - i / bufferSize;
-              data[i] = (Math.random() * 2 - 1) * env * 0.24;
-            }
-            const src = this.ctx.createBufferSource();
-            const filter = this.ctx.createBiquadFilter();
-            filter.type = "lowpass";
-            filter.frequency.value = 1400 + Math.random() * 700;
-            const gain = this.ctx.createGain();
-            gain.gain.value = 0.08;
-            src.buffer = buffer;
-            src.connect(filter);
-            filter.connect(gain);
-            gain.connect(this.ctx.destination);
-            src.start();
-          }
-
-          tone(freq, duration, type, start = 0, gainValue = 0.05) {
-            this.ensure();
-            const t = this.ctx.currentTime + start;
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, t);
-            gain.gain.setValueAtTime(0.0001, t);
-            gain.gain.exponentialRampToValueAtTime(gainValue, t + 0.02);
-            gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
-            osc.start(t);
-            osc.stop(t + duration + 0.03);
-          }
-
-          success() {
-            [261.63, 329.63, 392.0, 523.25].forEach((f, i) => this.tone(f, 0.18, "triangle", i * 0.08, 0.05));
-          }
-
-          warn() {
-            this.tone(220, 0.13, "square", 0, 0.04);
-            this.tone(184, 0.13, "square", 0.09, 0.04);
-          }
+      function ensureAudio() {
+        if (!state.audio) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) state.audio = new AudioContext();
         }
+        if (state.audio?.state === "suspended") state.audio.resume();
+      }
+      function playTone(freq, duration, type, gainValue) {
+        if (!state.audio) return;
+        const now = state.audio.currentTime;
+        const osc = state.audio.createOscillator();
+        const gain = state.audio.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(gainValue, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        osc.connect(gain).connect(state.audio.destination);
+        osc.start(now);
+        osc.stop(now + duration);
+      }
+      function playClick() {
+        playTone(180 + Math.random() * 80, 0.045, "triangle", 0.045);
+      }
+      function playScribble() {
+        playTone(420 + Math.random() * 220, 0.035, "sawtooth", 0.018);
+      }
+      function playSuccess() {
+        playTone(523, 0.08, "sine", 0.055);
+        setTimeout(() => playTone(784, 0.1, "sine", 0.05), 70);
+      }
 
-        class ChalkDust {
-          constructor(canvas) {
-            this.canvas = canvas;
-            this.ctx = canvas.getContext("2d");
-            this.particles = [];
-            this.running = false;
-            this.resize();
-            window.addEventListener("resize", () => this.resize());
-          }
-
-          resize() {
-            this.canvas.width = window.innerWidth;
-            this.canvas.height = window.innerHeight;
-          }
-
-          burst(x, y, tint = "#86efac") {
-            for (let i = 0; i < 45; i += 1) {
-              const angle = Math.random() * Math.PI * 2;
-              const speed = 0.6 + Math.random() * 2.2;
-              this.particles.push({
-                x,
-                y,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed - 0.6,
-                life: 45 + Math.floor(Math.random() * 30),
-                size: 1.5 + Math.random() * 4,
-                color: Math.random() > 0.5 ? tint : "#f8fafc",
-              });
-            }
-            if (!this.running) {
-              this.running = true;
-              this.loop();
-            }
-          }
-
-          loop() {
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.particles = this.particles.filter((p) => p.life > 0);
-            this.particles.forEach((p) => {
-              p.life -= 1;
-              p.x += p.vx;
-              p.y += p.vy;
-              p.vy += 0.03;
-              this.ctx.globalAlpha = Math.max(0, p.life / 70);
-              this.ctx.fillStyle = p.color;
-              this.ctx.beginPath();
-              this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-              this.ctx.fill();
-            });
-            this.ctx.globalAlpha = 1;
-            if (this.particles.length) requestAnimationFrame(() => this.loop());
-            else this.running = false;
-          }
+      function resizeCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        ui.dustCanvas.width = Math.floor(window.innerWidth * dpr);
+        ui.dustCanvas.height = Math.floor(window.innerHeight * dpr);
+        ui.dustCanvas.getContext("2d").setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      function puffFromEquation() {
+        const rect = ui.equation.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+        const colors = ["#7dd3fc", "#fde68a", "#f9a8d4", "#86efac", "#fdba74"];
+        for (let i = 0; i < 54; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 1 + Math.random() * 5;
+          state.particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, life: 55 + Math.random() * 30, color: choose(colors), size: 2 + Math.random() * 5 });
         }
+      }
+      function animateDust() {
+        const ctx = ui.dustCanvas.getContext("2d");
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        state.particles = state.particles.filter((p) => p.life > 0);
+        state.particles.forEach((p) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vx *= 0.965;
+          p.vy = p.vy * 0.965 + 0.018;
+          p.life--;
+          ctx.globalAlpha = Math.max(0, p.life / 80);
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(animateDust);
+      }
 
-        const audio = new AudioEngine();
-        const chalkDust = new ChalkDust(ui.dustCanvas);
-
-        function tierBandConfig(tier) {
-          const t = Math.max(1, Math.min(30, tier));
-          if (t <= 5) return { label: `Tier ${t} • Beginner`, tone: "Soft Blue / Teal", color: "#7dd3fc", hint: "Tiny values and straightforward equations." };
-          if (t <= 10) return { label: `Tier ${t} • Easy`, tone: "Mint / Emerald", color: "#86efac", hint: "Single digits to low teens." };
-          if (t <= 15) return { label: `Tier ${t} • Medium`, tone: "Amber / Citrus", color: "#fbbf24", hint: "Mixed single and double digits." };
-          if (t <= 20) return { label: `Tier ${t} • Hard`, tone: "Royal Purple / Indigo", color: "#a78bfa", hint: "Double digits up to 50 and heavier logic." };
-          if (t <= 25) return { label: `Tier ${t} • Extra Hard`, tone: "Crimson / Ruby", color: "#fb7185", hint: "Dense double-digit operations and pressure." };
-          if (t <= 29) return { label: `Tier ${t} • Extra Extra Hard`, tone: "Violet / Magenta", color: "#d946ef", hint: "Multi-term and broad ranges." };
-          return { label: "Tier 30 • Math Boss", tone: "Cosmic Neon", color: "#22d3ee", hint: "Maximum complexity with 4-term combinations." };
-        }
-
-        function updateTierVisuals(tier) {
-          const config = tierBandConfig(tier);
-          ui.tierBadge.textContent = config.label;
-          ui.tierBadge.style.color = config.color;
-          ui.tierBadge.style.borderColor = `${config.color}88`;
-          ui.tierDescription.textContent = `${config.tone}: ${config.hint}`;
-          document.documentElement.style.setProperty("--chalk-primary", config.color);
-          ui.resultBanner.style.borderColor = `${config.color}66`;
-          if (tier === 30) {
-            document.getElementById("challengePanel").classList.add("animate-neonBorder");
+      function showToast(message) {
+        ui.toast.textContent = message;
+        ui.toast.classList.add("show");
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => ui.toast.classList.remove("show"), 2400);
+      }
+      function openPin() {
+        state.pin = "";
+        ui.pinDots.textContent = "----";
+        ui.pinHint.textContent = "";
+        ui.pinOverlay.classList.remove("hidden");
+      }
+      function pressPin(value) {
+        playClick();
+        if (value === "clear") state.pin = "";
+        else if (value === "back") state.pin = state.pin.slice(0, -1);
+        else if (state.pin.length < 4) state.pin += value;
+        ui.pinDots.textContent = state.pin.padEnd(4, "-").replace(/\d/g, "•");
+        if (state.pin.length === 4) {
+          if (state.pin === PIN) {
+            ui.pinOverlay.classList.add("hidden");
+            ui.adminPanel.classList.remove("hidden");
+            refreshAdmin();
           } else {
-            document.getElementById("challengePanel").classList.remove("animate-neonBorder");
+            ui.pinHint.textContent = "That PIN did not match.";
+            state.pin = "";
+            setTimeout(() => ui.pinDots.textContent = "----", 250);
           }
         }
+      }
 
-        function modeSubtitle(mode) {
-          const map = {
-            addition: "Chalk your way through sum-building.",
-            subtraction: "Subtract with precision and calm cadence.",
-            multiplication: "Layer factors with grouping fluency.",
-            division: "Only clean integer outcomes are generated.",
-            pattern: "Decode sequence logic and predict confidently.",
-          };
-          return map[mode];
-        }
-
-        function tierExamples(mode, tier) {
-          const t = Math.max(1, Math.min(30, tier));
-          if (mode === "addition") {
-            if (t === 1) return ["1 + 1", "2 + 1", "1 + 2"];
-            if (t <= 10) return [`${t} + ${t + 1}`, `${t + 2} + ${t + 3}`, `${t + 5} + ${Math.min(12, t + 1)}`];
-            if (t <= 20) return [`${12 + t} + ${8 + Math.floor(t / 2)}`, `${18 + t} + ${9 + Math.floor(t / 3)}`, `${11 + t} + ${17 + Math.floor(t / 2)}`];
-            return [`${24 + t} + ${31 + Math.floor(t / 2)} + ${14 + Math.floor(t / 3)}`, `${17 + t} + ${28 + t} + ${9 + Math.floor(t / 2)}`, `${20 + t} + ${20 + t} + ${20 + t}`];
-          }
-          if (mode === "subtraction") {
-            if (t <= 5) return ["10 - 1", "12 - 3", "14 - 4"];
-            if (t <= 15) return [`${24 + t} - ${6 + Math.floor(t / 2)}`, `${30 + t} - ${9 + Math.floor(t / 3)}`, `${35 + t} - ${12 + Math.floor(t / 3)}`];
-            if (t <= 25) return [`${58 + t} - ${18 + Math.floor(t / 2)} - ${6 + Math.floor(t / 3)}`, `${70 + t} - ${26 + Math.floor(t / 2)}`, `${68 + t} - ${17 + Math.floor(t / 2)} - ${9 + Math.floor(t / 3)}`];
-            return [`${90 + t} - ${40 + Math.floor(t / 2)} - ${18 + Math.floor(t / 3)} - ${7 + Math.floor(t / 4)}`, `${100 + t} - ${33 + Math.floor(t / 2)} - ${22 + Math.floor(t / 3)}`, `${110 + t} - ${57 + Math.floor(t / 2)}`];
-          }
-          if (mode === "multiplication") {
-            if (t <= 5) return ["2 × 3", "4 × 2", "5 × 3"];
-            if (t <= 15) return [`${4 + Math.floor(t / 2)} × ${5 + Math.floor(t / 2)}`, `${3 + Math.floor(t / 3)} × ${7 + Math.floor(t / 2)}`, `${6 + Math.floor(t / 3)} × ${4 + Math.floor(t / 2)}`];
-            if (t <= 25) return [`${7 + Math.floor(t / 3)} × ${8 + Math.floor(t / 3)} × ${2 + Math.floor(t / 5)}`, `${9 + Math.floor(t / 3)} × ${6 + Math.floor(t / 3)} × ${3 + Math.floor(t / 6)}`, `${8 + Math.floor(t / 3)} × ${7 + Math.floor(t / 4)}`];
-            return [`${9 + Math.floor(t / 4)} × ${11 + Math.floor(t / 4)} × ${3 + Math.floor(t / 8)} × ${2 + Math.floor(t / 9)}`, `${10 + Math.floor(t / 4)} × ${9 + Math.floor(t / 4)} × ${4 + Math.floor(t / 10)}`, `${12 + Math.floor(t / 5)} × ${8 + Math.floor(t / 5)} × ${3 + Math.floor(t / 10)}`];
-          }
-          if (mode === "division") {
-            if (t <= 5) return ["6 ÷ 2", "8 ÷ 4", "12 ÷ 3"];
-            if (t <= 15) return [`${(6 + Math.floor(t / 2)) * (2 + Math.floor(t / 6))} ÷ ${2 + Math.floor(t / 6)}`, `${(7 + Math.floor(t / 2)) * (3 + Math.floor(t / 8))} ÷ ${3 + Math.floor(t / 8)}`, `${(8 + Math.floor(t / 2)) * (2 + Math.floor(t / 9))} ÷ ${2 + Math.floor(t / 9)}`];
-            if (t <= 25) return [`${(8 + Math.floor(t / 2)) * (4 + Math.floor(t / 8)) * 2} ÷ ${4 + Math.floor(t / 8)} ÷ 2`, `${(9 + Math.floor(t / 2)) * (3 + Math.floor(t / 9)) * (2 + Math.floor(t / 10))} ÷ ${3 + Math.floor(t / 9)} ÷ ${2 + Math.floor(t / 10)}`, `${(11 + Math.floor(t / 2)) * (5 + Math.floor(t / 10))} ÷ ${5 + Math.floor(t / 10)}`];
-            return [`${(12 + Math.floor(t / 2)) * 6 * 3 * 2} ÷ 6 ÷ 3 ÷ 2`, `${(10 + Math.floor(t / 2)) * 7 * 2 * 2} ÷ 7 ÷ 2 ÷ 2`, `${(14 + Math.floor(t / 2)) * 4 * 3} ÷ 4 ÷ 3`];
-          }
-          if (t <= 10) return ["2, 4, 6, ...", "5, 8, 11, ...", "3, 6, 9, ..."];
-          if (t <= 20) return ["3, 7, 11, 15, ...", "2, 5, 10, 17, ...", "8, 13, 18, 23, ..."];
-          return ["2, 6, 18, 54, ...", "3, 9, 8, 24, 23, ...", "5, 11, 23, 47, ..."];
-        }
-
-
-        function syncViewportHeight() {
-          const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight) * 0.01;
-          document.documentElement.style.setProperty("--app-vh", `${vh}px`);
-        }
-
-        function setModalState(modalName, isOpen) {
-          const modalMap = {
-            scaffold: ui.scaffoldModal,
-            pin: ui.pinModal,
-            admin: ui.adminPanel,
-          };
-          const el = modalMap[modalName];
-          if (!el) return;
-          if (isOpen) {
-            state.activeModal = modalName;
-            state.lastFocusedElement = document.activeElement;
-            el.classList.remove("hidden");
-            el.classList.add("flex");
-            const first = el.querySelector("button, input, select, textarea, [tabindex]:not([tabindex='-1'])");
-            if (first) first.focus();
-          } else {
-            el.classList.add("hidden");
-            el.classList.remove("flex");
-            if (state.activeModal === modalName) state.activeModal = null;
-            if (state.lastFocusedElement instanceof HTMLElement) {
-              state.lastFocusedElement.focus();
-              state.lastFocusedElement = null;
-            }
-          }
-        }
-
-        function trapFocusInModal(event) {
-          if (!state.activeModal || event.key !== "Tab") return;
-          const modalEl = state.activeModal === "scaffold" ? ui.scaffoldModal : state.activeModal === "pin" ? ui.pinModal : ui.adminPanel;
-          if (!modalEl || modalEl.classList.contains("hidden")) return;
-          const focusables = [...modalEl.querySelectorAll("button, input, select, textarea, [tabindex]:not([tabindex='-1'])")]
-            .filter((el) => !el.hasAttribute("disabled"));
-          if (!focusables.length) return;
-          const first = focusables[0];
-          const last = focusables[focusables.length - 1];
-          if (event.shiftKey && document.activeElement === first) {
-            event.preventDefault();
-            last.focus();
-          } else if (!event.shiftKey && document.activeElement === last) {
-            event.preventDefault();
-            first.focus();
-          }
-        }
-
-        function updateAdaptationTimeline(profile) {
-          const items = profile.adaptationLog.filter((x) => x.mode === state.activeMode).slice(-6).reverse();
-          ui.adaptationTimeline.innerHTML = items.length
-            ? items.map((entry) => `<li>${new Date(entry.at).toLocaleTimeString()} • ${entry.reason}</li>`).join("")
-            : "<li>No adaptations yet for this mode.</li>";
-        }
-
-        function compactLogsIfNeeded(profile) {
-          if (!Array.isArray(profile.logs)) profile.logs = [];
-          if (!profile.logArchive) profile.logArchive = { totalArchived: 0, byMode: modeCountsTemplate(0), byError: {} };
-          if (profile.logs.length <= 1200) return;
-          const removeCount = Math.min(250, profile.logs.length - 1000);
-          const chunk = profile.logs.splice(0, removeCount);
-          profile.logArchive.totalArchived += chunk.length;
-          chunk.forEach((log) => {
-            profile.logArchive.byMode[log.mode] = (profile.logArchive.byMode[log.mode] || 0) + 1;
-            if (log.errorType) profile.logArchive.byError[log.errorType] = (profile.logArchive.byError[log.errorType] || 0) + 1;
+      function setupControls() {
+        OPERATIONS.forEach((op) => {
+          const option1 = new Option(OP_LABEL[op], op);
+          ui.setOperation.add(option1);
+          ui.blockOperation.add(new Option(OP_LABEL[op], op));
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = `btn mode-btn${op === state.operation ? " active" : ""}`;
+          btn.style.setProperty("--btn", "var(--chalk-orange)");
+          btn.textContent = OP_LABEL[op];
+          btn.addEventListener("click", () => {
+            state.operation = op;
+            document.querySelectorAll(".mode-btn").forEach((node) => node.classList.toggle("active", node === btn));
+            nextQuestion(generateEquation(state.operation, state.tier));
           });
+          ui.modeButtons.appendChild(btn);
+        });
+        for (let i = 1; i <= 30; i++) {
+          const option = document.createElement("option");
+          option.value = i;
+          option.label = `Tier ${i}`;
+          ui.tierMarks.appendChild(option);
         }
+        ["1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "0", "back", "clear", "submit"].forEach((key) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "btn";
+          btn.style.setProperty("--btn", key === "submit" ? "var(--chalk-green)" : key === "clear" ? "var(--chalk-red)" : "var(--chalk-blue)");
+          btn.textContent = key === "back" ? "⌫" : key === "clear" ? "C" : key === "submit" ? "✓" : key;
+          btn.addEventListener("pointerdown", () => btn.classList.add("pressed"));
+          btn.addEventListener("pointerup", () => btn.classList.remove("pressed"));
+          btn.addEventListener("pointerleave", () => btn.classList.remove("pressed"));
+          btn.addEventListener("click", () => pressKey(key));
+          ui.numpad.appendChild(btn);
+        });
+        ["1", "2", "3", "4", "5", "6", "7", "8", "9", "clear", "0", "back"].forEach((key) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "btn";
+          btn.style.setProperty("--btn", "var(--chalk-pink)");
+          btn.textContent = key === "back" ? "⌫" : key === "clear" ? "C" : key;
+          btn.addEventListener("click", () => pressPin(key));
+          ui.pinPad.appendChild(btn);
+        });
+      }
 
-        function maybeApplyDebugEaster(challenge) {
-          if (!(state.debugEasterOnce || new URLSearchParams(location.search).get("debug67") === "1")) return challenge;
-          state.debugEasterOnce = false;
-          if (challenge.kind === "pattern") {
-            challenge.sequence = [6, 7, 13, 20, 27];
-            challenge.prompt = "6, 7, 13, 20, 27, ...";
-            challenge.answer = 34;
-            challenge.signature = `${challenge.signature}|debug67`;
-          } else {
-            challenge.terms = [6, 7];
-            challenge.op = "×";
-            challenge.prompt = "6 × 7 = ?";
-            challenge.answer = 42;
-            challenge.signature = `${challenge.signature}|debug67`;
-           }
-           return challenge;
-         }
-
-        function updateTierPanel(profile) {
-          const tier = profile.difficultyByMode[state.activeMode];
-          ui.tierSlider.value = String(tier);
-          updateTierVisuals(tier);
-          ui.tierExamples.innerHTML = "";
-          const assignedPreset = getAssignedPreset(profile, state.activeMode);
-          if (assignedPreset) {
-            const li = document.createElement("li");
-            li.textContent = describePreset(assignedPreset);
-            ui.tierExamples.appendChild(li);
-            const li2 = document.createElement("li");
-            li2.textContent = presetPreviewText(assignedPreset.mode, assignedPreset.config);
-            ui.tierExamples.appendChild(li2);
-          } else {
-            tierExamples(state.activeMode, tier).forEach((example) => {
-              const li = document.createElement("li");
-              li.textContent = example;
-              ui.tierExamples.appendChild(li);
-            });
-          }
-          updateAdaptationTimeline(profile);
-        }
-
-        function renderProfileGate() {
-          ui.profileList.innerHTML = "";
-          const profiles = Object.values(state.data.profiles);
-          if (!profiles.length) {
-            ui.profileList.innerHTML = `<p class="text-sm text-slate-200">No learners yet. Add one on the right.</p>`;
-            return;
-          }
-          profiles
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .forEach((profile) => {
-              const btn = document.createElement("button");
-              btn.className = "crayon-btn w-full px-3 py-3 text-left";
-              btn.style.setProperty("--button-color", "rgba(99, 102, 241, 0.26)");
-              btn.innerHTML = `
-                <p class="font-header text-xl text-sky-100">${profile.name}</p>
-                <p class="text-sm text-slate-100">Level ${profile.level} • ${profile.totalCorrect}/${profile.totalQuestions || 0} correct</p>
-                <p class="text-xs text-amber-100">Support: ${profile.supportStyle}</p>
-              `;
-              btn.addEventListener("click", () => {
-                state.data.activeProfileId = profile.id;
-                safeWriteStorage();
-                openGameForActiveProfile();
-              });
-              ui.profileList.appendChild(btn);
-            });
-        }
-
-        function profileStyles(style) {
-          return style === "adaptive" ? "deconstructive / visual / narrative rotation" : style;
-        }
-
-        function createNewProfileFromForm() {
+      function wireEvents() {
+        ui.addProfileForm.addEventListener("submit", (event) => {
+          event.preventDefault();
           const name = ui.newProfileName.value.trim();
-          if (!name) {
-            ui.profileGateHint.textContent = "Please enter a learner name.";
-            return;
-          }
-          if (Object.values(state.data.profiles).some((p) => p.name.toLowerCase() === name.toLowerCase())) {
-            ui.profileGateHint.textContent = "That learner already exists. Pick a unique name.";
-            return;
-          }
-          const profile = ensureProfileShape(createProfile(name, ui.supportPreference.value));
-          state.data.profiles[profile.id] = profile;
-          state.data.activeProfileId = profile.id;
-          safeWriteStorage();
+          if (!name) return showToast("Add a player name first.");
+          createProfile(name, ui.newProfileStyle.value);
           ui.newProfileName.value = "";
-          ui.profileGateHint.textContent = `Created ${profile.name} with ${profileStyles(profile.supportStyle)} support.`;
-          renderProfileGate();
-          openGameForActiveProfile();
-        }
-
-        function renderModeButtons() {
-          ui.modeButtons.innerHTML = "";
-          MODES.forEach((mode) => {
-            const button = document.createElement("button");
-            button.className = "crayon-btn px-3 py-2 text-left text-sm";
-            button.style.setProperty("--button-color", mode === state.activeMode ? "rgba(125, 211, 252, 0.32)" : "rgba(148, 163, 184, 0.2)");
-            button.innerHTML = `<span class="font-header text-lg text-slate-50">${MODE_LABEL[mode]}</span>`;
-            button.addEventListener("click", () => {
-              state.activeMode = mode;
-              renderModeButtons();
-              refreshGameChrome();
-              generateChallenge();
-            });
-            ui.modeButtons.appendChild(button);
-          });
-        }
-
-        function refreshGameChrome() {
-          const profile = getActiveProfile();
-          if (!profile) return;
-          ui.activeProfilePill.textContent = `${profile.name} • support ${profile.supportStyle}`;
-          ui.modeTitle.textContent = `${MODE_LABEL[state.activeMode]} Odyssey`;
-          ui.modeSubtitle.textContent = modeSubtitle(state.activeMode);
-          const assigned = getAssignedPreset(profile, state.activeMode);
-          ui.activePresetBadge.textContent = assigned ? `Custom Set: ${describePreset(assigned)}` : "";
-          updateTierPanel(profile);
-          updateStatsHeader(profile);
-        }
-
-        function updateStatsHeader(profile) {
-          const streak = profile.streakByMode[state.activeMode] || 0;
-          ui.xpStat.textContent = `${profile.xp}/${levelXpNeeded(profile.level)}`;
-          ui.levelStat.textContent = String(profile.level);
-          ui.streakStat.textContent = String(streak);
-        }
-
-        function tierToRules(mode, tier) {
-          const t = Math.max(1, Math.min(30, tier));
-          if (mode === "addition") {
-            return {
-              terms: t < 10 ? 2 : t < 24 ? 3 : 4,
-              min: t === 1 ? 1 : 1 + Math.floor(t / 3),
-              max: t <= 5 ? 10 : t <= 10 ? 12 : t <= 15 ? 25 : t <= 20 ? 50 : t <= 25 ? 100 : 180,
-              allowNegative: false,
-            };
+        });
+        ui.backToProfiles.addEventListener("click", () => {
+          ui.gameScreen.classList.add("hidden");
+          ui.profileScreen.classList.remove("hidden");
+          state.chain = null;
+          renderProfiles();
+        });
+        ui.tierSlider.addEventListener("input", () => {
+          state.tier = Number(ui.tierSlider.value);
+          setAccent(state.tier);
+          nextQuestion(generateEquation(state.operation, state.tier));
+        });
+        ui.skipQuestion.addEventListener("click", skipQuestion);
+        ui.resetChainBtn.addEventListener("click", () => activeProfile() && startChain(activeProfile()));
+        window.addEventListener("keydown", (event) => {
+          if (ui.gameScreen.classList.contains("hidden")) return;
+          if (/^\d$/.test(event.key)) pressKey(event.key);
+          if (event.key === "Backspace") pressKey("back");
+          if (event.key === "Enter") submitAnswer();
+          if (event.key === "-") pressKey("-");
+        });
+        ui.educatorAccess.addEventListener("click", openPin);
+        ui.closePin.addEventListener("click", () => ui.pinOverlay.classList.add("hidden"));
+        ui.closeAdmin.addEventListener("click", () => {
+          ui.adminPanel.classList.add("hidden");
+          renderProfiles();
+        });
+        ui.adminProfileSelect.addEventListener("change", () => {
+          state.activeProfileId = ui.adminProfileSelect.value;
+          renderChainList();
+          renderAnalytics();
+        });
+        ui.setMethod.addEventListener("change", () => {
+          ui.manualSetFields.classList.toggle("hidden", ui.setMethod.value !== "manual");
+          ui.generatorSetFields.classList.toggle("hidden", ui.setMethod.value !== "generator");
+        });
+        ui.blockType.addEventListener("change", () => {
+          ui.generatedBlockFields.classList.toggle("hidden", ui.blockType.value !== "generated");
+          ui.setBlockFields.classList.toggle("hidden", ui.blockType.value !== "set");
+        });
+        ui.saveSetBtn.addEventListener("click", saveEquationSet);
+        ui.addBlockBtn.addEventListener("click", addBlock);
+        ui.setList.addEventListener("click", (event) => {
+          const id = event.target?.dataset?.deleteSet;
+          if (id) deleteEquationSet(id);
+        });
+        ui.chainList.addEventListener("click", (event) => {
+          const move = event.target?.dataset?.move;
+          const del = event.target?.dataset?.deleteBlock;
+          if (move) {
+            const [index, direction] = move.split(":").map(Number);
+            moveBlock(index, direction);
           }
-          if (mode === "subtraction") {
-            return {
-              terms: t < 11 ? 2 : t < 24 ? 3 : 4,
-              min: 0,
-              max: t <= 5 ? 10 : t <= 10 ? 15 : t <= 15 ? 35 : t <= 20 ? 50 : t <= 25 ? 100 : 220,
-              allowNegative: t >= 18,
-            };
-          }
-          if (mode === "multiplication") {
-            return {
-              terms: t < 12 ? 2 : t < 24 ? 3 : 4,
-              min: t <= 5 ? 1 : 2,
-              max: t <= 5 ? 5 : t <= 10 ? 12 : t <= 15 ? 16 : t <= 20 ? 22 : t <= 25 ? 30 : 40,
-              allowNegative: t >= 26,
-            };
-          }
-          if (mode === "division") {
-            return {
-              terms: t < 12 ? 2 : t < 24 ? 3 : 4,
-              divisorMin: 2,
-              divisorMax: t <= 10 ? 12 : t <= 20 ? 20 : 35,
-              quotientMin: 1,
-              quotientMax: t <= 10 ? 12 : t <= 20 ? 30 : 60,
-            };
-          }
-          return {
-            sequenceLength: 5,
-            patternSet: t <= 10 ? ["arithmetic"] : t <= 18 ? ["arithmetic", "step-alt", "squares"] : t <= 25 ? ["arithmetic", "step-alt", "geometric", "fib"] : ["arithmetic", "step-alt", "geometric", "fib", "hybrid"],
-            valueCap: t <= 10 ? 70 : t <= 20 ? 220 : 500,
-          };
-        }
-
-        function evaluateOperation(terms, op) {
-          if (op === "+") return terms.reduce((a, b) => a + b, 0);
-          if (op === "-") return terms.slice(1).reduce((a, b) => a - b, terms[0]);
-          if (op === "×") return terms.reduce((a, b) => a * b, 1);
-          return terms.slice(1).reduce((a, b) => a / b, terms[0]);
-        }
-
-        function normalizeSignature(mode, op, terms, extra = "") {
-          const ordered = op === "+" || op === "×" ? [...terms].sort((a, b) => a - b) : terms;
-          return `${mode}|${op}|${ordered.join(":")}|${extra}`;
-        }
-
-        function rememberSignature(mode, signature) {
-          const arr = state.memoryByMode[mode];
-          arr.push(signature);
-          if (arr.length > 80) arr.shift();
-        }
-
-        function isRepeatedSignature(mode, signature) {
-          return state.memoryByMode[mode].includes(signature);
-        }
-
-        function generateMathChallenge(mode, tier) {
-          const rules = tierToRules(mode, tier);
-          const op = MODE_SYMBOL[mode];
-          const maxAttempts = 130;
-          for (let i = 0; i < maxAttempts; i += 1) {
-            let terms = [];
-            if (mode === "addition") {
-              terms = Array.from({ length: rules.terms }, () => {
-                if (tier === 1) return Math.random() > 0.6 ? 1 : 2;
-                return Math.floor(Math.random() * (rules.max - rules.min + 1)) + rules.min;
-              });
-            } else if (mode === "subtraction") {
-              const base = Math.floor(Math.random() * (rules.max - Math.max(5, rules.max * 0.25))) + Math.max(5, Math.floor(rules.max * 0.25));
-              terms = [base];
-              let running = base;
-              for (let idx = 1; idx < rules.terms; idx += 1) {
-                const cap = Math.min(rules.max, Math.max(3, running + (rules.allowNegative ? rules.max * 0.3 : 0)));
-                const next = Math.floor(Math.random() * cap) + 1;
-                terms.push(next);
-                running -= next;
-              }
-            } else if (mode === "multiplication") {
-              terms = Array.from({ length: rules.terms }, () => {
-                const base = Math.floor(Math.random() * (rules.max - rules.min + 1)) + rules.min;
-                if (!rules.allowNegative || Math.random() < 0.8) return base;
-                return -base;
-              });
-              const identityCount = terms.filter((n) => Math.abs(n) === 1).length;
-              if (identityCount > 1) continue;
-            } else if (mode === "division") {
-              const divisors = Array.from({ length: rules.terms - 1 }, () => {
-                return Math.floor(Math.random() * (rules.divisorMax - rules.divisorMin + 1)) + rules.divisorMin;
-              });
-              const quotient = Math.floor(Math.random() * (rules.quotientMax - rules.quotientMin + 1)) + rules.quotientMin;
-              const dividend = divisors.reduce((acc, value) => acc * value, quotient);
-              terms = [dividend, ...divisors];
-            }
-
-            const answer = evaluateOperation(terms, op);
-            if (!Number.isFinite(answer)) continue;
-            if (Math.abs(answer) > 99999) continue;
-            if (mode === "subtraction" && !rules.allowNegative && answer < 0) continue;
-            if (mode === "division" && Math.floor(answer) !== answer) continue;
-            const signature = normalizeSignature(mode, op, terms, `t${tier}`);
-            if (isRepeatedSignature(mode, signature)) continue;
-            rememberSignature(mode, signature);
-            return {
-              kind: "math",
-              mode,
-              tier,
-              op,
-              terms,
-              prompt: `${terms.join(` ${op} `)} = ?`,
-              answer,
-              signature,
-            };
-          }
-
-          return {
-            kind: "math",
-            mode,
-            tier,
-            op: "+",
-            terms: [1, 1],
-            prompt: "1 + 1 = ?",
-            answer: 2,
-            signature: "fallback",
-          };
-        }
-
-        function generatePatternChallenge(tier) {
-          const rules = tierToRules("pattern", tier);
-          for (let i = 0; i < 100; i += 1) {
-            const kind = rules.patternSet[Math.floor(Math.random() * rules.patternSet.length)];
-            let seq = [];
-            let answer = 0;
-            if (kind === "arithmetic") {
-              const start = Math.floor(Math.random() * (12 + tier)) + 1;
-              const step = Math.floor(Math.random() * Math.max(3, Math.floor(tier / 2))) + 1;
-              seq = Array.from({ length: 5 }, (_, idx) => start + idx * step);
-              answer = seq[4] + step;
-            } else if (kind === "step-alt") {
-              const start = Math.floor(Math.random() * 20) + 1;
-              const a = Math.floor(Math.random() * Math.max(4, Math.floor(tier / 2))) + 2;
-              const b = Math.floor(Math.random() * Math.max(5, Math.floor(tier / 2))) + 3;
-              seq = [start];
-              for (let idx = 1; idx < 5; idx += 1) seq.push(seq[idx - 1] + (idx % 2 ? a : b));
-              answer = seq[4] + a;
-            } else if (kind === "squares") {
-              const base = Math.floor(Math.random() * 4) + 2;
-              seq = [base, base * base, base * base * base, base ** 4, base ** 5];
-              answer = base ** 6;
-            } else if (kind === "geometric") {
-              const start = Math.floor(Math.random() * 4) + 1;
-              const ratio = Math.floor(Math.random() * 3) + 2;
-              seq = [start];
-              for (let idx = 1; idx < 5; idx += 1) seq.push(seq[idx - 1] * ratio);
-              answer = seq[4] * ratio;
-            } else if (kind === "fib") {
-              seq = [Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 2];
-              while (seq.length < 5) seq.push(seq[seq.length - 1] + seq[seq.length - 2]);
-              answer = seq[3] + seq[4];
-            } else {
-              const start = Math.floor(Math.random() * 6) + 2;
-              const ratio = Math.floor(Math.random() * 2) + 2;
-              const minus = Math.floor(Math.random() * 4) + 1;
-              seq = [start];
-              for (let idx = 1; idx < 5; idx += 1) {
-                seq.push(idx % 2 ? seq[idx - 1] * ratio : seq[idx - 1] - minus);
-              }
-              answer = seq[4] * ratio;
-            }
-
-            if (Math.max(...seq.map((v) => Math.abs(v)), Math.abs(answer)) > rules.valueCap) continue;
-            const signature = normalizeSignature("pattern", kind, seq, `a${answer}`);
-            if (isRepeatedSignature("pattern", signature)) continue;
-            rememberSignature("pattern", signature);
-            return {
-              kind: "pattern",
-              mode: "pattern",
-              tier,
-              patternType: kind,
-              sequence: seq,
-              prompt: `${seq.join(", ")}, ...`,
-              answer,
-              signature,
-            };
-          }
-
-          return {
-            kind: "pattern",
-            mode: "pattern",
-            tier,
-            patternType: "fallback",
-            sequence: [1, 2, 3, 4, 5],
-            prompt: "1, 2, 3, 4, 5, ...",
-            answer: 6,
-            signature: "pattern-fallback",
-          };
-        }
-
-        function currentTier(profile) {
-          return profile.difficultyByMode[state.activeMode];
-        }
-
-        function generateChallenge() {
-          const profile = getActiveProfile();
-          if (!profile) return;
-          const tier = currentTier(profile);
-          state.inputValue = "";
-          state.inputKeystrokes = [];
-          ui.answerDisplay.textContent = "—";
-          ui.feedbackThread.innerHTML = "";
-          const assignedPreset = getAssignedPreset(profile, state.activeMode);
-          let challenge = null;
-          if (assignedPreset) {
-            for (let attempt = 0; attempt < 80; attempt += 1) {
-              const candidate = generateChallengeFromPreset(assignedPreset);
-              if (!candidate) continue;
-              if (isRepeatedSignature(state.activeMode, candidate.signature)) continue;
-              rememberSignature(state.activeMode, candidate.signature);
-              challenge = candidate;
-              break;
-            }
-            if (!challenge) challenge = generateChallengeFromPreset(assignedPreset);
-          }
-          if (!challenge) {
-            challenge = state.activeMode === "pattern" ? generatePatternChallenge(tier) : generateMathChallenge(state.activeMode, tier);
-          }
-          challenge = maybeApplyDebugEaster(challenge);
-          challenge.startedAt = performance.now();
-          challenge.wrongCount = 0;
-          challenge.keystrokes = [];
-          challenge.scaffoldHistory = [];
-          state.currentChallenge = challenge;
-          renderPrompt(challenge);
-          ui.resultBanner.textContent = "Enter an answer using keyboard or crayon pad.";
-          ui.resultBanner.style.color = "#f1f5f9";
-          maybeTriggerHiddenEaster(challenge);
-
-          if (state.queuedInputValue) {
-            state.inputValue = state.queuedInputValue;
-            state.queuedInputValue = "";
-            updateAnswerDisplay();
-            if (state.queuedSubmit) {
-              state.queuedSubmit = false;
-              setTimeout(() => submitAnswer(), 40);
-            }
-          }
-        }
-
-        function renderPrompt(challenge) {
-          ui.equationPrompt.innerHTML = "";
-          const prompt = challenge.prompt;
-          for (let i = 0; i < prompt.length; i += 1) {
-            const span = document.createElement("span");
-            span.className = "equation-token";
-            span.textContent = prompt[i];
-            span.dataset.char = prompt[i];
-            ui.equationPrompt.appendChild(span);
-          }
-        }
-
-        function digitsContain67ByRule(challenge) {
-          if (String(challenge.answer).includes("67")) return true;
-          if (challenge.kind === "math" && challenge.terms.length > 1) {
-            for (let i = 0; i < challenge.terms.length - 1; i += 1) {
-              const a = challenge.terms[i];
-              const b = challenge.terms[i + 1];
-              if ((a === 6 && b === 7) || (a === 7 && b === 6)) return true;
-            }
-          }
-          return false;
-        }
-
-        function maybeTriggerHiddenEaster(challenge) {
-          if (state.easterActive) return;
-          if (!digitsContain67ByRule(challenge)) return;
-          state.easterActive = true;
-          const tokens = [...ui.equationPrompt.querySelectorAll(".equation-token")];
-          tokens.forEach((token, idx) => {
-            const char = token.textContent;
-            const nextChar = tokens[idx + 1]?.textContent;
-            if ((char === "6" && nextChar === "7") || (char === "7" && nextChar === "6")) {
-              token.classList.add("pop67");
-              tokens[idx + 1].classList.add("pop67");
-            }
-          });
-          ui.easterStage.classList.add("show");
-          ui.easterDigit6.classList.add("animate-rainbowFlash");
-          ui.easterDigit7.classList.add("animate-rainbowFlash");
-          ui.easterText.classList.add("animate-pulseWord");
-          clearTimeout(state.easterTimer);
-          state.easterTimer = setTimeout(() => {
-            tokens.forEach((token) => token.classList.remove("pop67"));
-            ui.easterStage.classList.remove("show");
-            ui.easterDigit6.classList.remove("animate-rainbowFlash");
-            ui.easterDigit7.classList.remove("animate-rainbowFlash");
-            ui.easterText.classList.remove("animate-pulseWord");
-            state.easterActive = false;
-          }, 10000);
-        }
-
-        function pushFeedbackCard(title, lines, tone = "sky") {
-          const card = document.createElement("article");
-          const toneMap = {
-            sky: "border-sky-300/45 bg-sky-400/10 text-sky-100",
-            rose: "border-rose-300/45 bg-rose-400/10 text-rose-100",
-            emerald: "border-emerald-300/45 bg-emerald-400/10 text-emerald-100",
-            amber: "border-amber-300/45 bg-amber-400/10 text-amber-100",
-            violet: "border-violet-300/45 bg-violet-400/10 text-violet-100",
-          };
-          card.className = `rounded-xl border p-2 text-sm ${toneMap[tone] || toneMap.sky}`;
-          card.innerHTML = `<p class="font-header text-base">${title}</p>${lines.map((line) => `<p class="mt-1">${line}</p>`).join("")}`;
-          ui.feedbackThread.prepend(card);
-          while (ui.feedbackThread.children.length > 6) {
-            ui.feedbackThread.removeChild(ui.feedbackThread.lastChild);
-          }
-        }
-
-        function classifyError(challenge, guess) {
-          const answer = challenge.answer;
-          if (Math.abs(guess - answer) <= 2) return { type: "Off-By-One", confidence: "high" };
-          if (challenge.kind === "math") {
-            const terms = challenge.terms;
-            const ops = ["+", "-", "×", "÷"];
-            for (const op of ops) {
-              if (op === challenge.op) continue;
-              const alt = evaluateOperation(terms, op);
-              if (Number.isFinite(alt) && Math.round(alt) === guess) return { type: "Operation Swap", confidence: "high" };
-            }
-          }
-          const absGuess = String(Math.abs(guess));
-          const absAnswer = String(Math.abs(answer));
-          if (absGuess.length > 1 && absGuess.split("").reverse().join("") === absAnswer) return { type: "Transposition", confidence: "medium" };
-          return { type: "Calculation Breakdown", confidence: "medium" };
-        }
-
-        function scaffoldStyleForProfile(profile) {
-          if (profile.supportStyle !== "adaptive") return profile.supportStyle;
-          const pickStyle = ["deconstructive", "visual", "narrative"][Math.floor(Math.random() * 3)];
-          profile.preferredSupportStylesSeen.push(pickStyle);
-          if (profile.preferredSupportStylesSeen.length > 80) profile.preferredSupportStylesSeen.shift();
-          return pickStyle;
-        }
-
-        function scaffoldContent(style, challenge, name) {
-          if (style === "deconstructive") {
-            if (challenge.kind === "math") {
-              if (challenge.op === "×" && challenge.terms.length >= 2) {
-                const a = challenge.terms[0];
-                const b = challenge.terms[1];
-                const tens = Math.floor(a / 10) * 10;
-                const ones = a - tens;
-                return {
-                  title: `Deconstructive Support for ${name}`,
-                  lines: [
-                    `Break ${a} × ${b} into (${tens} × ${b}) + (${ones} × ${b}).`,
-                    `Solve each part separately, then recombine.`,
-                    "Verification: divide your product by one factor to recover the other.",
-                  ],
-                };
-              }
-              return {
-                title: `Deconstructive Support for ${name}`,
-                lines: [
-                  "Split the equation into one operation at a time.",
-                  "Track a running value after each step.",
-                  "Verification: replay the equation in slow sequence to confirm each transition.",
-                ],
-              };
-            }
-            return {
-              title: `Pattern Breakdown for ${name}`,
-              lines: [
-                "List consecutive differences between terms.",
-                "If differences fail, test ratios between terms.",
-                "Verification: ensure your next value preserves both recent transitions.",
-              ],
-            };
-          }
-          if (style === "visual") {
-            if (challenge.kind === "math") {
-              return {
-                title: `Visual/Spatial Support for ${name}`,
-                lines: [
-                  "Imagine chalk blocks grouped by each term.",
-                  "For multiplication, draw rows/columns mentally; for subtraction, remove chunks.",
-                  "Verification: estimate with rounded blocks before computing exact answer.",
-                ],
-              };
-            }
-            return {
-              title: `Visual/Spatial Support for ${name}`,
-              lines: [
-                "Plot the sequence as rising/falling points in your head.",
-                "Look for repeating shape moves (same jump, alternating jump, or growth).",
-                "Verification: extend one more step beyond your answer and see if pattern remains coherent.",
-              ],
-            };
-          }
-          return {
-            title: `Narrative Support for ${name}`,
-            lines: [
-              challenge.kind === "math"
-                ? "Turn this into a story: boxes, gems, groups, or distance changes."
-                : "Tell a story where each next number is the next scene in the sequence.",
-              "Use the story to justify each step rather than guessing the final number.",
-              "Verification: retell the story from start to finish with your chosen answer included.",
-            ],
-          };
-        }
-
-        function showScaffold(style, challenge) {
-          const profile = getActiveProfile();
-          if (!profile) return;
-          const content = scaffoldContent(style, challenge, profile.name);
-          ui.scaffoldTitle.textContent = content.title;
-          ui.scaffoldBody.innerHTML = content.lines.map((line) => `<p>${line}</p>`).join("");
-          setModalState("scaffold", true);
-          pushFeedbackCard("Scaffold Activated", [content.lines[0], content.lines[1]], "violet");
-          audio.tone(392, 0.14, "triangle", 0, 0.05);
-        }
-
-        function closeScaffold() {
-          setModalState("scaffold", false);
-        }
-
-        function addXp(profile, amount) {
-          profile.xp += amount;
-          while (profile.xp >= levelXpNeeded(profile.level)) {
-            profile.xp -= levelXpNeeded(profile.level);
-            profile.level += 1;
-            pushFeedbackCard("Level Up", [`${profile.name} reached level ${profile.level}.`], "emerald");
-            audio.success();
-          }
-        }
-
-        function updateAnswerDisplay() {
-          ui.answerDisplay.textContent = state.inputValue || "—";
-        }
-
-        function recordAttempt(profile, payload) {
-          profile.logs.push(payload);
-          compactLogsIfNeeded(profile);
-        }
-
-        function applyAdaptiveTier(profile, mode) {
-          const arr = state.perfByMode[mode];
-          if (arr.length < 6) return;
-          const tier = profile.difficultyByMode[mode];
-          const accuracy = arr.filter((r) => r.correct).length / arr.length;
-          const avgMs = arr.reduce((sum, r) => sum + r.responseMs, 0) / arr.length;
-          let newTier = tier;
-          let reason = "";
-          if (accuracy >= 0.84 && avgMs <= 7000 && tier < 30) {
-            newTier += 1;
-            reason = `Tier nudged up to ${newTier}: recent accuracy ${(accuracy * 100).toFixed(0)}% with quick response pace.`;
-          } else if ((accuracy < 0.45 || avgMs > 18000) && tier > 1) {
-            newTier -= 1;
-            reason = `Tier eased to ${newTier}: recent attempts suggest reinforcing fundamentals before scaling back up.`;
-          }
-          if (newTier !== tier) {
-            profile.difficultyByMode[mode] = newTier;
-            profile.adaptationLog.push({ at: new Date().toISOString(), mode, from: tier, to: newTier, reason });
-            if (profile.adaptationLog.length > 120) profile.adaptationLog.shift();
-            ui.adaptiveMessage.textContent = reason;
-            pushFeedbackCard("Adaptive Tier Update", [reason], newTier > tier ? "emerald" : "amber");
-            updateAdaptationTimeline(profile);
-          }
-        }
-
-        function parseInputValue() {
-          if (state.inputValue === "") return null;
-          const value = Number(state.inputValue);
-          return Number.isFinite(value) ? value : null;
-        }
-
-        function handleWrongAnswer(profile, challenge, guess) {
-          challenge.wrongCount += 1;
-          profile.streakByMode[state.activeMode] = 0;
-          ui.resultBanner.textContent = "Not quite. Follow the strategy support and try again.";
-          ui.resultBanner.style.color = "#fda4af";
-          const errInfo = classifyError(challenge, guess);
-          pushFeedbackCard("Clinical Error Classification", [`Detected: ${errInfo.type} (confidence: ${errInfo.confidence})`], "rose");
-          const style = scaffoldStyleForProfile(profile);
-          if (challenge.wrongCount === 3 || challenge.wrongCount === 6) {
-            challenge.scaffoldHistory.push(style);
-            showScaffold(style, challenge);
-          }
-          audio.warn();
-          return errInfo;
-        }
-
-        function handleCorrectAnswer(profile, challenge) {
-          const answerBox = ui.answerDisplay.getBoundingClientRect();
-          chalkDust.burst(answerBox.left + answerBox.width * 0.5, answerBox.top + answerBox.height * 0.5, "#86efac");
-          ui.answerDisplay.parentElement.style.borderColor = "rgba(16,185,129,0.9)";
-          setTimeout(() => {
-            ui.answerDisplay.parentElement.style.borderColor = "rgba(255,255,255,0.3)";
-          }, 900);
-          profile.streakByMode[state.activeMode] = (profile.streakByMode[state.activeMode] || 0) + 1;
-          const streak = profile.streakByMode[state.activeMode];
-          const responseMs = performance.now() - challenge.startedAt;
-          const xpGain = Math.max(8, Math.round(12 + streak * 1.4 + Math.max(0, 9000 - responseMs) / 1500));
-          addXp(profile, xpGain);
-          ui.resultBanner.textContent = `Correct! +${xpGain} XP`;
-          ui.resultBanner.style.color = "#86efac";
-          pushFeedbackCard("Great Work", [`Solved in ${(responseMs / 1000).toFixed(1)}s with ${challenge.wrongCount} prior misses.`], "emerald");
-          audio.success();
-        }
-
-        function pedagogicalSummary(profile) {
-          const logs = profile.logs;
-          if (!logs.length) return "Collect a few attempts to generate instructional guidance.";
-          const errorCounts = {};
-          let impulsive = 0;
-          let methodical = 0;
-          logs.forEach((log) => {
-            if (log.errorType) errorCounts[log.errorType] = (errorCounts[log.errorType] || 0) + 1;
-            if (!log.correct && log.responseMs < 3000) impulsive += 1;
-            if (log.correct && log.responseMs > 15000) methodical += 1;
-          });
-          const topError = Object.entries(errorCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || "None";
-          const style = impulsive > methodical ? "Fast/Impulsive leaning" : methodical > impulsive ? "Methodical processing" : "Balanced rhythm";
-          const support = topError === "Operation Swap"
-            ? "Use operation cue cards and verbalize operation before solving."
-            : topError === "Transposition"
-              ? "Encourage spoken digit ordering and place-value rehearsal."
-              : topError === "Off-By-One"
-                ? "Add quick post-answer check for ±1/±2 adjustments."
-                : "Continue mixed-mode reps with scaffold rotation.";
-          return `${style}. Most frequent error: ${topError}. Suggested support: ${support}`;
-        }
-
-        function favoriteOperation(profile) {
-          const winner = MODES
-            .filter((mode) => mode !== "pattern")
-            .map((mode) => ({ mode, count: profile.modeUsage[mode] || 0 }))
-            .sort((a, b) => b.count - a.count)[0];
-          return winner && winner.count > 0 ? MODE_LABEL[winner.mode] : "No dominant mode yet";
-        }
-
-        function updateAdminPanel(selectedProfileId) {
-          const profileIds = Object.keys(state.data.profiles);
-          if (!profileIds.length) return;
-          const targetId = selectedProfileId && state.data.profiles[selectedProfileId] ? selectedProfileId : profileIds[0];
-          ui.adminProfileSelect.innerHTML = profileIds
-            .map((id) => `<option value="${id}" ${id === targetId ? "selected" : ""}>${state.data.profiles[id].name}</option>`)
-            .join("");
-          const profile = state.data.profiles[targetId];
-          if (!profile) return;
-
-          const accuracy = profile.totalQuestions ? (profile.totalCorrect / profile.totalQuestions) * 100 : 0;
-          const avgMs = profile.totalQuestions ? profile.totalResponseMs / profile.totalQuestions : 0;
-          ui.adminStatsCards.innerHTML = `
-            <div class="rounded-xl border border-white/20 bg-white/10 p-2 text-sm"><span class="text-slate-200">Total Questions:</span> <span class="font-header text-sky-100">${profile.totalQuestions}</span></div>
-            <div class="rounded-xl border border-white/20 bg-white/10 p-2 text-sm"><span class="text-slate-200">Accuracy:</span> <span class="font-header text-emerald-100">${accuracy.toFixed(1)}%</span></div>
-            <div class="rounded-xl border border-white/20 bg-white/10 p-2 text-sm"><span class="text-slate-200">Favorite Operation:</span> <span class="font-header text-yellow-100">${favoriteOperation(profile)}</span></div>
-            <div class="rounded-xl border border-white/20 bg-white/10 p-2 text-sm"><span class="text-slate-200">Average Speed:</span> <span class="font-header text-pink-100">${(avgMs / 1000).toFixed(2)}s</span></div>
-          `;
-
-          ui.pedagogicalSummary.textContent = pedagogicalSummary(profile);
-          const assignedEntries = MODES.map((mode) => {
-            const preset = getAssignedPreset(profile, mode);
-            return preset ? `${MODE_LABEL[mode]}: ${preset.name}` : null;
-          }).filter(Boolean);
-          ui.assignedPresetSummary.textContent = assignedEntries.length
-            ? assignedEntries.join(" • ")
-            : "No custom set for selected learner.";
-          renderPresetList();
-          ui.adminLogBody.innerHTML = "";
-          profile.logs.slice().reverse().forEach((log) => {
-            const tr = document.createElement("tr");
-            tr.className = "border-b border-white/10";
-            tr.innerHTML = `
-              <td class="py-1">${new Date(log.time).toLocaleTimeString()}</td>
-              <td class="py-1">${log.prompt}</td>
-              <td class="py-1">${log.keystrokes.join(" ")}</td>
-              <td class="py-1">${log.correct ? "✓" : "✗"} (${log.userAnswer})</td>
-              <td class="py-1">${log.errorType || "-"}</td>
-              <td class="py-1">${log.errorConfidence || "-"}</td>
-              <td class="py-1">${Math.round(log.responseMs)}</td>
-            `;
-            ui.adminLogBody.appendChild(tr);
-          });
-
-          renderAdminChart(profile);
-        }
-
-        function renderAdminChart(profile) {
-          const allRecent = profile.logs.slice(-180);
-          const step = Math.max(1, Math.ceil(allRecent.length / 40));
-          const recent = allRecent.filter((_, idx) => idx % step === 0);
-          const labels = recent.map((_, idx) => `${idx + 1}`);
-          const accuracySeries = [];
-          let correct = 0;
-          recent.forEach((log, idx) => {
-            if (log.correct) correct += 1;
-            accuracySeries.push(((correct / (idx + 1)) * 100).toFixed(1));
-          });
-          if (state.chart) state.chart.destroy();
-          state.chart = new Chart(ui.adminChart, {
-            type: "line",
-            data: {
-              labels,
-              datasets: [
-                {
-                  label: "Accuracy % (running)",
-                  data: accuracySeries,
-                  borderColor: "#7dd3fc",
-                  pointRadius: 2.5,
-                  pointBackgroundColor: "#fef08a",
-                  tension: 0.3,
-                },
-              ],
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: {
-                  labels: { color: "#f8fafc" },
-                },
-              },
-              scales: {
-                x: {
-                  ticks: { color: "#e2e8f0" },
-                  grid: { color: "rgba(255,255,255,0.08)" },
-                },
-                y: {
-                  ticks: { color: "#e2e8f0" },
-                  grid: { color: "rgba(255,255,255,0.08)" },
-                  min: 0,
-                  max: 100,
-                },
-              },
-            },
-          });
-        }
-
-        function copyAdminData(asCsv) {
-          const profile = state.data.profiles[ui.adminProfileSelect.value];
-          if (!profile) return;
-          let text = "";
-          if (!asCsv) {
-            text = JSON.stringify(profile.logs, null, 2);
-          } else {
-            const header = ["time", "mode", "tier", "prompt", "answer", "userAnswer", "correct", "errorType", "errorConfidence", "keystrokes", "responseMs", "scaffoldLevel", "scaffoldStyle"];
-            const rows = profile.logs.map((log) =>
-              [
-                log.time,
-                log.mode,
-                log.tier,
-                log.prompt,
-                log.answer,
-                log.userAnswer,
-                log.correct,
-                log.errorType || "",
-                log.errorConfidence || "",
-                log.keystrokes.join(" "),
-                Math.round(log.responseMs),
-                log.scaffoldLevel,
-                log.scaffoldStyle || "",
-              ].map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(","),
-            );
-            text = [header.join(","), ...rows].join("\n");
-          }
-          navigator.clipboard
-            .writeText(text)
-            .then(() => {
-              pushFeedbackCard("Admin Export", ["Copied to clipboard."], "emerald");
-            })
-            .catch(() => {
-              const blob = new Blob([text], { type: asCsv ? "text/csv;charset=utf-8" : "application/json;charset=utf-8" });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = asCsv ? `sparkmath-${profile.name}-logs.csv` : `sparkmath-${profile.name}-logs.json`;
-              document.body.appendChild(a);
-              a.click();
-              a.remove();
-              setTimeout(() => URL.revokeObjectURL(url), 800);
-              pushFeedbackCard("Admin Export", ["Clipboard unavailable. Downloaded file instead."], "amber");
-            });
-        }
-
-        function openGameForActiveProfile() {
-          const profile = getActiveProfile();
-          if (!profile) return;
-          ui.profileGate.classList.add("hidden");
-          ui.gameView.classList.remove("hidden");
-          state.activeMode = "addition";
-          renderModeButtons();
-          refreshGameChrome();
-          generateChallenge();
-          lucide.createIcons();
-        }
-
-        function openProfileGate() {
-          ui.gameView.classList.add("hidden");
-          ui.profileGate.classList.remove("hidden");
-          renderProfileGate();
-        }
-
-        function handleInputKey(key) {
-          if (!state.currentChallenge) return;
-          if (state.lockInput) {
-            if (/^\d$/.test(key)) {
-              if (state.queuedInputValue.length < 8) state.queuedInputValue += key;
-            } else if (key === "backspace") {
-              state.queuedInputValue = state.queuedInputValue.slice(0, -1);
-            } else if (key === "submit") {
-              state.queuedSubmit = true;
-            }
-            ui.resultBanner.textContent = "Queued input for next challenge...";
-            ui.resultBanner.style.color = "#fef08a";
-            return;
-          }
-          if (/^\d$/.test(key)) {
-            if (state.inputValue.length < 8) {
-              state.inputValue += key;
-              state.inputKeystrokes.push(key);
-              audio.playScribble();
-            }
-          } else if (key === "-") {
-            if (!state.inputValue.length) {
-              state.inputValue = "-";
-              state.inputKeystrokes.push(key);
-              audio.playScribble();
-            }
-          } else if (key === "backspace") {
-            state.inputValue = state.inputValue.slice(0, -1);
-            state.inputKeystrokes.push("⌫");
-            audio.playScribble();
-          } else if (key === "submit") {
-            state.inputKeystrokes.push("↵");
-            submitAnswer();
-            return;
-          } else {
-            return;
-          }
-          updateAnswerDisplay();
-        }
-
-        function submitAnswer() {
-          const profile = getActiveProfile();
-          const challenge = state.currentChallenge;
-          if (!profile || !challenge || state.lockInput) return;
-          const value = parseInputValue();
-          if (value === null) {
-            ui.resultBanner.textContent = "Please enter a valid number.";
-            ui.resultBanner.style.color = "#fbbf24";
-            return;
-          }
-
-          const responseMs = performance.now() - challenge.startedAt;
-          const correct = Number(value) === Number(challenge.answer);
-          let errorType = "";
-          let errorConfidence = "";
-          if (correct) {
-            handleCorrectAnswer(profile, challenge);
-          } else {
-            const err = handleWrongAnswer(profile, challenge, value);
-            errorType = err.type;
-            errorConfidence = err.confidence;
-          }
-
-          profile.totalQuestions += 1;
-          if (correct) profile.totalCorrect += 1;
-          profile.totalResponseMs += responseMs;
-          profile.modeUsage[state.activeMode] += 1;
-          if (correct) profile.modeCorrect[state.activeMode] += 1;
-          const scaffoldLevel = challenge.wrongCount >= 6 ? 2 : challenge.wrongCount >= 3 ? 1 : 0;
-          const scaffoldStyle = challenge.scaffoldHistory[challenge.scaffoldHistory.length - 1] || "";
-          recordAttempt(profile, {
-            time: new Date().toISOString(),
-            mode: state.activeMode,
-            tier: profile.difficultyByMode[state.activeMode],
-            prompt: challenge.prompt,
-            answer: challenge.answer,
-            userAnswer: value,
-            correct,
-            errorType,
-            errorConfidence,
-            keystrokes: [...state.inputKeystrokes],
-            responseMs,
-            scaffoldLevel,
-            scaffoldStyle,
-            presetId: challenge.presetId || profile.presetByMode[state.activeMode] || null,
-          });
-
-          state.perfByMode[state.activeMode].push({ correct, responseMs });
-          if (state.perfByMode[state.activeMode].length > 8) state.perfByMode[state.activeMode].shift();
-          applyAdaptiveTier(profile, state.activeMode);
-          updateStatsHeader(profile);
-          safeWriteStorage();
-          if (correct) {
-            state.lockInput = true;
-            setTimeout(() => {
-              state.lockInput = false;
-              refreshGameChrome();
-              generateChallenge();
-            }, 620);
-          }
-          state.inputValue = "";
-          state.inputKeystrokes = [];
-          updateAnswerDisplay();
-        }
-
-        function buildNumberPad() {
-          ui.numberPad.innerHTML = "";
-          const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "backspace", "0", "submit"];
-          const styles = [
-            "#38bdf8", "#22d3ee", "#34d399",
-            "#a3e635", "#facc15", "#fb923c",
-            "#f472b6", "#c084fc", "#818cf8",
-            "#fda4af", "#e2e8f0", "#10b981",
-          ];
-          keys.forEach((key, idx) => {
-            const btn = document.createElement("button");
-            btn.className = "crayon-btn crayon-numpad px-2 py-3 text-2xl font-header text-slate-50";
-            btn.style.setProperty("--button-color", `color-mix(in srgb, ${styles[idx]} 40%, transparent)`);
-            btn.dataset.key = key;
-            btn.textContent = key === "backspace" ? "⌫" : key === "submit" ? "OK" : key;
-            btn.addEventListener("click", () => {
-              handleInputKey(key);
-            });
-            ui.numberPad.appendChild(btn);
-          });
-        }
-
-        function buildPinPad() {
-          ui.pinPad.innerHTML = "";
-          const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "clear", "0", "enter"];
-          keys.forEach((key) => {
-            const btn = document.createElement("button");
-            btn.className = "crayon-btn px-2 py-3 text-xl font-header text-slate-50";
-            btn.style.setProperty("--button-color", "rgba(148, 163, 184, 0.26)");
-            btn.textContent = key === "clear" ? "C" : key === "enter" ? "↵" : key;
-            btn.addEventListener("click", () => handlePinKey(key));
-            ui.pinPad.appendChild(btn);
-          });
-        }
-
-        function openPinModal() {
-          state.pinValue = "";
-          ui.pinDisplay.textContent = "----";
-          ui.pinHint.textContent = "Enter 4 digits.";
-          setModalState("pin", true);
-        }
-
-        function closePinModal() {
-          setModalState("pin", false);
-        }
-
-        function handlePinKey(key) {
-          if (/^\d$/.test(key)) {
-            if (state.pinValue.length < 4) state.pinValue += key;
-          } else if (key === "clear") {
-            state.pinValue = "";
-          } else if (key === "enter") {
-            if (state.pinValue === SECURITY_PIN) {
-              closePinModal();
-              openAdminPanel();
-              return;
-            }
-            ui.pinHint.textContent = "Incorrect PIN.";
-            state.pinValue = "";
-          }
-          const visible = state.pinValue.padEnd(4, "-").split("").join("");
-          ui.pinDisplay.textContent = visible;
-        }
-
-        function openAdminPanel() {
-          ui.projectorOverlay.classList.remove("hidden");
-          ui.projectorPanel.classList.remove("show");
-          void ui.projectorPanel.offsetWidth;
-          ui.projectorPanel.classList.add("show");
-          setTimeout(() => {
-            setModalState("admin", true);
-            updatePresetPreview();
-            renderPresetList();
-            updateAdminPanel(state.data.activeProfileId);
-            const adminBody = document.querySelector("#adminPanel .admin-panel-body");
-            if (adminBody) adminBody.scrollTop = 0;
-          }, 540);
-        }
-
-        function closeAdminPanel() {
-          setModalState("admin", false);
-          ui.projectorOverlay.classList.add("hidden");
-          ui.projectorPanel.classList.remove("show");
-        }
-
-        function bindEvents() {
-          ui.createProfileBtn.addEventListener("click", createNewProfileFromForm);
-          ui.backToProfilesBtn.addEventListener("click", openProfileGate);
-          ui.tierSlider.addEventListener("input", () => {
-            const profile = getActiveProfile();
-            if (!profile) return;
-            const newTier = Number(ui.tierSlider.value);
-            profile.difficultyByMode[state.activeMode] = newTier;
-            updateTierPanel(profile);
-            safeWriteStorage();
-            generateChallenge();
-          });
-
-          ui.closeScaffoldBtn.addEventListener("click", closeScaffold);
-          ui.themeToggleBtn.addEventListener("click", toggleTheme);
-          ui.educatorAccessBtn.addEventListener("click", openPinModal);
-          ui.closePinModalBtn.addEventListener("click", closePinModal);
-          ui.adminCloseBtn.addEventListener("click", closeAdminPanel);
-          ui.adminProfileSelect.addEventListener("change", () => updateAdminPanel(ui.adminProfileSelect.value));
-          ui.savePresetBtn.addEventListener("click", savePracticePresetFromForm);
-          ui.assignPresetBtn.addEventListener("click", assignSelectedPresetToLearner);
-          ui.clearPresetAssignmentBtn.addEventListener("click", clearPresetAssignmentForLearner);
-          [ui.presetModeSelect, ui.presetFocusInput, ui.presetOtherMinInput, ui.presetOtherMaxInput, ui.presetAnswerCapInput, ui.presetShuffleOrder].forEach((el) => {
-            el.addEventListener("input", updatePresetPreview);
-            el.addEventListener("change", updatePresetPreview);
-          });
-          ui.adminCopyJson.addEventListener("click", () => copyAdminData(false));
-          ui.adminCopyCsv.addEventListener("click", () => copyAdminData(true));
-
-          window.addEventListener("keydown", (event) => {
-            trapFocusInModal(event);
-            if (event.key === "Escape") {
-              if (state.activeModal === "admin") closeAdminPanel();
-              else if (state.activeModal === "pin") closePinModal();
-              else if (state.activeModal === "scaffold") closeScaffold();
-              return;
-            }
-            if (event.key === "F8" && event.shiftKey) {
-              state.debugEasterOnce = true;
-              pushFeedbackCard("Debug", ["Hidden sequence primed for next challenge."], "amber");
-            }
-            if (ui.pinModal.classList.contains("flex")) {
-              if (/^\d$/.test(event.key)) handlePinKey(event.key);
-              else if (event.key === "Backspace") handlePinKey("clear");
-              else if (event.key === "Enter") handlePinKey("enter");
-              return;
-            }
-            const target = event.target;
-            if (target instanceof HTMLElement && (target.tagName === "INPUT" || target.tagName === "SELECT" || target.tagName === "TEXTAREA")) {
-              return;
-            }
-            if (/^\d$/.test(event.key)) {
-              event.preventDefault();
-              handleInputKey(event.key);
-            } else if (event.key === "Backspace") {
-              event.preventDefault();
-              handleInputKey("backspace");
-            } else if (event.key === "Enter") {
-              event.preventDefault();
-              handleInputKey("submit");
-            } else if (event.key === "-") {
-              event.preventDefault();
-              handleInputKey("-");
-            }
-          });
-
-          ["pointerdown", "keydown"].forEach((type) => {
-            window.addEventListener(
-              type,
-              () => {
-                audio.ensure();
-              },
-              { once: true },
-            );
-          });
-        }
-
-
-        const THEME_STORAGE_KEY = "sparkMathTheme";
-
-        function getStoredTheme() {
+          if (del) deleteBlock(del);
+        });
+        ui.exportData.addEventListener("click", async () => {
           try {
-            const saved = localStorage.getItem(THEME_STORAGE_KEY);
-            return saved === "light" ? "light" : "dark";
+            await navigator.clipboard.writeText(JSON.stringify(state.data, null, 2));
+            showToast("Copied SparkMath JSON.");
           } catch {
-            return "dark";
+            showToast("Clipboard unavailable in this browser.");
           }
-        }
+        });
+        document.querySelectorAll(".admin-tab").forEach((button) => {
+          button.addEventListener("click", () => {
+            document.querySelectorAll(".admin-tab").forEach((node) => node.classList.toggle("active", node === button));
+            document.querySelectorAll("[data-tab-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.tabPanel === button.dataset.tab));
+          });
+        });
+        window.addEventListener("resize", resizeCanvas);
+      }
 
-        function applyTheme(theme) {
-          const next = theme === "light" ? "light" : "dark";
-          document.documentElement.setAttribute("data-theme", next);
-          ui.themeToggleLabel.textContent = next === "dark" ? "Pastel Fun Mode" : "Chalkboard Mode";
-          ui.themeToggleBtn.style.setProperty(
-            "--button-color",
-            next === "dark" ? "rgba(251, 191, 36, 0.35)" : "rgba(244, 114, 182, 0.35)",
-          );
-          try {
-            localStorage.setItem(THEME_STORAGE_KEY, next);
-          } catch {
-            // Keep runtime stable if storage is unavailable.
-          }
-        }
+      function seedIfEmpty() {
+        if (Object.keys(state.data.profiles).length) return;
+        const id = makeId("p");
+        state.data.profiles[id] = normalizeProfile({ id, name: "Demo Learner", supportStyle: "visual" });
+        state.data.activeProfileId = id;
+        safeWriteStorage();
+      }
 
-        function toggleTheme() {
-          const current = document.documentElement.getAttribute("data-theme") || "dark";
-          applyTheme(current === "dark" ? "light" : "dark");
-        }
-
-        function bootstrap() {
-          applyTheme(getStoredTheme());
-          syncViewportHeight();
-          window.addEventListener("resize", syncViewportHeight);
-          if (window.visualViewport) window.visualViewport.addEventListener("resize", syncViewportHeight);
-          state.data = safeReadStorage();
-          ensureStorageShape();
-          buildNumberPad();
-          buildPinPad();
-          renderModeButtons();
-          renderProfileGate();
-          bindEvents();
-          if (state.data.activeProfileId && state.data.profiles[state.data.activeProfileId]) {
-            openGameForActiveProfile();
-          }
-          updatePresetPreview();
-          renderPresetList();
-          lucide.createIcons();
-        }
-
-        bootstrap();
-      })();
-    </script>
-  </body>
+      setupControls();
+      wireEvents();
+      seedIfEmpty();
+      renderProfiles();
+      refreshAdmin();
+      resizeCanvas();
+      animateDust();
+      setAccent(1);
+    })();
+  </script>
+</body>
 </html>
