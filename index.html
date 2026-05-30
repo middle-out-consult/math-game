@@ -360,6 +360,61 @@
       .app-frame {
         height: calc(var(--app-vh, 1vh) * 100);
       }
+      .safe-top {
+        padding-top: max(3.5rem, calc(env(safe-area-inset-top, 0px) + 3.25rem));
+      }
+
+      #adminPanel {
+        overflow: hidden;
+        overscroll-behavior: contain;
+      }
+
+      #adminPanel .admin-panel-shell {
+        height: 100%;
+        max-height: 100%;
+        min-height: 0;
+      }
+
+      #adminPanel .admin-panel-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+      }
+
+      #scaffoldModal .scaffold-panel,
+      #pinModal .pin-panel {
+        max-height: min(92vh, calc(var(--app-vh, 1vh) * 92));
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      @media (max-width: 640px) {
+        #equationPrompt {
+          font-size: 2.25rem !important;
+          line-height: 1.1;
+        }
+
+        #answerDisplay {
+          font-size: 2rem !important;
+        }
+
+        #adminPanel .admin-panel-body {
+          padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+        }
+
+        #adminPanel .admin-action-row {
+          width: 100%;
+        }
+
+        #adminPanel .admin-action-row .crayon-btn {
+          flex: 1 1 auto;
+          min-width: 7.5rem;
+        }
+      }
+
 
       .focus-ring:focus-visible,
       .crayon-btn:focus-visible,
@@ -375,10 +430,10 @@
   <body>
     <canvas id="dustCanvas" class="fixed inset-0 pointer-events-none z-20"></canvas>
 
-    <main id="appRoot" class="app-frame relative z-10 overflow-hidden p-2 pt-14 sm:p-3 sm:pt-16">
+    <main id="appRoot" class="app-frame safe-top relative z-10 overflow-hidden p-2 sm:p-3 sm:pt-16">
       <button
         id="themeToggleBtn"
-        class="theme-toggle-btn crayon-btn fixed left-3 top-3 z-40 px-3 py-2 text-xs font-header"
+        class="theme-toggle-btn crayon-btn fixed left-3 top-3 z-40 max-w-[46vw] px-3 py-2 text-xs font-header"
         style="--button-color: rgba(251, 191, 36, 0.35)"
         type="button"
         aria-label="Toggle color theme"
@@ -390,7 +445,7 @@
       </button>
       <button
         id="educatorAccessBtn"
-        class="crayon-btn fixed right-3 top-3 z-40 px-3 py-2 text-xs font-header font-semibold tracking-wide text-sky-100"
+        class="crayon-btn fixed right-3 top-3 z-40 max-w-[46vw] px-2 py-2 text-xs font-header font-semibold tracking-wide text-sky-100 sm:max-w-none sm:px-3"
         style="--button-color: rgba(56, 189, 248, 0.28)"
       >
         <span class="inline-flex items-center gap-2">
@@ -468,8 +523,8 @@
           </div>
         </header>
 
-        <div class="grid min-h-0 flex-1 gap-3 lg:grid-cols-[250px_1fr_330px]">
-          <aside class="chalk-card min-h-0 p-3">
+        <div class="grid min-h-0 flex-1 gap-3 md:grid-cols-2 lg:grid-cols-[250px_1fr_330px]">
+          <aside class="chalk-card order-2 min-h-0 p-3 md:order-none">
             <h3 class="font-header text-xl text-sky-200">Game Modes</h3>
             <div id="modeButtons" class="mt-2 grid gap-2 text-sm"></div>
 
@@ -490,7 +545,7 @@
             </div>
           </aside>
 
-          <section id="challengePanel" class="chalk-card min-h-0 p-3">
+          <section id="challengePanel" class="chalk-card order-1 min-h-0 p-3 md:order-none">
             <div class="flex h-full flex-col">
               <p class="text-center text-sm uppercase tracking-wide text-slate-200">Current Challenge</p>
               <div id="equationPrompt" class="mt-1 text-center font-header text-4xl text-yellow-100 sm:text-5xl"></div>
@@ -512,16 +567,16 @@
             </div>
           </section>
 
-          <aside class="chalk-card flex min-h-0 flex-col p-3">
+          <aside class="chalk-card order-3 flex min-h-0 flex-col p-3 md:order-none">
             <p class="text-center text-sm uppercase tracking-wide text-slate-200">Crayon Number Pad</p>
-            <div id="numberPad" class="mt-2 grid min-h-0 flex-1 grid-cols-3 gap-2"></div>
+            <div id="numberPad" class="mt-2 grid min-h-[220px] grid-cols-3 gap-2 sm:min-h-0 sm:flex-1"></div>
           </aside>
         </div>
       </section>
     </main>
 
     <div id="scaffoldModal" class="fixed inset-0 z-40 hidden items-center justify-center bg-black/50 px-3" role="dialog" aria-modal="true" aria-labelledby="scaffoldTitle">
-      <div class="chalk-card w-full max-w-lg p-4">
+      <div class="scaffold-panel chalk-card w-full max-w-lg p-4">
         <h3 class="font-header text-2xl text-emerald-200">Support Window</h3>
         <p id="scaffoldTitle" class="mt-1 text-lg text-sky-100"></p>
         <div id="scaffoldBody" class="mt-2 space-y-1 text-base text-slate-100"></div>
@@ -536,7 +591,7 @@
     </div>
 
     <div id="pinModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 px-3" role="dialog" aria-modal="true" aria-labelledby="pinDisplay">
-      <div class="chalk-card w-full max-w-sm p-4">
+      <div class="pin-panel chalk-card w-full max-w-sm p-4">
         <h3 class="font-header text-center text-2xl text-sky-200">Educator PIN</h3>
         <p id="pinDisplay" class="mt-2 text-center font-header text-3xl tracking-[0.5em] text-yellow-100">----</p>
         <p id="pinHint" class="mt-2 text-center text-sm text-slate-200">Enter 4 digits.</p>
@@ -555,19 +610,20 @@
       <div id="projectorPanel" class="projector-panel h-full w-full bg-gradient-to-b from-slate-100 via-slate-50 to-slate-200"></div>
     </div>
 
-    <section id="adminPanel" class="fixed inset-0 z-[70] hidden bg-black/75 p-3" role="dialog" aria-modal="true" aria-labelledby="adminDashboardTitle">
-      <div class="chalk-card flex h-full flex-col p-3">
-        <header class="flex flex-wrap items-center justify-between gap-2">
-          <h2 id="adminDashboardTitle" class="font-header text-3xl text-slate-50">Administrator Dashboard</h2>
-          <div class="flex gap-2">
+    <section id="adminPanel" class="fixed inset-0 z-[70] hidden overflow-hidden bg-black/75 p-2 sm:p-3" role="dialog" aria-modal="true" aria-labelledby="adminDashboardTitle">
+      <div class="admin-panel-shell chalk-card flex min-h-0 flex-col overflow-hidden p-2 sm:p-3">
+        <header class="shrink-0 flex flex-wrap items-center justify-between gap-2 border-b border-white/15 pb-2">
+          <h2 id="adminDashboardTitle" class="font-header text-2xl text-slate-50 sm:text-3xl">Administrator Dashboard</h2>
+          <div class="admin-action-row flex flex-wrap gap-2">
             <button id="adminCopyJson" class="crayon-btn px-3 py-2 text-sm text-sky-100" style="--button-color: rgba(14, 165, 233, 0.28)">Copy JSON</button>
             <button id="adminCopyCsv" class="crayon-btn px-3 py-2 text-sm text-emerald-100" style="--button-color: rgba(16, 185, 129, 0.28)">Copy CSV</button>
             <button id="adminCloseBtn" class="crayon-btn px-3 py-2 text-sm text-slate-100" style="--button-color: rgba(148, 163, 184, 0.28)">Close</button>
           </div>
         </header>
 
-        <div class="mt-2 grid min-h-0 flex-1 gap-3 lg:grid-cols-[260px_1fr] xl:grid-cols-[260px_1fr_320px]">
-          <aside class="chalk-card min-h-0 p-3">
+        <div class="admin-panel-body scroll-lite mt-2 min-h-0 flex-1 pr-1">
+        <div class="grid gap-3 lg:grid-cols-[260px_1fr] xl:grid-cols-[260px_1fr_320px]">
+          <aside class="chalk-card min-h-0 p-3 xl:sticky xl:top-0">
             <h3 class="font-header text-xl text-sky-200">Learners</h3>
             <select id="adminProfileSelect" class="chalk-input mt-2 w-full px-2 py-2 text-lg"></select>
             <div id="adminStatsCards" class="mt-3 grid gap-2"></div>
@@ -626,7 +682,7 @@
               <button id="clearPresetAssignmentBtn" class="crayon-btn px-3 py-2 text-sm text-rose-100" style="--button-color: rgba(244, 63, 94, 0.28)">Clear Assignment</button>
             </div>
             <p id="presetBuilderHint" class="mt-2 text-xs text-slate-200"></p>
-            <div class="scroll-lite mt-3 max-h-44 overflow-auto pr-1">
+            <div class="scroll-lite mt-3 max-h-none overflow-visible pr-1 sm:max-h-44 sm:overflow-auto">
               <ul id="presetList" class="space-y-2 text-xs text-slate-100"></ul>
             </div>
           </section>
@@ -637,7 +693,7 @@
             </div>
             <div class="chalk-card min-h-0 p-3">
               <h3 class="font-header text-xl text-pink-200">Attempt Log</h3>
-              <div class="scroll-lite mt-2 max-h-[55vh] overflow-auto pr-1">
+              <div class="scroll-lite mt-2 overflow-x-auto pr-1">
                 <table class="w-full text-left text-xs text-slate-100">
                   <thead>
                     <tr class="border-b border-white/20">
@@ -655,6 +711,7 @@
               </div>
             </div>
           </section>
+        </div>
         </div>
       </div>
     </section>
@@ -2402,6 +2459,8 @@
             updatePresetPreview();
             renderPresetList();
             updateAdminPanel(state.data.activeProfileId);
+            const adminBody = document.querySelector("#adminPanel .admin-panel-body");
+            if (adminBody) adminBody.scrollTop = 0;
           }, 540);
         }
 
