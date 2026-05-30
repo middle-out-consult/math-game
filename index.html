@@ -514,7 +514,7 @@
               </select>
             </label>
             <div id="manualSetFields">
-              <label>Equations<textarea id="manualEquations" placeholder="6x7, 7x8, 12x7"></textarea></label>
+              <label>Equations<textarea id="manualEquations" placeholder="6x7, 7x8"></textarea></label>
             </div>
             <div id="generatorSetFields" class="grid grid-3 hidden">
               <label>Operation<select id="setOperation"></select></label>
@@ -1135,9 +1135,9 @@
         const style = profile?.supportStyle || "deconstructive";
         const q = state.question;
         const messages = {
-          deconstructive: `Pause and split it: solve the left side first, write that mini-answer in your head, then finish ${escapeHtml(q.prompt)} one step at a time.`,
-          visual: `Picture the numbers as chalk groups. Circle equal groups, pair leftovers, and compare the shape to ${escapeHtml(q.prompt)} before answering.`,
-          narrative: `Turn it into a quick story: a crayon crew has ${escapeHtml(q.prompt)} supplies. What final count belongs in their box?`,
+          deconstructive: `Break ${escapeHtml(q.prompt)} into one small step, check that mini-answer, then finish.`,
+          visual: `Picture chalk groups, circle equal sets, then count what the groups make.`,
+          narrative: `Make it a crayon story: what final count belongs in the supply box?`,
         };
         ui.scaffoldBox.innerHTML = `<strong>Coach Chalk says:</strong><br>${messages[style]}`;
         ui.scaffoldBox.classList.remove("hidden");
