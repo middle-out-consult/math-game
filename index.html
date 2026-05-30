@@ -298,6 +298,7 @@
           <div class="text-center">
             <h2 id="modeTitle" class="font-header text-3xl text-sky-200"></h2>
             <p id="modeSubtitle" class="text-sm text-slate-200"></p>
+            <p id="activePresetBadge" class="mt-1 text-xs font-header text-amber-200"></p>
           </div>
           <div class="grid grid-cols-3 gap-2 text-center text-sm">
             <div class="rounded-xl border border-white/20 bg-white/10 px-2 py-2">
@@ -413,7 +414,7 @@
           </div>
         </header>
 
-        <div class="mt-2 grid min-h-0 flex-1 gap-3 lg:grid-cols-[260px_1fr]">
+        <div class="mt-2 grid min-h-0 flex-1 gap-3 lg:grid-cols-[260px_1fr] xl:grid-cols-[260px_1fr_320px]">
           <aside class="chalk-card min-h-0 p-3">
             <h3 class="font-header text-xl text-sky-200">Learners</h3>
             <select id="adminProfileSelect" class="chalk-input mt-2 w-full px-2 py-2 text-lg"></select>
@@ -422,7 +423,61 @@
               <p class="font-header text-lg text-yellow-100">Pedagogical Profile Summary</p>
               <p id="pedagogicalSummary" class="mt-1 text-slate-100"></p>
             </div>
+            <div class="mt-3 rounded-xl border border-white/20 bg-white/10 p-2 text-sm">
+              <p class="font-header text-lg text-emerald-200">Assigned Practice Set</p>
+              <p id="assignedPresetSummary" class="mt-1 text-xs text-slate-100">No custom set for selected learner.</p>
+            </div>
           </aside>
+          <section class="chalk-card min-h-0 overflow-auto p-3 lg:col-span-1 xl:col-span-1">
+            <h3 class="font-header text-xl text-amber-200">Practice Set Builder</h3>
+            <p class="mt-1 text-xs text-slate-200">Create focused drills (e.g. multiply by 3 up to 3×12) and assign them to learners.</p>
+            <div class="mt-2 grid gap-2 sm:grid-cols-2">
+              <div>
+                <label class="text-xs text-slate-200">Set Name</label>
+                <input id="presetNameInput" class="chalk-input mt-1 w-full px-2 py-1 text-base" placeholder="Times Table x3" />
+              </div>
+              <div>
+                <label class="text-xs text-slate-200">Game Mode</label>
+                <select id="presetModeSelect" class="chalk-input mt-1 w-full px-2 py-1 text-base">
+                  <option value="multiplication">Multiplication</option>
+                  <option value="addition">Addition</option>
+                  <option value="subtraction">Subtraction</option>
+                  <option value="division">Division</option>
+                  <option value="pattern">Pattern</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs text-slate-200">Focus Number (0 = none)</label>
+                <input id="presetFocusInput" type="number" min="0" max="999" value="3" class="chalk-input mt-1 w-full px-2 py-1 text-base" />
+              </div>
+              <div>
+                <label class="text-xs text-slate-200">Other Operand Min</label>
+                <input id="presetOtherMinInput" type="number" min="0" max="999" value="1" class="chalk-input mt-1 w-full px-2 py-1 text-base" />
+              </div>
+              <div>
+                <label class="text-xs text-slate-200">Other Operand Max</label>
+                <input id="presetOtherMaxInput" type="number" min="0" max="999" value="12" class="chalk-input mt-1 w-full px-2 py-1 text-base" />
+              </div>
+              <div>
+                <label class="text-xs text-slate-200">Max Answer Cap (0 = none)</label>
+                <input id="presetAnswerCapInput" type="number" min="0" max="99999" value="0" class="chalk-input mt-1 w-full px-2 py-1 text-base" />
+              </div>
+            </div>
+            <label class="mt-2 inline-flex items-center gap-2 text-xs text-slate-200">
+              <input id="presetShuffleOrder" type="checkbox" class="h-4 w-4" checked />
+              Shuffle operand order (3×7 and 7×3)
+            </label>
+            <p id="presetPreview" class="mt-2 rounded-lg border border-white/20 bg-white/10 px-2 py-1 text-xs text-yellow-100">Preview: 3 × 7 = ?</p>
+            <div class="mt-2 flex flex-wrap gap-2">
+              <button id="savePresetBtn" class="crayon-btn px-3 py-2 text-sm text-emerald-100" style="--button-color: rgba(16, 185, 129, 0.28)">Save Set</button>
+              <button id="assignPresetBtn" class="crayon-btn px-3 py-2 text-sm text-sky-100" style="--button-color: rgba(14, 165, 233, 0.28)">Assign to Learner</button>
+              <button id="clearPresetAssignmentBtn" class="crayon-btn px-3 py-2 text-sm text-rose-100" style="--button-color: rgba(244, 63, 94, 0.28)">Clear Assignment</button>
+            </div>
+            <p id="presetBuilderHint" class="mt-2 text-xs text-slate-200"></p>
+            <div class="scroll-lite mt-3 max-h-44 overflow-auto pr-1">
+              <ul id="presetList" class="space-y-2 text-xs text-slate-100"></ul>
+            </div>
+          </section>
           <section class="grid min-h-0 gap-3 xl:grid-cols-[1fr_1fr]">
             <div class="chalk-card min-h-0 p-3">
               <h3 class="font-header text-xl text-emerald-200">Trend Snapshot</h3>
@@ -525,6 +580,21 @@
           easterDigit6: document.getElementById("easterDigit6"),
           easterDigit7: document.getElementById("easterDigit7"),
           easterText: document.getElementById("easterText"),
+          activePresetBadge: document.getElementById("activePresetBadge"),
+          assignedPresetSummary: document.getElementById("assignedPresetSummary"),
+          presetNameInput: document.getElementById("presetNameInput"),
+          presetModeSelect: document.getElementById("presetModeSelect"),
+          presetFocusInput: document.getElementById("presetFocusInput"),
+          presetOtherMinInput: document.getElementById("presetOtherMinInput"),
+          presetOtherMaxInput: document.getElementById("presetOtherMaxInput"),
+          presetAnswerCapInput: document.getElementById("presetAnswerCapInput"),
+          presetShuffleOrder: document.getElementById("presetShuffleOrder"),
+          presetPreview: document.getElementById("presetPreview"),
+          savePresetBtn: document.getElementById("savePresetBtn"),
+          assignPresetBtn: document.getElementById("assignPresetBtn"),
+          clearPresetAssignmentBtn: document.getElementById("clearPresetAssignmentBtn"),
+          presetBuilderHint: document.getElementById("presetBuilderHint"),
+          presetList: document.getElementById("presetList"),
         };
 
         const state = {
@@ -550,13 +620,14 @@
         function safeReadStorage() {
           try {
             const raw = localStorage.getItem(STORAGE_KEY);
-            if (!raw) return { profiles: {}, activeProfileId: null };
+            if (!raw) return { profiles: {}, activeProfileId: null, practicePresets: {} };
             const parsed = JSON.parse(raw);
-            if (!parsed || typeof parsed !== "object") return { profiles: {}, activeProfileId: null };
+            if (!parsed || typeof parsed !== "object") return { profiles: {}, activeProfileId: null, practicePresets: {} };
             const profiles = parsed.profiles && typeof parsed.profiles === "object" ? parsed.profiles : {};
-            return { profiles, activeProfileId: parsed.activeProfileId || null };
+            const practicePresets = parsed.practicePresets && typeof parsed.practicePresets === "object" ? parsed.practicePresets : {};
+            return { profiles, activeProfileId: parsed.activeProfileId || null, practicePresets };
           } catch {
-            return { profiles: {}, activeProfileId: null };
+            return { profiles: {}, activeProfileId: null, practicePresets: {} };
           }
         }
 
@@ -591,12 +662,316 @@
             logs: [],
             logArchive: { totalArchived: 0, byMode: modeCountsTemplate(0), byError: {} },
             adaptationLog: [],
+            presetByMode: modeCountsTemplate(null),
           };
         }
 
         function getActiveProfile() {
           return state.data.profiles[state.data.activeProfileId] || null;
         }
+
+        function ensureProfileShape(profile) {
+          if (!profile.presetByMode) profile.presetByMode = modeCountsTemplate(null);
+          if (!profile.logArchive) profile.logArchive = { totalArchived: 0, byMode: modeCountsTemplate(0), byError: {} };
+          return profile;
+        }
+
+        function ensureStorageShape() {
+          if (!state.data.practicePresets || typeof state.data.practicePresets !== "object") {
+            state.data.practicePresets = {};
+          }
+          Object.values(state.data.profiles).forEach((profile) => ensureProfileShape(profile));
+        }
+
+        function buildPresetConfigFromForm() {
+          const mode = ui.presetModeSelect.value;
+          const focus = Math.max(0, Number(ui.presetFocusInput.value) || 0);
+          const otherMin = Math.max(0, Number(ui.presetOtherMinInput.value) || 0);
+          const otherMax = Math.max(otherMin, Number(ui.presetOtherMaxInput.value) || otherMin);
+          const answerCap = Math.max(0, Number(ui.presetAnswerCapInput.value) || 0);
+          return {
+            focus,
+            otherMin,
+            otherMax,
+            answerCap,
+            shuffleOrder: ui.presetShuffleOrder.checked,
+            termCount: 2,
+          };
+        }
+
+        function presetPreviewText(mode, config) {
+          const focus = config.focus;
+          const partner = Math.min(config.otherMax, Math.max(config.otherMin, config.otherMin));
+          if (mode === "multiplication" && focus > 0) {
+            const sample = config.shuffleOrder ? `${focus} × ${partner} or ${partner} × ${focus}` : `${focus} × ${partner}`;
+            return `Preview: ${sample} = ?`;
+          }
+          if (mode === "addition" && focus > 0) {
+            return `Preview: ${focus} + ${partner} = ?`;
+          }
+          if (mode === "subtraction" && focus > 0) {
+            const minuend = focus + partner;
+            return `Preview: ${minuend} - ${focus} = ?`;
+          }
+          if (mode === "division" && focus > 0) {
+            const dividend = focus * partner;
+            return `Preview: ${dividend} ÷ ${focus} = ?`;
+          }
+          if (mode === "pattern") {
+            return `Preview: ${partner}, ${partner + 2}, ${partner + 4}, ...`;
+          }
+          return `Preview: random ${MODE_LABEL[mode]} within ${config.otherMin}-${config.otherMax}`;
+        }
+
+        function createPracticePreset(name, mode, config) {
+          const id = `preset_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+          return {
+            id,
+            name: name.trim(),
+            mode,
+            config,
+            createdAt: new Date().toISOString(),
+          };
+        }
+
+        function getPresetById(id) {
+          return state.data.practicePresets[id] || null;
+        }
+
+        function getAssignedPreset(profile, mode) {
+          const presetId = profile?.presetByMode?.[mode];
+          if (!presetId) return null;
+          const preset = getPresetById(presetId);
+          if (!preset || preset.mode !== mode) return null;
+          return preset;
+        }
+
+        function describePreset(preset) {
+          if (!preset) return "None";
+          const c = preset.config;
+          if (preset.mode === "multiplication" && c.focus > 0) {
+            return `${preset.name}: ×${c.focus} with partners ${c.otherMin}-${c.otherMax}`;
+          }
+          if (c.focus > 0) {
+            return `${preset.name}: focus ${c.focus}, range ${c.otherMin}-${c.otherMax}`;
+          }
+          return `${preset.name}: ${MODE_LABEL[preset.mode]} range ${c.otherMin}-${c.otherMax}`;
+        }
+
+        function renderPresetList() {
+          const presets = Object.values(state.data.practicePresets).sort((a, b) => a.name.localeCompare(b.name));
+          if (!presets.length) {
+            ui.presetList.innerHTML = "<li>No saved practice sets yet.</li>";
+            return;
+          }
+          ui.presetList.innerHTML = presets
+            .map((preset) => {
+              const selected = state.selectedPresetId === preset.id ? "ring-2 ring-sky-300" : "";
+              return `<li class="rounded-lg border border-white/20 bg-white/10 p-2 ${selected}">
+                <button data-preset-id="${preset.id}" class="preset-select-btn w-full text-left">
+                  <p class="font-header text-sm text-sky-100">${preset.name}</p>
+                  <p class="text-[11px] text-slate-200">${describePreset(preset)}</p>
+                </button>
+                <div class="mt-1 flex gap-1">
+                  <button data-preset-edit="${preset.id}" class="crayon-btn px-2 py-1 text-[11px] text-amber-100" style="--button-color: rgba(245, 158, 11, 0.25)">Edit</button>
+                  <button data-preset-delete="${preset.id}" class="crayon-btn px-2 py-1 text-[11px] text-rose-100" style="--button-color: rgba(244, 63, 94, 0.25)">Delete</button>
+                </div>
+              </li>`;
+            })
+            .join("");
+
+          ui.presetList.querySelectorAll(".preset-select-btn").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              state.selectedPresetId = btn.dataset.presetId;
+              renderPresetList();
+            });
+          });
+          ui.presetList.querySelectorAll("[data-preset-edit]").forEach((btn) => {
+            btn.addEventListener("click", () => loadPresetIntoForm(btn.dataset.presetEdit));
+          });
+          ui.presetList.querySelectorAll("[data-preset-delete]").forEach((btn) => {
+            btn.addEventListener("click", () => deletePracticePreset(btn.dataset.presetDelete));
+          });
+        }
+
+        function loadPresetIntoForm(presetId) {
+          const preset = getPresetById(presetId);
+          if (!preset) return;
+          state.editingPresetId = preset.id;
+          state.selectedPresetId = preset.id;
+          ui.presetNameInput.value = preset.name;
+          ui.presetModeSelect.value = preset.mode;
+          ui.presetFocusInput.value = String(preset.config.focus || 0);
+          ui.presetOtherMinInput.value = String(preset.config.otherMin || 1);
+          ui.presetOtherMaxInput.value = String(preset.config.otherMax || 12);
+          ui.presetAnswerCapInput.value = String(preset.config.answerCap || 0);
+          ui.presetShuffleOrder.checked = !!preset.config.shuffleOrder;
+          updatePresetPreview();
+          renderPresetList();
+          ui.presetBuilderHint.textContent = `Editing "${preset.name}". Save to update.`;
+        }
+
+        function updatePresetPreview() {
+          const mode = ui.presetModeSelect.value;
+          const config = buildPresetConfigFromForm();
+          ui.presetPreview.textContent = presetPreviewText(mode, config);
+        }
+
+        function savePracticePresetFromForm() {
+          const name = ui.presetNameInput.value.trim();
+          if (!name) {
+            ui.presetBuilderHint.textContent = "Enter a practice set name.";
+            return;
+          }
+          const mode = ui.presetModeSelect.value;
+          const config = buildPresetConfigFromForm();
+          if (config.otherMax < config.otherMin) {
+            ui.presetBuilderHint.textContent = "Other operand max must be >= min.";
+            return;
+          }
+          let preset;
+          if (state.editingPresetId && state.data.practicePresets[state.editingPresetId]) {
+            preset = state.data.practicePresets[state.editingPresetId];
+            preset.name = name;
+            preset.mode = mode;
+            preset.config = config;
+            preset.updatedAt = new Date().toISOString();
+          } else {
+            preset = createPracticePreset(name, mode, config);
+            state.data.practicePresets[preset.id] = preset;
+          }
+          state.selectedPresetId = preset.id;
+          state.editingPresetId = null;
+          safeWriteStorage();
+          renderPresetList();
+          updateAdminPanel(ui.adminProfileSelect.value);
+          ui.presetBuilderHint.textContent = `Saved practice set "${preset.name}".`;
+        }
+
+        function deletePracticePreset(presetId) {
+          const preset = getPresetById(presetId);
+          if (!preset) return;
+          delete state.data.practicePresets[presetId];
+          Object.values(state.data.profiles).forEach((profile) => {
+            MODES.forEach((mode) => {
+              if (profile.presetByMode[mode] === presetId) profile.presetByMode[mode] = null;
+            });
+          });
+          if (state.selectedPresetId === presetId) state.selectedPresetId = null;
+          if (state.editingPresetId === presetId) state.editingPresetId = null;
+          safeWriteStorage();
+          renderPresetList();
+          updateAdminPanel(ui.adminProfileSelect.value);
+          refreshGameChrome();
+          ui.presetBuilderHint.textContent = `Deleted "${preset.name}".`;
+        }
+
+        function assignSelectedPresetToLearner() {
+          const profileId = ui.adminProfileSelect.value;
+          const profile = state.data.profiles[profileId];
+          const presetId = state.selectedPresetId;
+          const preset = getPresetById(presetId);
+          if (!profile || !preset) {
+            ui.presetBuilderHint.textContent = "Select a learner and a saved practice set first.";
+            return;
+          }
+          profile.presetByMode[preset.mode] = preset.id;
+          state.data.activeProfileId = profile.id;
+          state.activeMode = preset.mode;
+          safeWriteStorage();
+          updateAdminPanel(profileId);
+          if (!ui.gameView.classList.contains("hidden")) {
+            renderModeButtons();
+            refreshGameChrome();
+            generateChallenge();
+          }
+          ui.presetBuilderHint.textContent = `Assigned "${preset.name}" to ${profile.name} for ${MODE_LABEL[preset.mode]}.`;
+        }
+
+        function clearPresetAssignmentForLearner() {
+          const profileId = ui.adminProfileSelect.value;
+          const profile = state.data.profiles[profileId];
+          if (!profile) return;
+          const mode = ui.presetModeSelect.value;
+          profile.presetByMode[mode] = null;
+          safeWriteStorage();
+          updateAdminPanel(profileId);
+          refreshGameChrome();
+          generateChallenge();
+          ui.presetBuilderHint.textContent = `Cleared custom set for ${profile.name} in ${MODE_LABEL[mode]}.`;
+        }
+
+        function generateChallengeFromPreset(preset) {
+          const mode = preset.mode;
+          const c = preset.config;
+          const op = MODE_SYMBOL[mode];
+          const partner = Math.floor(Math.random() * (c.otherMax - c.otherMin + 1)) + c.otherMin;
+          let terms = [];
+          let answer = 0;
+          let prompt = "";
+
+          if (mode === "multiplication") {
+            const a = c.focus > 0 ? c.focus : partner;
+            const b = c.focus > 0 ? partner : Math.floor(Math.random() * (c.otherMax - c.otherMin + 1)) + c.otherMin;
+            terms = c.shuffleOrder && Math.random() > 0.5 ? [b, a] : [a, b];
+            answer = terms[0] * terms[1];
+            prompt = `${terms.join(" × ")} = ?`;
+          } else if (mode === "addition") {
+            const a = c.focus > 0 ? c.focus : partner;
+            const b = c.focus > 0 ? partner : Math.floor(Math.random() * (c.otherMax - c.otherMin + 1)) + c.otherMin;
+            terms = c.shuffleOrder && Math.random() > 0.5 ? [b, a] : [a, b];
+            answer = terms[0] + terms[1];
+            prompt = `${terms.join(" + ")} = ?`;
+          } else if (mode === "subtraction") {
+            const sub = c.focus > 0 ? c.focus : partner;
+            const minuend = sub + Math.floor(Math.random() * (c.otherMax - c.otherMin + 1)) + c.otherMin;
+            terms = [minuend, sub];
+            answer = minuend - sub;
+            prompt = `${terms.join(" - ")} = ?`;
+          } else if (mode === "division") {
+            const divisor = c.focus > 0 ? c.focus : partner;
+            const quotient = Math.floor(Math.random() * (c.otherMax - c.otherMin + 1)) + c.otherMin;
+            const dividend = divisor * quotient;
+            terms = [dividend, divisor];
+            answer = quotient;
+            prompt = `${dividend} ÷ ${divisor} = ?`;
+          } else {
+            const start = Math.floor(Math.random() * (c.otherMax - c.otherMin + 1)) + c.otherMin;
+            const step = c.focus > 0 ? c.focus : 2;
+            const seq = [start, start + step, start + step * 2, start + step * 3, start + step * 4];
+            answer = start + step * 5;
+            return {
+              kind: "pattern",
+              mode: "pattern",
+              tier: currentTier(getActiveProfile()),
+              patternType: "custom",
+              sequence: seq,
+              prompt: `${seq.join(", ")}, ...`,
+              answer,
+              signature: normalizeSignature("pattern", "custom", seq, `p${answer}`),
+              presetId: preset.id,
+            };
+          }
+
+          if (c.answerCap > 0 && Math.abs(answer) > c.answerCap) {
+            return null;
+          }
+
+          const signature = normalizeSignature(mode, op, terms, `preset:${preset.id}`);
+          return {
+            kind: "math",
+            mode,
+            tier: currentTier(getActiveProfile()),
+            op,
+            terms,
+            prompt,
+            answer,
+            signature,
+            presetId: preset.id,
+          };
+        }
+
+
 
         function levelXpNeeded(level) {
           return 90 + (level - 1) * 45;
@@ -880,11 +1255,21 @@
           ui.tierSlider.value = String(tier);
           updateTierVisuals(tier);
           ui.tierExamples.innerHTML = "";
-          tierExamples(state.activeMode, tier).forEach((example) => {
+          const assignedPreset = getAssignedPreset(profile, state.activeMode);
+          if (assignedPreset) {
             const li = document.createElement("li");
-            li.textContent = example;
+            li.textContent = describePreset(assignedPreset);
             ui.tierExamples.appendChild(li);
-          });
+            const li2 = document.createElement("li");
+            li2.textContent = presetPreviewText(assignedPreset.mode, assignedPreset.config);
+            ui.tierExamples.appendChild(li2);
+          } else {
+            tierExamples(state.activeMode, tier).forEach((example) => {
+              const li = document.createElement("li");
+              li.textContent = example;
+              ui.tierExamples.appendChild(li);
+            });
+          }
           updateAdaptationTimeline(profile);
         }
 
@@ -929,7 +1314,7 @@
             ui.profileGateHint.textContent = "That learner already exists. Pick a unique name.";
             return;
           }
-          const profile = createProfile(name, ui.supportPreference.value);
+          const profile = ensureProfileShape(createProfile(name, ui.supportPreference.value));
           state.data.profiles[profile.id] = profile;
           state.data.activeProfileId = profile.id;
           safeWriteStorage();
@@ -962,6 +1347,8 @@
           ui.activeProfilePill.textContent = `${profile.name} • support ${profile.supportStyle}`;
           ui.modeTitle.textContent = `${MODE_LABEL[state.activeMode]} Odyssey`;
           ui.modeSubtitle.textContent = modeSubtitle(state.activeMode);
+          const assigned = getAssignedPreset(profile, state.activeMode);
+          ui.activePresetBadge.textContent = assigned ? `Custom Set: ${describePreset(assigned)}` : "";
           updateTierPanel(profile);
           updateStatsHeader(profile);
         }
@@ -1190,7 +1577,22 @@
           state.inputKeystrokes = [];
           ui.answerDisplay.textContent = "—";
           ui.feedbackThread.innerHTML = "";
-          let challenge = state.activeMode === "pattern" ? generatePatternChallenge(tier) : generateMathChallenge(state.activeMode, tier);
+          const assignedPreset = getAssignedPreset(profile, state.activeMode);
+          let challenge = null;
+          if (assignedPreset) {
+            for (let attempt = 0; attempt < 80; attempt += 1) {
+              const candidate = generateChallengeFromPreset(assignedPreset);
+              if (!candidate) continue;
+              if (isRepeatedSignature(state.activeMode, candidate.signature)) continue;
+              rememberSignature(state.activeMode, candidate.signature);
+              challenge = candidate;
+              break;
+            }
+            if (!challenge) challenge = generateChallengeFromPreset(assignedPreset);
+          }
+          if (!challenge) {
+            challenge = state.activeMode === "pattern" ? generatePatternChallenge(tier) : generateMathChallenge(state.activeMode, tier);
+          }
           challenge = maybeApplyDebugEaster(challenge);
           challenge.startedAt = performance.now();
           challenge.wrongCount = 0;
@@ -1525,6 +1927,14 @@
           `;
 
           ui.pedagogicalSummary.textContent = pedagogicalSummary(profile);
+          const assignedEntries = MODES.map((mode) => {
+            const preset = getAssignedPreset(profile, mode);
+            return preset ? `${MODE_LABEL[mode]}: ${preset.name}` : null;
+          }).filter(Boolean);
+          ui.assignedPresetSummary.textContent = assignedEntries.length
+            ? assignedEntries.join(" • ")
+            : "No custom set for selected learner.";
+          renderPresetList();
           ui.adminLogBody.innerHTML = "";
           profile.logs.slice().reverse().forEach((log) => {
             const tr = document.createElement("tr");
@@ -1743,6 +2153,7 @@
             responseMs,
             scaffoldLevel,
             scaffoldStyle,
+            presetId: challenge.presetId || profile.presetByMode[state.activeMode] || null,
           });
 
           state.perfByMode[state.activeMode].push({ correct, responseMs });
@@ -1834,6 +2245,8 @@
           ui.projectorPanel.classList.add("show");
           setTimeout(() => {
             setModalState("admin", true);
+            updatePresetPreview();
+            renderPresetList();
             updateAdminPanel(state.data.activeProfileId);
           }, 540);
         }
@@ -1862,6 +2275,13 @@
           ui.closePinModalBtn.addEventListener("click", closePinModal);
           ui.adminCloseBtn.addEventListener("click", closeAdminPanel);
           ui.adminProfileSelect.addEventListener("change", () => updateAdminPanel(ui.adminProfileSelect.value));
+          ui.savePresetBtn.addEventListener("click", savePracticePresetFromForm);
+          ui.assignPresetBtn.addEventListener("click", assignSelectedPresetToLearner);
+          ui.clearPresetAssignmentBtn.addEventListener("click", clearPresetAssignmentForLearner);
+          [ui.presetModeSelect, ui.presetFocusInput, ui.presetOtherMinInput, ui.presetOtherMaxInput, ui.presetAnswerCapInput, ui.presetShuffleOrder].forEach((el) => {
+            el.addEventListener("input", updatePresetPreview);
+            el.addEventListener("change", updatePresetPreview);
+          });
           ui.adminCopyJson.addEventListener("click", () => copyAdminData(false));
           ui.adminCopyCsv.addEventListener("click", () => copyAdminData(true));
 
@@ -1918,6 +2338,7 @@
           window.addEventListener("resize", syncViewportHeight);
           if (window.visualViewport) window.visualViewport.addEventListener("resize", syncViewportHeight);
           state.data = safeReadStorage();
+          ensureStorageShape();
           buildNumberPad();
           buildPinPad();
           renderModeButtons();
@@ -1926,6 +2347,8 @@
           if (state.data.activeProfileId && state.data.profiles[state.data.activeProfileId]) {
             openGameForActiveProfile();
           }
+          updatePresetPreview();
+          renderPresetList();
           lucide.createIcons();
         }
 
