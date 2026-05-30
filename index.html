@@ -189,6 +189,36 @@
       font-size: 0.76rem;
       color: var(--muted);
     }
+    .minimal-challenge {
+      width: min(920px, 100%);
+      margin: 0 auto;
+    }
+    .student-topbar {
+      padding-bottom: 4px;
+    }
+    .student-topbar .btn,
+    .student-topbar .badge {
+      min-height: 36px;
+      padding: 6px 11px;
+      font-size: 0.92rem;
+    }
+    .challenge-progress {
+      padding: 8px 12px 10px;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 28px 16px 30px 14px / 16px 30px 14px 28px;
+      background: rgba(0,0,0,0.14);
+    }
+    .challenge-progress strong {
+      color: var(--chalk-green);
+      font-family: "Fredoka", ui-rounded, sans-serif;
+    }
+    .challenge-progress p {
+      margin: 2px 0 6px;
+    }
+    .challenge-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(230px, 310px);
+      align-items: center;
+    }
     .equation-wrap {
       min-height: 190px;
       display: grid;
@@ -236,6 +266,20 @@
       color: var(--chalk-blue);
       font-size: clamp(2rem, 7vw, 3.7rem);
       background: rgba(0,0,0,0.16);
+    }
+    .challenge-equation,
+    .challenge-pad {
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+    .challenge-equation::before,
+    .challenge-pad::before {
+      display: none;
+    }
+    .feedback-row {
+      justify-content: center;
+      min-height: 42px;
     }
     .numpad { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .numpad .btn { min-height: 58px; font-family: "Fredoka", sans-serif; font-size: 1.35rem; }
@@ -360,6 +404,7 @@
       body { font-size: 17px; }
       .screen { width: min(100% - 14px, 1180px); padding-top: 8px; }
       .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .challenge-grid { grid-template-columns: 1fr; }
       .pad { padding: 14px; }
       .educator-link { right: 8px; bottom: 8px; }
       .numpad { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -396,49 +441,35 @@
   </main>
 
   <main id="gameScreen" class="screen hidden">
-    <section class="chalk-card pad stack" id="gameShell">
-      <div class="between">
-        <div>
-          <button id="backToProfiles" class="btn" style="--btn: var(--chalk-blue)">Profiles</button>
-          <span id="playerBadge" class="badge"></span>
-        </div>
-        <div class="row">
-          <span id="tierBadge" class="badge">Tier 1 Beginner</span>
-          <button id="resetChainBtn" class="btn hidden" style="--btn: var(--chalk-orange)">Restart Chain</button>
-        </div>
+    <section class="chalk-card pad stack minimal-challenge" id="gameShell">
+      <div class="student-topbar between">
+        <button id="backToProfiles" class="btn" style="--btn: var(--chalk-blue)">Profiles</button>
+        <span id="playerBadge" class="badge"></span>
+        <span id="tierBadge" class="badge hidden">Tier 1 Beginner</span>
+        <button id="resetChainBtn" class="btn hidden" style="--btn: var(--chalk-orange)" type="button">Restart Chain</button>
       </div>
 
-      <div id="chainPanel" class="chalk-card pad stack hidden">
+      <div id="chainPanel" class="challenge-progress stack hidden">
         <div class="between">
           <div>
-            <h2 id="chainTitle" style="color: var(--chalk-green)">Assigned Quest Chain</h2>
-            <p id="chainSubtitle" class="muted"></p>
+            <strong id="chainTitle">Assigned Quest Chain</strong>
+            <p id="chainSubtitle" class="muted tiny"></p>
           </div>
           <span id="chainBlockBadge" class="badge"></span>
         </div>
         <div class="progress-shell"><div id="chainProgress" class="progress-fill"></div></div>
       </div>
 
-      <div id="freePlayPanel" class="chalk-card pad stack">
+      <div id="freePlayPanel" class="challenge-progress stack hidden">
         <div class="between">
-          <h2 style="color: var(--chalk-pink)">Free Practice Studio</h2>
-          <span class="badge">Drag Tier 1-30</span>
+          <strong>Practice Round</strong>
+          <span class="badge">Keep going</span>
         </div>
-        <div class="grid grid-2">
-          <label>Difficulty tier
-            <input id="tierSlider" class="slider" type="range" min="1" max="30" step="1" value="1" list="tierMarks" />
-            <datalist id="tierMarks"></datalist>
-            <div class="tier-track-labels"><span>1</span><span>5</span><span>10</span><span>15</span><span>20</span><span>25</span><span>30</span></div>
-          </label>
-          <div>
-            <p class="muted" id="tierDescription"></p>
-            <div class="row" id="modeButtons"></div>
-          </div>
-        </div>
+        <p class="muted tiny">Your teacher can assign a custom quest chain from Educator Access.</p>
       </div>
 
-      <div class="grid grid-2">
-        <section class="chalk-card pad stack">
+      <div class="grid challenge-grid">
+        <section class="chalk-card pad stack challenge-equation">
           <div class="equation-wrap">
             <div>
               <div id="equation" aria-live="polite"></div>
@@ -448,11 +479,11 @@
           <div id="answerDisplay" class="answer-display" aria-live="polite">?</div>
           <div id="scaffoldBox" class="chalk-card pad hidden"></div>
         </section>
-        <section class="chalk-card pad stack">
+        <section class="chalk-card pad stack challenge-pad">
           <div class="grid numpad" id="numpad"></div>
-          <div class="between">
+          <div class="row feedback-row">
             <span id="feedback" class="badge">Ready for chalk magic.</span>
-            <button id="skipQuestion" class="btn" style="--btn: var(--chalk-red)">Skip</button>
+            <button id="skipQuestion" class="btn hidden" style="--btn: var(--chalk-red)" type="button">Skip</button>
           </div>
         </section>
       </div>
@@ -812,7 +843,6 @@
         document.documentElement.style.setProperty("--accent", info.color);
         document.documentElement.style.setProperty("--accent-2", info.color2);
         ui.tierBadge.textContent = `Tier ${info.tier} ${info.name}`;
-        ui.tierDescription.textContent = `${info.desc}; max operand ${info.maxOperand}${info.negatives ? "; negatives can appear" : ""}.`;
         ui.gameShell.classList.toggle("neon-boss", info.tier === 30);
       }
       function randomInt(min, max) {
@@ -960,7 +990,7 @@
         state.chain = { blocks, blockIndex: 0, completed: 0, total: blocks.reduce((sum, block) => sum + block.questions.length, 0) };
         ui.freePlayPanel.classList.add("hidden");
         ui.chainPanel.classList.remove("hidden");
-        ui.resetChainBtn.classList.remove("hidden");
+        ui.resetChainBtn.classList.add("hidden");
         updateChainPanel();
         nextQuestion(currentChainQuestion());
       }
@@ -982,7 +1012,7 @@
         const blockWrap = state.chain.blocks[state.chain.blockIndex];
         const blockNumber = state.chain.blockIndex + 1;
         ui.chainTitle.textContent = blockWrap.block.title;
-        ui.chainSubtitle.textContent = message || `Question ${blockWrap.index + 1} of ${blockWrap.questions.length} in this block.`;
+        ui.chainSubtitle.textContent = message || `Question ${blockWrap.index + 1} / ${blockWrap.questions.length}`;
         ui.chainBlockBadge.textContent = `Block ${blockNumber} of ${state.chain.blocks.length}`;
         ui.chainProgress.style.width = `${Math.round((state.chain.completed / state.chain.total) * 100)}%`;
       }
@@ -1021,7 +1051,7 @@
         state.keyTimes = [];
         state.questionStartedAt = performance.now();
         ui.numpad.classList.remove("hidden");
-        ui.skipQuestion.classList.remove("hidden");
+        ui.skipQuestion.classList.add("hidden");
         ui.answerDisplay.textContent = "?";
         ui.feedback.textContent = "Solve it, then tap ✓.";
         ui.scaffoldBox.classList.add("hidden");
@@ -1428,24 +1458,7 @@
           const option1 = new Option(OP_LABEL[op], op);
           ui.setOperation.add(option1);
           ui.blockOperation.add(new Option(OP_LABEL[op], op));
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = `btn mode-btn${op === state.operation ? " active" : ""}`;
-          btn.style.setProperty("--btn", "var(--chalk-orange)");
-          btn.textContent = OP_LABEL[op];
-          btn.addEventListener("click", () => {
-            state.operation = op;
-            document.querySelectorAll(".mode-btn").forEach((node) => node.classList.toggle("active", node === btn));
-            nextQuestion(generateEquation(state.operation, state.tier));
-          });
-          ui.modeButtons.appendChild(btn);
         });
-        for (let i = 1; i <= 30; i++) {
-          const option = document.createElement("option");
-          option.value = i;
-          option.label = `Tier ${i}`;
-          ui.tierMarks.appendChild(option);
-        }
         ["1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "0", "back", "clear", "submit"].forEach((key) => {
           const btn = document.createElement("button");
           btn.type = "button";
@@ -1482,11 +1495,6 @@
           ui.profileScreen.classList.remove("hidden");
           state.chain = null;
           renderProfiles();
-        });
-        ui.tierSlider.addEventListener("input", () => {
-          state.tier = Number(ui.tierSlider.value);
-          setAccent(state.tier);
-          nextQuestion(generateEquation(state.operation, state.tier));
         });
         ui.skipQuestion.addEventListener("click", skipQuestion);
         ui.resetChainBtn.addEventListener("click", () => activeProfile() && startChain(activeProfile()));
